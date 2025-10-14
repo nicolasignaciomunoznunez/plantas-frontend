@@ -1,5 +1,5 @@
-// components/landing/Header.jsx
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -41,7 +41,7 @@ const Header = () => {
               Proyectos
             </a>
             <a 
-              href="/login" 
+              link to="/login" 
               className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
             >
               Iniciar Sesión
