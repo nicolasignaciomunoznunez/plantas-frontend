@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
@@ -40,12 +41,12 @@ const Header = () => {
             <a href="#proyectos" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Proyectos
             </a>
-            <a 
-              link to="/login" 
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
-            >
-              Iniciar Sesión
-            </a>
+         <button 
+  onClick={() => window.location.href = '/#/login'}
+  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+>
+  Iniciar Sesión
+</button>
           </nav>
 
           {/* Mobile Menu Button */}
