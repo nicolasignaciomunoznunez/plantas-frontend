@@ -3,7 +3,7 @@ import { api } from './api';
 export const plantasService = {
   // Obtener todas las plantas
   obtenerPlantas: async (limite = 10, pagina = 1) => {
-    const response = await api.get(`/plantas?limite=${limite}&pagina=${pagina}`);
+    const response = await api.get(`/api/plantas?limite=${limite}&pagina=${pagina}`);
     return response.data;
   },
 
@@ -28,7 +28,7 @@ export const plantasService = {
 
   // Crear nueva planta
   crearPlanta: async (plantaData) => {
-    const response = await api.post('/plantas', plantaData);
+    const response = await api.post('/api/plantas', plantaData);
     return response.data;
   },
 
@@ -38,7 +38,7 @@ export const plantasService = {
       throw new Error('ID de planta no proporcionado');
     }
     
-    const response = await api.put(`/plantas/${id}`, plantaData);
+    const response = await api.put(`/api/plantas/${id}`, plantaData);
     return response.data;
   },
 
@@ -48,7 +48,7 @@ export const plantasService = {
       throw new Error('ID de planta no proporcionado');
     }
     
-    const response = await api.delete(`/plantas/${id}`);
+    const response = await api.delete(`/api/plantas/${id}`);
     return response.data;
   },
 
@@ -58,7 +58,7 @@ export const plantasService = {
       throw new Error('ID de cliente no proporcionado');
     }
     
-    const response = await api.get(`/plantas/cliente/${clienteId}`);
+    const response = await api.get(`/api/plantas/cliente/${clienteId}`);
     return response.data;
   },
 };
