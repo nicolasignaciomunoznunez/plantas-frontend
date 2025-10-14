@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './stores/authStore';
 import { authService } from './services/authService';
@@ -65,7 +65,7 @@ function App() {
   console.log('✅ [APP] Renderizando aplicación - isAuthenticated:', isAuthenticated);
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <Routes>
         {/* ✅ RUTA PÚBLICA PRINCIPAL: Landing Page (siempre accesible) */}
         <Route path="/" element={<LandingPage />} />
@@ -140,7 +140,7 @@ function App() {
           <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
         } />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   );
 }
 
