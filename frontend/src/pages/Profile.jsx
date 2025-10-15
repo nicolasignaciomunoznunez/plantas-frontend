@@ -61,13 +61,13 @@ export default function ProfilePage() {
 
   const actualizarDatosPerfil = async () => {
     try {
-      console.log('🔄 [PROFILE] Actualizando datos del perfil desde servidor...');
+      
       const resultado = await obtenerPerfilActualizado();
       
       if (resultado.success) {
-        console.log('✅ [PROFILE] Datos actualizados:', resultado.usuario);
+       
       } else {
-        console.log('❌ [PROFILE] Error actualizando datos:', resultado.message);
+
       }
     } catch (error) {
       console.error('❌ [PROFILE] Error actualizando perfil:', error);
@@ -77,7 +77,7 @@ export default function ProfilePage() {
   // Llamar esta función cuando se monte el componente
   useEffect(() => {
     if (user && (!user.estaVerificado || !user.creadoEn)) {
-      console.log('🔄 [PROFILE] Datos incompletos, actualizando desde servidor...');
+    
       actualizarDatosPerfil();
     }
   }, [user, obtenerPerfilActualizado]);

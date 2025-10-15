@@ -12,7 +12,7 @@ export const useAuthStore = create(
       isLoading: true,
 
       login: (userData, authToken) => {
-        console.log('🔄 [AUTH STORE] EJECUTANDO LOGIN:', { 
+        console.log('', { 
           userData, 
           tieneRol: !!userData?.rol,
           rol: userData?.rol 
@@ -25,11 +25,11 @@ export const useAuthStore = create(
           isLoading: false 
         });
         
-        console.log('✅ [AUTH STORE] ESTADO DESPUÉS DE LOGIN:', get());
+     
       },
 
       logout: () => {
-        console.log('🔄 [AUTH STORE] EJECUTANDO LOGOUT');
+        console.log('');
         set({ 
           user: null, 
           token: null, 
@@ -39,12 +39,12 @@ export const useAuthStore = create(
       },
 
       setLoading: (loading) => {
-        console.log('🔄 [AUTH STORE] setLoading:', loading);
+        
         set({ isLoading: loading });
       },
 
       updateUser: (userData) => {
-        console.log('🔄 [AUTH STORE] Actualizando usuario:', userData);
+  
         set({ user: { ...get().user, ...userData } });
       },
 
@@ -58,7 +58,7 @@ export const useAuthStore = create(
     actualizarPerfil: async (datosPerfil) => {
         set({ loading: true, error: null });
         try {
-          console.log('🔄 [AUTH STORE] Actualizando perfil...', datosPerfil);
+          
           
           const response = await authService.actualizarPerfil(datosPerfil);
           
@@ -71,7 +71,7 @@ export const useAuthStore = create(
               loading: false 
             });
             
-            console.log('✅ [AUTH STORE] Perfil actualizado:', usuarioActualizado);
+           
             return { 
               success: true, 
               message: response.message,
@@ -104,11 +104,11 @@ export const useAuthStore = create(
   cambiarContraseña: async (datosContraseña) => {
   set({ loading: true, error: null });
   try {
-    console.log('🔄 [AUTH STORE] Cambiando contraseña...', datosContraseña);
+    
     
     const response = await authService.cambiarContraseña(datosContraseña);
     
-    console.log('📨 [AUTH STORE] Respuesta cambiar contraseña:', response);
+    
     
     set({ loading: false, error: null });
     return response;
@@ -134,7 +134,7 @@ export const useAuthStore = create(
    obtenerPerfilActualizado: async () => {
   set({ loading: true, error: null });
   try {
-    console.log('🔄 [AUTH STORE] Obteniendo perfil actualizado...');
+   
     
     const response = await authService.getProfile();
     
@@ -144,7 +144,7 @@ export const useAuthStore = create(
         user: response.usuario, 
         loading: false 
       });
-      console.log('✅ [AUTH STORE] Perfil actualizado desde servidor:', response.usuario);
+    
       return { 
         success: true, 
         usuario: response.usuario 
@@ -176,9 +176,9 @@ export const useAuthStore = create(
     {
       name: 'auth-storage',
       onRehydrateStorage: () => {
-        console.log('🔄 [AUTH STORE] Rehidratando estado...');
+       
         return (state) => {
-          console.log('✅ [AUTH STORE] Estado rehidratado:', state);
+          console.log('', state);
         };
       }
     }

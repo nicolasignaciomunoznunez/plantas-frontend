@@ -18,14 +18,14 @@ export default function PlantaDetalle() {
   const [errorDatos, setErrorDatos] = useState(null);
   const [cargado, setCargado] = useState(false);
 
-  console.log('🔍 [PlantaDetalle] ID extraído:', id);
+  
 
   useEffect(() => {
     if (!id || cargado) return;
 
     const cargarTodo = async () => {
       try {
-        console.log('🔄 Cargando datos de planta...');
+    
         await obtenerPlanta(id);
         await obtenerIncidenciasPlanta(id);
         

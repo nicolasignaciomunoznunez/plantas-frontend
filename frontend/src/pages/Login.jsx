@@ -20,11 +20,10 @@ export default function Login() {
     try {
       const response = await authService.login(email, password);
       
-      console.log('🔐 [LOGIN] Respuesta completa:', response);
+
       
       if (response.success && response.usuario) {
-        console.log('✅ [LOGIN] Usuario recibido:', response.usuario);
-        console.log('✅ [LOGIN] Rol del usuario:', response.usuario.rol);
+      
         
         login(response.usuario, response.token);
         navigate('/dashboard');
@@ -218,7 +217,7 @@ export default function Login() {
           {/* Footer */}
           <div className="mt-8 text-center">
             <p className="text-xs text-gray-500">
-              © 2024 RYV SPA. Sistema de Gestión de Mantenimiento Industrial para Plantas de Agua Potable.
+              © 2025 RYV SPA. Sistema de Gestión de Mantenimiento Industrial para Plantas de Agua Potable.
             </p>
           </div>
         </div>

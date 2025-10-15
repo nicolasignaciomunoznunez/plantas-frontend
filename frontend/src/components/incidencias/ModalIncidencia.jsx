@@ -126,40 +126,40 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm">
       <div 
-        className="bg-white rounded-2xl shadow-xl w-full max-w-2xl transform transition-all duration-300 scale-100"
+        className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-100 mx-2"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Header - RESPONSIVE */}
+        <div className="flex justify-between items-start sm:items-center p-4 sm:p-6 border-b border-gray-100 sticky top-0 bg-white">
+          <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-red-100 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
+            <div className="min-w-0">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                 {esEdicion ? 'Editar Incidencia' : 'Reportar Nueva Incidencia'}
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500 hidden xs:block">
                 {esEdicion ? 'Actualiza la información de la incidencia' : 'Completa los detalles del problema'}
               </p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 flex-shrink-0 ml-2"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        {/* Formulario - RESPONSIVE */}
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Campo Planta */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
@@ -171,7 +171,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
               required
               value={formData.plantId}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base ${
                 errors.plantId 
                   ? 'border-red-300 bg-red-50' 
                   : 'border-gray-300 hover:border-gray-400'
@@ -206,7 +206,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
               required
               value={formData.titulo}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 ${
+              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base ${
                 errors.titulo 
                   ? 'border-red-300 bg-red-50' 
                   : 'border-gray-300 hover:border-gray-400'
@@ -232,15 +232,15 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
               id="descripcion"
               name="descripcion"
               required
-              rows={4}
+              rows={3}
               value={formData.descripcion}
               onChange={handleChange}
-              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none ${
+              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none text-sm sm:text-base ${
                 errors.descripcion 
                   ? 'border-red-300 bg-red-50' 
                   : 'border-gray-300 hover:border-gray-400'
               }`}
-              placeholder="Describe el problema en detalle, incluyendo síntomas, frecuencia y cualquier observación relevante..."
+              placeholder="Describe el problema en detalle..."
             />
             {errors.descripcion && (
               <p className="text-sm text-red-600 flex items-center gap-1">
@@ -261,19 +261,19 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
               <label htmlFor="estado" className="block text-sm font-medium text-gray-700">
                 Estado de la Incidencia
               </label>
-              <div className="flex items-center gap-3">
+              <div className="flex flex-col xs:flex-row xs:items-center gap-2 xs:gap-3">
                 <select
                   id="estado"
                   name="estado"
                   value={formData.estado}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                  className="flex-1 px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 text-sm sm:text-base"
                 >
                   <option value="pendiente">Pendiente</option>
                   <option value="en_progreso">En Progreso</option>
                   <option value="resuelto">Resuelto</option>
                 </select>
-                <span className={`px-3 py-2 rounded-lg text-sm font-medium border ${estados[formData.estado]?.color || estados.pendiente.color}`}>
+                <span className={`px-3 py-2 rounded-lg text-sm font-medium border text-center xs:text-left ${estados[formData.estado]?.color || estados.pendiente.color}`}>
                   {estados[formData.estado]?.label || 'Pendiente'}
                 </span>
               </div>
@@ -284,34 +284,34 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
           )}
 
           {/* Información del usuario */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-6 h-6 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-xs font-semibold">
                   {user?.nombre?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
               </div>
-              <div className="text-sm">
-                <p className="text-gray-900 font-medium">{user?.nombre || 'Usuario'}</p>
+              <div className="text-xs sm:text-sm min-w-0">
+                <p className="text-gray-900 font-medium truncate">{user?.nombre || 'Usuario'}</p>
                 <p className="text-gray-500 capitalize">{user?.rol || 'sin rol'}</p>
               </div>
             </div>
           </div>
 
-          {/* Botones de acción */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+          {/* Botones de acción - RESPONSIVE */}
+          <div className="flex flex-col-reverse xs:flex-row justify-end gap-2 sm:gap-3 pt-4 border-t border-gray-100">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="px-6 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg sm:rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-1 xs:flex-none"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center flex-1 xs:flex-none"
             >
               {loading ? (
                 <>
@@ -319,14 +319,20 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Guardando...
+                  <span className="hidden xs:inline">Guardando...</span>
+                  <span className="xs:hidden">Guardando...</span>
                 </>
               ) : (
                 <>
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  {esEdicion ? 'Actualizar' : 'Reportar'} Incidencia
+                  <span className="hidden xs:inline">
+                    {esEdicion ? 'Actualizar' : 'Reportar'} Incidencia
+                  </span>
+                  <span className="xs:hidden">
+                    {esEdicion ? 'Actualizar' : 'Reportar'}
+                  </span>
                 </>
               )}
             </button>

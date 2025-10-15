@@ -46,13 +46,7 @@ export default function Dashboard() {
     const incidenciasPlanta = incidencias.filter(i => i.plantId === plantaId);
     const mantenimientosPlanta = mantenimientos.filter(m => m.plantId === plantaId);
     const reportesPlanta = reportes?.filter(r => r.plantId === plantaId) || [];
-      console.log(`🔍 DEBUG Reportes - Planta ${plantaId}:`, {
-    todosLosReportes: reportes,
-    reportesFiltrados: reportesPlanta,
-    totalReportes: reportes?.length || 0,
-    reportesDeEstaPlanta: reportesPlanta.length,
-    detallesReportes: reportesPlanta.map(r => ({ id: r.id, plantId: r.plantId, titulo: r.titulo }))
-  });
+
     const incidenciasResueltas = incidenciasPlanta.filter(i => i.estado === 'resuelto').length;
     const mantenimientosPreventivos = mantenimientosPlanta.filter(m => m.tipo === 'preventivo').length;
     const mantenimientosCompletados = mantenimientosPlanta.filter(m => m.estado === 'completado').length;

@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-console.log('🔧 [DEBUG] API_URL:', import.meta.env.VITE_API_URL);
-console.log('🔧 [DEBUG] Full env:', import.meta.env);
+
 // Crear instancia de axios
 export const api = axios.create({
   baseURL: API_URL,
@@ -15,16 +14,16 @@ const obtenerToken = () => {
     const authStorage = localStorage.getItem('auth-storage');
     
     if (!authStorage) {
-      console.log('🔐 [obtenerToken] No hay auth-storage en localStorage');
+    
       return null;
     }
 
     const authState = JSON.parse(authStorage);
-    console.log('🔐 [obtenerToken] Estructura completa:', authState);
+   
     
     // ✅ CORRECCIÓN: Zustand guarda el estado en authState.state
     const token = authState?.state?.token;
-    console.log('🔐 [obtenerToken] Token encontrado:', token);
+  
     
     return token || null;
   } catch (error) {
@@ -40,9 +39,7 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log('🔐 [API Request] Token agregado a:', config.url);
-    } else {
-      console.log('🔐 [API Request] Sin token para:', config.url);
+      
     }
     
     return config;

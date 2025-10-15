@@ -9,7 +9,7 @@ export const plantasService = {
 
   // Obtener planta por ID - VERSIÓN LIMPIA
   obtenerPlanta: async (id) => {
-    console.log('🔍 [PLANTAS SERVICE] Obteniendo planta ID:', id);
+
     
     // Validación básica
     if (!id) {
@@ -18,7 +18,7 @@ export const plantasService = {
     
     try {
       const response = await api.get(`/plantas/${id}`);
-      console.log('✅ [PLANTAS SERVICE] Planta obtenida exitosamente');
+      
       return response.data;
     } catch (error) {
       console.error('❌ [PLANTAS SERVICE] Error al obtener planta:', error);

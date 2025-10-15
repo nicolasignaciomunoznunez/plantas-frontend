@@ -3,12 +3,12 @@ import { api } from './api';
 export const authService = {
   // Login con debug
   login: async (email, password) => {
-    console.log('🔐 [AUTH SERVICE] Enviando login...', { email });
+
     const response = await api.post('/api/auth/iniciar-sesion', {
       email,
       password,
     });
-    console.log('🔐 [AUTH SERVICE] Respuesta login:', response.data);
+
     return response.data;
   },
 
@@ -22,10 +22,9 @@ export const authService = {
     // Verificar autenticación - VERSIÓN MEJORADA
   checkAuth: async () => {
     try {
-      console.log('🔐 [AUTH SERVICE] === INICIANDO checkAuth ===');
+
       const response = await api.get('/api/auth/verificar-autenticacion');
-      console.log('🔐 [AUTH SERVICE] Respuesta checkAuth:', response.data);
-      console.log('🔐 [AUTH SERVICE] === FIN checkAuth ===');
+
       return response.data;
     } catch (error) {
       console.error('❌ [AUTH SERVICE] Error en checkAuth:', error);
@@ -72,17 +71,17 @@ export const authService = {
   },
   // Actualizar perfil
 actualizarPerfil: async (datosPerfil) => {
-  console.log('🔐 [AUTH SERVICE] Actualizando perfil...', datosPerfil);
+
   const response = await api.put('/api/auth/perfil', datosPerfil);
-  console.log('🔐 [AUTH SERVICE] Perfil actualizado:', response.data);
+
   return response.data;
 },
 
 // Cambiar contraseña
 cambiarContraseña: async (datosContraseña) => {
-  console.log('🔐 [AUTH SERVICE] Cambiando contraseña...');
+
   const response = await api.post('/api/auth/cambiar-password', datosContraseña);
-  console.log('🔐 [AUTH SERVICE] Contraseña cambiada:', response.data);
+
   return response.data;
 },
 
