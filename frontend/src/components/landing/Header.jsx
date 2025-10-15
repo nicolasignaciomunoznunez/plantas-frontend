@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
 
   return (
     <header className="fixed top-0 left-0 w-full bg-white shadow-md z-50">
@@ -11,20 +10,20 @@ const Header = () => {
         <div className="flex items-center justify-between py-4">
           {/* Logo más grande */}
           <div className="flex items-center">
-            <a href="/" className="flex items-center">
+            <Link to="/" className="flex items-center">
               {/* Logo normal - más grande */}
               <img 
-                src="public/images/finalogo.jpeg" 
+                src="/images/finalogo.jpeg" 
                 alt="RYV SPA" 
-                className="h-20 w-auto hidden md:block" // Aumentado de h-12 a h-16
+                className="h-20 w-auto hidden md:block"
               />
               {/* Logo sticky para móvil - más grande */}
               <img 
-                src="public/images/finalogotr.png" 
+                src="/images/finalogotr.png" 
                 alt="RYV SPA" 
-                className="h-14 w-auto md:hidden" // Aumentado de h-10 a h-14
+                className="h-14 w-auto md:hidden"
               />
-            </a>
+            </Link>
           </div>
 
           {/* Desktop Menu */}
@@ -41,12 +40,12 @@ const Header = () => {
             <a href="#proyectos" className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
               Proyectos
             </a>
-         <button 
-  onClick={() => window.location.href = '/#/login'}
-  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
->
-  Iniciar Sesión
-</button>
+            <Link 
+              to="/login"
+              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium"
+            >
+              Iniciar Sesión
+            </Link>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -90,13 +89,13 @@ const Header = () => {
               >
                 Proyectos
               </a>
-              <a 
-                href="/login" 
+              <Link 
+                to="/login"
                 className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors duration-200 font-medium text-center mt-2"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 Iniciar Sesión
-              </a>
+              </Link>
             </div>
           </div>
         )}

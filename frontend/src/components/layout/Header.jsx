@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 import { authService } from '../../services/authService';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
   const { user, logout } = useAuthStore();
@@ -54,7 +55,7 @@ export default function Header() {
           {/* Logo optimizado para móvil */}
           <div className="w-12 h-12 sm:w-16 sm:h-16 lg:w-20 lg:h-20 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg lg:rounded-xl flex items-center justify-center shadow-sm flex-shrink-0">
             <img 
-              src="../public/images/finalogo.jpeg" 
+              src="/images/finalogo.jpeg" 
               alt="RYV SPA" 
               className="h-10 sm:h-14 lg:h-20 w-auto object-contain"
             />
@@ -147,19 +148,18 @@ export default function Header() {
                 </div>
 
                 {/* Opciones del menú */}
-                <div className="py-2">
-                  <a
-                    href="/api/dashboard/perfil"
-                    className="flex items-center gap-3 px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-                    onClick={() => setIsDropdownOpen(false)}
-                  >
-                    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    <span className="truncate">Mi Perfil</span>
-                  </a>
-               
-                </div>
+              <div className="py-2">
+  <Link
+    to="/dashboard/perfil"
+    className="flex items-center gap-3 px-3 sm:px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+    onClick={() => setIsDropdownOpen(false)}
+  >
+    <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+    </svg>
+    <span className="truncate">Mi Perfil</span>
+  </Link>
+</div>
 
                 {/* Separador */}
                 <div className="border-t border-gray-100 my-2"></div>
