@@ -14,13 +14,13 @@ const Header = () => {
             <a href="/" className="flex items-center">
               {/* Logo normal - más grande */}
               <img 
-                src="/images/finalogo.jpeg" 
+                src="public/images/finalogo.jpeg" 
                 alt="RYV SPA" 
                 className="h-20 w-auto hidden md:block" // Aumentado de h-12 a h-16
               />
               {/* Logo sticky para móvil - más grande */}
               <img 
-                src="/images/finalogotr.png" 
+                src="public/images/finalogotr.png" 
                 alt="RYV SPA" 
                 className="h-14 w-auto md:hidden" // Aumentado de h-10 a h-14
               />
