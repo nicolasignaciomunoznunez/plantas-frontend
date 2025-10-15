@@ -5,7 +5,7 @@ import BadgeEstado from './BadgeEstado';
 export default function ResumenActividad({ incidencias, mantenimientos }) {
   const [tipoActividad, setTipoActividad] = useState('reciente');
 
-  // ✅ ACTIVIDADES OPTIMIZADAS CON USEMEMO
+  // ✅ ACTIVIDADES OPTIMIZADAS CON USEMEMO - SIN CAMBIOS
   const actividadesOptimizadas = useMemo(() => {
     const mapearActividad = (item, tipo) => {
       const esIncidencia = tipo === 'incidencia';
@@ -51,7 +51,7 @@ export default function ResumenActividad({ incidencias, mantenimientos }) {
       .slice(0, 6);
   }, [incidencias, mantenimientos]);
 
-  // ✅ FILTRADO MEMOIZADO
+  // ✅ FILTRADO MEMOIZADO - SIN CAMBIOS
   const actividadesFiltradas = useMemo(() => {
     if (tipoActividad === 'todas') return actividadesOptimizadas;
     if (tipoActividad === 'incidencias') 
@@ -61,8 +61,7 @@ export default function ResumenActividad({ incidencias, mantenimientos }) {
     return actividadesOptimizadas;
   }, [tipoActividad, actividadesOptimizadas]);
 
-
-  // ✅ FORMATO TIEMPO CORREGIDO (SIN NEGATIVOS)
+  // ✅ FORMATO TIEMPO CORREGIDO (SIN NEGATIVOS) - SIN CAMBIOS
   const formatearTiempo = (fecha) => {
     const ahora = new Date();
     const diffMs = Math.abs(ahora - fecha); // ✅ MATH.ABS PARA EVITAR NEGATIVOS
@@ -87,62 +86,67 @@ export default function ResumenActividad({ incidencias, mantenimientos }) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div className="flex justify-between items-center mb-6">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
+      {/* ✅ HEADER RESPONSIVE */}
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0 mb-4 sm:mb-6">
         <h3 className="text-lg font-semibold text-gray-900">Actividad Reciente</h3>
         
-        {/* ✅ FILTROS MÁS COMPACTOS */}
-        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
+        {/* ✅ FILTROS MÁS COMPACTOS Y RESPONSIVE */}
+        <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 w-full sm:w-auto">
           {['reciente', 'incidencias', 'mantenimientos'].map((tipo) => (
             <button
               key={tipo}
               onClick={() => setTipoActividad(tipo)}
-              className={`px-3 py-1 text-xs rounded-md transition-colors capitalize ${
+              className={`px-2 sm:px-3 py-1 text-xs rounded-md transition-colors capitalize flex-1 sm:flex-none ${
                 tipoActividad === tipo 
                   ? 'bg-white text-blue-600 shadow-sm' 
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
-              {tipo}
+              <span className="hidden xs:inline">{tipo}</span>
+              <span className="xs:hidden">
+                {tipo === 'reciente' ? 'Todo' : 
+                 tipo === 'incidencias' ? 'Inc.' : 'Mant.'}
+              </span>
             </button>
           ))}
         </div>
       </div>
 
-      {/* ✅ LISTA OPTIMIZADA */}
+      {/* ✅ LISTA OPTIMIZADA Y RESPONSIVE */}
       {actividadesFiltradas.length === 0 ? (
-        <div className="text-center py-8">
-          <div className="text-4xl mb-3">📝</div>
-          <p className="text-gray-600">No hay actividad reciente</p>
+        <div className="text-center py-6 sm:py-8">
+          <div className="text-3xl sm:text-4xl mb-2 sm:mb-3">📝</div>
+          <p className="text-gray-600 text-sm sm:text-base">No hay actividad reciente</p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2 sm:space-y-3">
           {actividadesFiltradas.map((actividad) => (
             <div
               key={actividad.id}
-              className="flex items-start gap-3 p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
+              className="flex items-start gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
             >
-              <div className="flex-shrink-0 w-8 h-8 bg-white border border-gray-300 rounded-lg flex items-center justify-center text-sm group-hover:border-blue-400 transition-colors">
+              <div className="flex-shrink-0 w-6 h-6 sm:w-8 sm:h-8 bg-white border border-gray-300 rounded-lg flex items-center justify-center text-xs sm:text-sm group-hover:border-blue-400 transition-colors">
                 {actividad.icono}
               </div>
 
               <div className="flex-1 min-w-0">
-                <div className="flex items-start justify-between mb-1">
+                <div className="flex flex-col xs:flex-row xs:items-start xs:justify-between gap-1 xs:gap-2 mb-1">
                   <h4 className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors line-clamp-1 text-sm">
                     {actividad.titulo}
                   </h4>
-                  <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
                     {formatearTiempo(actividad.fecha)}
                   </span>
                 </div>
                 
-                <p className="text-xs text-gray-600 mb-2 line-clamp-2">
+                <p className="text-xs text-gray-600 mb-1 sm:mb-2 line-clamp-2">
                   {actividad.descripcion}
                 </p>
                 
-                <div className="flex items-center gap-2 flex-wrap">
-                 <BadgeEstado estado={actividad.estado} />
-                  <span className="text-xs text-gray-500 capitalize">
+                <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+                  <BadgeEstado estado={actividad.estado} size="sm" />
+                  <span className="text-xs text-gray-500 capitalize hidden xs:inline">
                     {actividad.tipo}
                   </span>
                 </div>
@@ -152,17 +156,23 @@ export default function ResumenActividad({ incidencias, mantenimientos }) {
         </div>
       )}
 
-      {/* ✅ FOOTER COMPACTO */}
-      <div className="mt-4 pt-3 border-t border-gray-200">
-        <div className="flex justify-between items-center text-sm">
-          <span className="text-gray-500">
+      {/* ✅ FOOTER COMPACTO Y RESPONSIVE */}
+      <div className="mt-3 sm:mt-4 pt-3 border-t border-gray-200">
+        <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center gap-2 xs:gap-0 text-sm">
+          <span className="text-gray-500 text-xs sm:text-sm">
             {actividadesFiltradas.length} actividades
           </span>
-          <div className="flex gap-4">
-            <Link to="/incidencias" className="text-blue-600 hover:text-blue-700 font-medium">
+          <div className="flex gap-3 sm:gap-4">
+            <Link 
+              to="/incidencias" 
+              className="text-blue-600 hover:text-blue-700 font-medium text-xs sm:text-sm"
+            >
               Incidencias →
             </Link>
-            <Link to="/mantenimientos" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link 
+              to="/mantenimientos" 
+              className="text-blue-600 hover:text-blue-700 font-medium text-xs sm:text-sm"
+            >
               Mantenimientos →
             </Link>
           </div>

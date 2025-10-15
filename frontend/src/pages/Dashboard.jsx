@@ -94,10 +94,10 @@ export default function Dashboard() {
   mantenimientosPendientes: mantenimientosPlanta.filter(m => m.estado !== 'completado').length,
   totalMantenimientos: totalMantenimientos,
   mantenimientosPreventivos,
-  mantenimientosCorrectivos, // ✅ NUEVO
+  mantenimientosCorrectivos,
   mantenimientosCompletados,
   ratioMantenimientoPreventivo,
-  ratioMantenimientoCorrectivo, // ✅ NUEVO
+  ratioMantenimientoCorrectivo,
   tasaCumplimientoMantenimiento,
   reportesGenerados: reportesPlanta.length,
   estadoGeneral,
@@ -178,7 +178,7 @@ export default function Dashboard() {
   obtenerPlantas(12),
   obtenerIncidencias(15),
   obtenerMantenimientos(12),
-  obtenerReportes(50, 1, true) // ✅ forzarRecarga: true
+  obtenerReportes(50, 1, true)
 ]);
 
         setCargandoSecciones({
@@ -211,16 +211,16 @@ export default function Dashboard() {
   // ✅ SI ES CLIENTE, MOSTRAR ACCESO DENEGADO
   if (esCliente) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-md shadow-sm border border-gray-100">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-md w-full shadow-sm border border-gray-100">
           <div className="text-6xl mb-4">🚫</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Acceso Restringido</h2>
-          <p className="text-gray-600 mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Acceso Restringido</h2>
+          <p className="text-gray-600 mb-6 text-sm sm:text-base">
             Como cliente, puedes gestionar tus incidencias desde la sección correspondiente.
           </p>
           <button 
             onClick={() => window.location.href = '/incidencias'}
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium"
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium w-full sm:w-auto"
           >
             Ir a Mis Incidencias
           </button>
@@ -232,11 +232,11 @@ export default function Dashboard() {
   // ✅ SI NO TIENE PERMISOS, MOSTRAR ERROR
   if (!puedeVerDashboard && !authLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-8 text-center max-w-md">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-center justify-center">
+        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-md w-full">
           <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Sin permisos</h2>
-          <p className="text-gray-600">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sin permisos</h2>
+          <p className="text-gray-600 text-sm sm:text-base">
             No tienes permisos para acceder al dashboard.
           </p>
         </div>
@@ -247,20 +247,20 @@ export default function Dashboard() {
   // ✅ SKELETON LOADING MEJORADO
   if (loadingPrincipal) {
     return (
-      <div className="min-h-screen bg-gray-50 p-6">
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
         <div className="animate-pulse space-y-6">
           {/* Header Skeleton */}
           <div className="flex justify-between items-center">
             <div>
-              <div className="h-8 bg-gray-200 rounded w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-96"></div>
+              <div className="h-8 bg-gray-200 rounded w-48 sm:w-64 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-64 sm:w-96"></div>
             </div>
           </div>
           
-          {/* Tarjetas Métricas Skeleton */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[...Array(3)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
+          {/* Tarjetas Métricas Skeleton - Responsive */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
                 <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
                 <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
                 <div className="h-3 bg-gray-200 rounded w-full"></div>
@@ -271,12 +271,12 @@ export default function Dashboard() {
           {/* Contenido Principal Skeleton */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
             <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm h-80"></div>
-              <div className="bg-white rounded-xl p-6 shadow-sm h-64"></div>
+              <div className="bg-white rounded-xl p-6 shadow-sm h-64 sm:h-80"></div>
+              <div className="bg-white rounded-xl p-6 shadow-sm h-48 sm:h-64"></div>
             </div>
             <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm h-64"></div>
-              <div className="bg-white rounded-xl p-6 shadow-sm h-80"></div>
+              <div className="bg-white rounded-xl p-6 shadow-sm h-48 sm:h-64"></div>
+              <div className="bg-white rounded-xl p-6 shadow-sm h-64 sm:h-80"></div>
             </div>
           </div>
         </div>
@@ -285,55 +285,53 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6 space-y-6">
-      {/* ✅ HEADER SIMPLIFICADO */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 space-y-4 sm:space-y-6">
+      {/* ✅ HEADER SIMPLIFICADO - RESPONSIVE */}
+      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
         <div className="space-y-2">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             {esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
           </h1>
-          <p className="text-gray-500 flex items-center gap-2">
+          <p className="text-gray-500 flex items-center gap-2 text-sm sm:text-base">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
             {esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
             {user?.nombre && ` • ${user.nombre}`}
           </p>
         </div>
-        
- 
       </div>
 
-      {/* ✅ TARJETAS DE CARGA DE TRABAJO */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-6 shadow-sm">
-          <div className="text-3xl font-bold text-orange-600">
+      {/* ✅ TARJETAS DE CARGA DE TRABAJO - RESPONSIVE */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="text-2xl sm:text-3xl font-bold text-orange-600">
             {datosOptimizados.metricasRapidas.incidenciasPendientes}
           </div>
-          <div className="text-orange-700 font-medium">Incidencias Pendientes</div>
-          <div className="text-sm text-orange-600 mt-2">Requieren atención inmediata</div>
+          <div className="text-orange-700 font-medium text-sm sm:text-base">Incidencias Pendientes</div>
+          <div className="text-xs sm:text-sm text-orange-600 mt-2">Requieren atención inmediata</div>
         </div>
         
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6 shadow-sm">
-          <div className="text-3xl font-bold text-blue-600">
+        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="text-2xl sm:text-3xl font-bold text-blue-600">
             {datosOptimizados.metricasRapidas.mantenimientosPendientes}
           </div>
-          <div className="text-blue-700 font-medium">Mantenimientos</div>
-          <div className="text-sm text-blue-600 mt-2">Programados esta semana</div>
+          <div className="text-blue-700 font-medium text-sm sm:text-base">Mantenimientos</div>
+          <div className="text-xs sm:text-sm text-blue-600 mt-2">Programados esta semana</div>
         </div>
         
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-6 shadow-sm">
-          <div className="text-3xl font-bold text-red-600">
+        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="text-2xl sm:text-3xl font-bold text-red-600">
             {datosOptimizados.metricasRapidas.mantenimientosAtrasados}
           </div>
-          <div className="text-red-700 font-medium">Atrasados</div>
-          <div className="text-sm text-red-600 mt-2">Resolver urgentemente</div>
+          <div className="text-red-700 font-medium text-sm sm:text-base">Atrasados</div>
+          <div className="text-xs sm:text-sm text-red-600 mt-2">Resolver urgentemente</div>
         </div>
 
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-6 shadow-sm">
-          <div className="text-3xl font-bold text-green-600">
+        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 sm:p-6 shadow-sm">
+          <div className="text-2xl sm:text-3xl font-bold text-green-600">
             {datosOptimizados.metricasRapidas.totalReportes}
           </div>
-          <div className="text-green-700 font-medium">Reportes</div>
-          <div className="text-sm text-green-600 mt-2">Generados este mes</div>
+          <div className="text-green-700 font-medium text-sm sm:text-base">Reportes</div>
+          <div className="text-xs sm:text-sm text-green-600 mt-2">Generados este mes</div>
         </div>
       </div>
 
@@ -342,7 +340,7 @@ export default function Dashboard() {
         <div className="flex justify-end">
           <button 
             onClick={() => window.location.href = '/plantas/crear'}
-            className="bg-green-500 text-white px-6 py-3 rounded-xl hover:bg-green-600 transition-colors flex items-center gap-2 font-medium shadow-sm"
+            className="bg-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-green-600 transition-colors flex items-center gap-2 font-medium shadow-sm w-full sm:w-auto text-sm sm:text-base"
           >
             <span className="text-lg">+</span>
             Crear Nueva Planta
@@ -352,12 +350,12 @@ export default function Dashboard() {
 
       {/* ✅ MENSAJE DE ERROR */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-6 py-4 rounded-2xl flex items-center gap-3 shadow-sm">
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl flex items-center gap-3 shadow-sm">
           <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
             <span className="text-red-500 text-sm">!</span>
           </div>
           <div>
-            <p className="font-medium">Error al cargar datos</p>
+            <p className="font-medium text-sm sm:text-base">Error al cargar datos</p>
             <p className="text-sm text-red-600">{error}</p>
           </div>
         </div>
@@ -365,15 +363,15 @@ export default function Dashboard() {
 
       {/* ✅ CONTENIDO PRINCIPAL */}
       {loadingContenido ? (
-        <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 text-center py-12">
+        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 text-center py-8 sm:py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500">Cargando datos del sistema...</p>
+          <p className="text-gray-500 text-sm sm:text-base">Cargando datos del sistema...</p>
         </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div className="xl:col-span-2 space-y-4 sm:space-y-6">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
                 <GraficosDashboard 
                   datos={datosOptimizados.graficos}
                   plantas={datosOptimizados.plantasOptimizadas}
@@ -382,7 +380,7 @@ export default function Dashboard() {
                 />
               </div>
               
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
                 <ResumenActividad 
                   incidencias={incidencias}
                   mantenimientos={mantenimientos}
@@ -390,15 +388,15 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* ✅ COLUMNA DERECHA - CONTENIDO NUEVO PARA EVITAR VACÍO */}
-            <div className="space-y-6">
+            {/* ✅ COLUMNA DERECHA - RESPONSIVE */}
+            <div className="space-y-4 sm:space-y-6">
               {/* LISTA SIMPLE DE PLANTAS */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
                 <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-lg font-semibold text-gray-900">Plantas Activas</h3>
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Plantas Activas</h3>
                   <Link
                     to="/plantas"
-                    className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
                   >
                     Ver todas →
                   </Link>
@@ -411,16 +409,16 @@ export default function Dashboard() {
                       to={`/plantas/${planta.id}`}
                       className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
                     >
-                      <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-semibold text-sm">
+                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
                         {planta.nombre.charAt(0)}
                       </div>
                       <div className="ml-3 flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors truncate">
+                        <h4 className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors truncate text-sm sm:text-base">
                           {planta.nombre}
                         </h4>
-                        <p className="text-sm text-gray-500 truncate">{planta.ubicacion}</p>
+                        <p className="text-xs sm:text-sm text-gray-500 truncate">{planta.ubicacion}</p>
                       </div>
-                      <div className={`w-3 h-3 rounded-full ${
+                      <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
                         planta.estadoGeneral === 'optimal' ? 'bg-green-400' :
                         planta.estadoGeneral === 'attention' ? 'bg-yellow-400' : 'bg-red-400'
                       }`}></div>
@@ -430,22 +428,22 @@ export default function Dashboard() {
               </div>
 
               {/* RESUMEN RÁPIDO */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Resumen Rápido</h3>
-                <div className="space-y-4">
+              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
+                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Resumen Rápido</h3>
+                <div className="space-y-3 sm:space-y-4">
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700">Plantas totales</span>
-                    <span className="font-semibold text-gray-900">{plantas.length}</span>
+                    <span className="text-gray-700 text-sm sm:text-base">Plantas totales</span>
+                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{plantas.length}</span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700">Incidencias resueltas</span>
-                    <span className="font-semibold text-green-600">
+                    <span className="text-gray-700 text-sm sm:text-base">Incidencias resueltas</span>
+                    <span className="font-semibold text-green-600 text-sm sm:text-base">
                       {datosOptimizados.metricasRapidas.incidenciasResueltas}
                     </span>
                   </div>
                   <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700">Reportes generados</span>
-                    <span className="font-semibold text-blue-600">
+                    <span className="text-gray-700 text-sm sm:text-base">Reportes generados</span>
+                    <span className="font-semibold text-blue-600 text-sm sm:text-base">
                       {datosOptimizados.metricasRapidas.totalReportes}
                     </span>
                   </div>
@@ -456,12 +454,12 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* ✅ ESTADO DEL SISTEMA */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-6 text-white shadow-lg">
+      {/* ✅ ESTADO DEL SISTEMA - RESPONSIVE */}
+      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div className="space-y-2">
-            <h3 className="text-xl font-semibold">Estado del Sistema</h3>
-            <div className="flex items-center gap-4 text-blue-100">
+            <h3 className="text-lg sm:text-xl font-semibold">Estado del Sistema</h3>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-blue-100 text-sm">
               <p>
                 {metricas?.metricas 
                   ? `${metricas.metricas.plantasActivas}/${metricas.metricas.totalPlantas} plantas activas` 
@@ -469,15 +467,15 @@ export default function Dashboard() {
                 }
               </p>
               {metricas?.metricas && (
-                <div className="flex items-center gap-4 text-sm">
+                <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
                   <span>Eficiencia: {metricas.metricas.eficienciaPromedio}%</span>
-                  <span>•</span>
+                  <span className="hidden sm:inline">•</span>
                   <span>Incidencias: {datosOptimizados.metricasRapidas.incidenciasPendientes}</span>
                 </div>
               )}
             </div>
           </div>
-          <div className={`px-4 py-2 rounded-full text-sm font-medium backdrop-blur-sm ${
+          <div className={`px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm ${
             metricas?.metricas && metricas.metricas.plantasActivas > 0
               ? 'bg-green-400/20 text-green-100 border border-green-300/30' 
               : 'bg-yellow-400/20 text-yellow-100 border border-yellow-300/30'
@@ -488,7 +486,7 @@ export default function Dashboard() {
         
         {metricas?.metricas && (
           <div className="mt-4">
-            <div className="flex justify-between text-sm text-blue-100 mb-2">
+            <div className="flex justify-between text-xs sm:text-sm text-blue-100 mb-2">
               <span>Eficiencia del sistema</span>
               <span>{metricas.metricas.eficienciaPromedio}%</span>
             </div>
