@@ -76,13 +76,13 @@ export const mantenimientoService = {
   },
 
   obtenerReportesPlanta: async (plantId) => {
-    const response = await api.get(`/reportes/planta/${plantId}`);
+    const response = await api.get(`/api/reportes/planta/${plantId}`);
     return response.data;
   },
 
   // Descargar reporte
   descargarReporte: async (rutaArchivo) => {
-    const response = await api.get(`/reportes/descargar/${encodeURIComponent(rutaArchivo)}`, {
+    const response = await api.get(`/api/reportes/descargar/${encodeURIComponent(rutaArchivo)}`, {
       responseType: 'blob'
     });
     return response.data;
