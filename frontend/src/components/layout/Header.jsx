@@ -15,7 +15,7 @@ export default function Header() {
       console.error('Error al cerrar sesión:', error);
     } finally {
       logout();
-      window.location.href = '/login';
+      window.location.href = '#/login';
     }
   };
 

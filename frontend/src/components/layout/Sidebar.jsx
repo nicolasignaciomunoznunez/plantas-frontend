@@ -86,46 +86,47 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
 
   return (
     <>
-      {/* ✅ BOTÓN HAMBURGUESA PARA MÓVIL */}
+      {/* ✅ BOTÓN HAMBURGUESA PARA MÓVIL - MEJOR POSICIONADO */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md border border-gray-200 hover:bg-gray-50 transition-colors"
+        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
       >
-        <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
 
-      {/* ✅ OVERLAY PARA MÓVIL */}
+      {/* ✅ OVERLAY MEJORADO */}
       {isMobileOpen && (
         <div 
-          className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300"
+          className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300"
           onClick={() => setIsMobileOpen(false)}
         />
       )}
 
-      {/* ✅ SIDEBAR PRINCIPAL - RESPONSIVE */}
+      {/* ✅ SIDEBAR PRINCIPAL - CORREGIDO PARA MÓVIL */}
       <div className={`
-        bg-white shadow-lg border-r border-gray-100 transition-all duration-300
-        fixed lg:relative z-40 h-full
-        ${isMobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        ${isCollapsed ? 'w-20' : 'w-64'}
+        bg-white shadow-xl border-r border-gray-200 transition-all duration-300 ease-in-out
+        fixed lg:relative z-50 h-screen lg:h-full
+        ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
+        ${isCollapsed ? 'w-20 lg:w-20' : 'w-72 lg:w-64'}
+        flex flex-col
       `}>
         <div className="flex flex-col h-full">
-          {/* Header del Sidebar */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
+          {/* Header del Sidebar - MEJORADO */}
+          <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
             {(!isCollapsed || isMobileOpen) && (
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                 </div>
-                <div>
-                  <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+                <div className="min-w-0">
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent truncate">
                     RYV SPA
                   </h1>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-gray-500 truncate">
                     {esCliente ? 'Portal Cliente' : 
                      esTecnico ? 'Panel Técnico' : 
                      'Gestión Plantas'}
@@ -135,22 +136,22 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
             )}
             
             {(isCollapsed && !isMobileOpen) && (
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mx-auto">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mx-auto shadow-sm">
                 <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                 </svg>
               </div>
             )}
 
-            {/* Botón de colapsar/cerrar */}
+            {/* Botón de colapsar/cerrar - MEJORADO */}
             <div className="flex items-center gap-2">
-              {/* Botón cerrar móvil */}
+              {/* Botón cerrar móvil - MÁS VISIBLE */}
               {isMobileOpen && (
                 <button
                   onClick={() => setIsMobileOpen(false)}
-                  className="p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 lg:hidden"
+                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 lg:hidden"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
@@ -175,15 +176,15 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
             </div>
           </div>
 
-          {/* Navegación FILTRADA */}
-          <nav className="flex-1 px-3 py-6 space-y-1 overflow-y-auto">
+          {/* Navegación FILTRADA - MEJOR SCROLL */}
+          <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navigationFiltrada.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.href}
                 onClick={() => isMobile && setIsMobileOpen(false)}
                 className={({ isActive }) =>
-                  `group flex items-center rounded-xl transition-all duration-200 ${
+                  `group flex items-center rounded-xl transition-all duration-200 mx-1 ${
                     isActive 
                       ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 shadow-sm' 
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -197,13 +198,13 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
                     {item.icon}
                   </div>
                   {(!isCollapsed || isMobileOpen) && (
-                    <span className="font-medium text-sm">{item.name}</span>
+                    <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
                   )}
                 </div>
                 
                 {/* Tooltip para modo colapsado desktop */}
                 {(isCollapsed && !isMobileOpen) && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap">
+                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap shadow-lg">
                     {item.name}
                   </div>
                 )}
@@ -211,18 +212,18 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
             ))}
           </nav>
 
-          {/* Footer del Sidebar */}
-          <div className={`p-4 border-t border-gray-100 ${(isCollapsed && !isMobileOpen) ? 'text-center' : ''}`}>
+          {/* Footer del Sidebar - MEJORADO */}
+          <div className={`p-4 border-t border-gray-100 flex-shrink-0 ${(isCollapsed && !isMobileOpen) ? 'text-center' : ''}`}>
             <div className={`flex items-center ${(isCollapsed && !isMobileOpen) ? 'justify-center' : 'justify-between'}`}>
               {(!isCollapsed || isMobileOpen) && (
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-gray-500 min-w-0">
                   <div className="flex items-center gap-1.5 mb-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0"></div>
+                    <span className="truncate">
                       {esCliente ? 'Portal activo' : 'Sistema activo'}
                     </span>
                   </div>
-                  <div>
+                  <div className="truncate">
                     {user?.nombre && `Hola, ${user.nombre}`}
                   </div>
                 </div>

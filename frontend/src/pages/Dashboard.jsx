@@ -454,51 +454,6 @@ export default function Dashboard() {
         </>
       )}
 
-      {/* ✅ ESTADO DEL SISTEMA - RESPONSIVE */}
-      <div className="bg-gradient-to-r from-blue-500 to-indigo-600 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
-        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
-          <div className="space-y-2">
-            <h3 className="text-lg sm:text-xl font-semibold">Estado del Sistema</h3>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-blue-100 text-sm">
-              <p>
-                {metricas?.metricas 
-                  ? `${metricas.metricas.plantasActivas}/${metricas.metricas.totalPlantas} plantas activas` 
-                  : 'Sistema operativo'
-                }
-              </p>
-              {metricas?.metricas && (
-                <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-sm">
-                  <span>Eficiencia: {metricas.metricas.eficienciaPromedio}%</span>
-                  <span className="hidden sm:inline">•</span>
-                  <span>Incidencias: {datosOptimizados.metricasRapidas.incidenciasPendientes}</span>
-                </div>
-              )}
-            </div>
-          </div>
-          <div className={`px-3 sm:px-4 py-1 sm:py-2 rounded-full text-xs sm:text-sm font-medium backdrop-blur-sm ${
-            metricas?.metricas && metricas.metricas.plantasActivas > 0
-              ? 'bg-green-400/20 text-green-100 border border-green-300/30' 
-              : 'bg-yellow-400/20 text-yellow-100 border border-yellow-300/30'
-          }`}>
-            {metricas?.metricas && metricas.metricas.plantasActivas > 0 ? '✅ Operativo' : '⚠️ En configuración'}
-          </div>
-        </div>
-        
-        {metricas?.metricas && (
-          <div className="mt-4">
-            <div className="flex justify-between text-xs sm:text-sm text-blue-100 mb-2">
-              <span>Eficiencia del sistema</span>
-              <span>{metricas.metricas.eficienciaPromedio}%</span>
-            </div>
-            <div className="w-full bg-blue-400/30 rounded-full h-2">
-              <div 
-                className="bg-white rounded-full h-2 transition-all duration-1000 ease-out"
-                style={{ width: `${metricas.metricas.eficienciaPromedio}%` }}
-              ></div>
-            </div>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
