@@ -50,36 +50,35 @@ export default function Header({ onToggleSidebar, sidebarCollapsed, className = 
 
   return (
     <header className={clsx(
-      'bg-white/80 backdrop-blur-sm border-b border-secondary-100',
+      'bg-white border-b border-secondary-100 w-full', // ✅ w-full para ancho completo
       'sticky top-0 z-40 transition-all duration-300',
       className
     )}>
-      <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-        {/* ✅ Lado Izquierdo - Logo y Botón Sidebar */}
-        <div className="flex items-center gap-4 flex-1 min-w-0">
+      <div className="flex items-center justify-between h-16 w-full px-4 sm:px-6 lg:px-8"> {/* ✅ w-full aquí también */}
+        {/* ✅ Lado Izquierdo - Logo y Botón Sidebar CORREGIDO */}
+        <div className="flex items-center gap-3 flex-shrink-0"> {/* ✅ Removido flex-1 min-w-0 */}
           {/* Botón para toggle sidebar - Solo en móvil */}
           <button
-            onClick={onToggleSidebar}
-            className="lg:hidden p-2 rounded-lg text-secondary-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+    onClick={() => window.openSidebarMobile?.()} // ✅ CAMBIADO AQUÍ
+    className="lg:hidden p-2 rounded-lg text-secondary-600 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200"
+  >
+    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
 
-          {/* Logo y Branding - Optimizado para espacio */}
-          <div className="flex items-center gap-3 flex-shrink-0">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
-              <img 
-                src="/images/finalogo.jpeg" 
-                alt="RYV SPA" 
-                className="h-8 w-8 object-contain"
-              />
-            </div>
+          {/* Logo y Branding - CORREGIDO (sin cuadro azul feo) */}
+          <div className="flex items-center gap-3">
+            {/* Logo sin fondo azul - SOLO la imagen */}
+            <img 
+              src="/images/finalogo.jpeg" 
+              alt="RYV SPA" 
+              className="h-8 w-8 object-contain flex-shrink-0" // ✅ Sin fondo azul
+            />
             
             {/* Texto que se adapta al espacio */}
             <div className="hidden sm:block">
-              <h1 className="text-lg font-bold bg-gradient-to-r from-secondary-800 to-primary-600 bg-clip-text text-transparent font-heading">
+              <h1 className="text-lg font-bold text-secondary-800 font-heading"> {/* ✅ Sin gradient */}
                 RYV SPA
               </h1>
               <p className="text-xs text-secondary-500 font-medium">
@@ -89,17 +88,17 @@ export default function Header({ onToggleSidebar, sidebarCollapsed, className = 
           </div>
         </div>
 
-        {/* ✅ Centro - Información del sistema (Desktop only) */}
-        <div className="hidden xl:flex items-center justify-center flex-1">
-          <div className="flex items-center gap-6 text-sm">
-            <div className="flex items-center gap-2 px-3 py-1 bg-success-50 text-success-700 rounded-full">
+        {/* ✅ Centro - Información del sistema (Desktop only) CORREGIDO */}
+        <div className="hidden xl:flex items-center justify-center absolute left-1/2 transform -translate-x-1/2"> {/* ✅ Centrado absoluto */}
+          <div className="flex items-center gap-4 text-sm">
+            <div className="flex items-center gap-2 px-3 py-1 bg-success-50 text-success-700 rounded-full border border-success-200">
               <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
-              <span className="font-medium">Sistema activo</span>
+              <span className="font-medium text-sm">Sistema activo</span>
             </div>
             
             {/* Información adicional opcional */}
             {user?.rol === 'admin' && (
-              <div className="flex items-center gap-2 text-secondary-600">
+              <div className="flex items-center gap-2 text-secondary-600 bg-secondary-50 px-3 py-1 rounded-full border border-secondary-200">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>

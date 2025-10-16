@@ -43,14 +43,10 @@ const GRAFICO_CONFIG = {
       bar: 'bg-primary-400',
       text: 'text-primary-600'
     }
-  },
-  breakpoints: {
-    mobile: 640,
-    tablet: 1024
   }
 };
 
-// 🎯 Hook personalizado para datos de gráficos
+// 🎯 Hook personalizado para datos de gráficos - CORREGIDO
 const useDatosGraficos = ({ datos, incidencias }) => {
   // ✅ Datos de rendimiento memoizados
   const datosRendimientoReales = useMemo(() => 
@@ -58,51 +54,91 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     [datos?.plantas]
   );
 
-  // ✅ Datos de incidencias por día optimizados
+  // ✅ Datos de incidencias por día - CORREGIDO (más robusto)
   const datosIncidenciasReales = useMemo(() => {
     const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     
+    // Fecha de hace 7 días (incluyendo hoy)
     const unaSemanaAtras = new Date();
-    unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7);
-    
-    const incidenciasRecientes = incidencias.filter(incidencia => {
-      if (!incidencia.fechaReporte) return false;
-      return new Date(incidencia.fechaReporte) >= unaSemanaAtras;
-    });
+    unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 6); // 7 días incluyendo hoy
+    unaSemanaAtras.setHours(0, 0, 0, 0); // Inicio del día
     
     const pendientesPorDia = Array(7).fill(0);
     const resueltasPorDia = Array(7).fill(0);
     const enProgresoPorDia = Array(7).fill(0);
     
-    incidenciasRecientes.forEach(incidencia => {
-      const fecha = new Date(incidencia.fechaReporte);
-      const diaSemana = fecha.getDay();
-      const index = diaSemana === 0 ? 6 : diaSemana - 1;
-      
-      switch(incidencia.estado) {
-        case 'pendiente':
-          pendientesPorDia[index]++;
-          break;
-        case 'en_progreso':
-          enProgresoPorDia[index]++;
-          break;
-        case 'resuelto':
-          resueltasPorDia[index]++;
-          break;
+    // Si no hay incidencias, retornar estructura vacía
+    if (!incidencias || incidencias.length === 0) {
+      return {
+        labels: dias,
+        pendientes: pendientesPorDia,
+        enProgreso: enProgresoPorDia,
+        resueltas: resueltasPorDia,
+        total: 0
+      };
+    }
+    
+    // Procesar cada incidencia
+    incidencias.forEach(incidencia => {
+      try {
+        // Manejar fechas de manera segura
+        let fechaIncidencia;
+        if (incidencia.fechaReporte) {
+          fechaIncidencia = new Date(incidencia.fechaReporte);
+        } else if (incidencia.createdAt) {
+          fechaIncidencia = new Date(incidencia.createdAt);
+        } else {
+          return; // Si no hay fecha, saltar esta incidencia
+        }
+        
+        // Validar fecha
+        if (isNaN(fechaIncidencia.getTime())) {
+          return;
+        }
+        
+        // Solo incluir incidencias de la última semana
+        if (fechaIncidencia >= unaSemanaAtras) {
+          const diaSemana = fechaIncidencia.getDay(); // 0=Domingo, 1=Lunes...
+          const index = diaSemana === 0 ? 6 : diaSemana - 1; // Ajustar para Lunes=0
+          
+          // Contar por estado
+          switch(incidencia.estado) {
+            case 'pendiente':
+              pendientesPorDia[index]++;
+              break;
+            case 'en_progreso':
+              enProgresoPorDia[index]++;
+              break;
+            case 'resuelto':
+              resueltasPorDia[index]++;
+              break;
+            default:
+              // Si no es un estado reconocido, contar como pendiente
+              pendientesPorDia[index]++;
+          }
+        }
+      } catch (error) {
+        console.warn('Error procesando incidencia:', incidencia.id, error);
       }
     });
+    
+    const total = pendientesPorDia.reduce((a, b) => a + b, 0) +
+                 enProgresoPorDia.reduce((a, b) => a + b, 0) +
+                 resueltasPorDia.reduce((a, b) => a + b, 0);
     
     return {
       labels: dias,
       pendientes: pendientesPorDia,
       enProgreso: enProgresoPorDia,
       resueltas: resueltasPorDia,
-      total: incidenciasRecientes.length
+      total
     };
   }, [incidencias]);
 
   // ✅ Altura máxima dinámica para gráficos de barras
   const maxIncidencias = useMemo(() => {
+    if (datosIncidenciasReales.total === 0) return 1;
+    
     const todosLosValores = [
       ...datosIncidenciasReales.pendientes,
       ...datosIncidenciasReales.enProgreso,
@@ -188,9 +224,9 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
 
   // ✅ Calcular métricas resumen
   const metricasResumen = useMemo(() => ({
-    pendientes: incidencias.filter(i => i.estado === 'pendiente').length,
-    enProgreso: incidencias.filter(i => i.estado === 'en_progreso').length,
-    resueltas: incidencias.filter(i => i.estado === 'resuelto').length,
+    pendientes: incidencias?.filter(i => i.estado === 'pendiente').length || 0,
+    enProgreso: incidencias?.filter(i => i.estado === 'en_progreso').length || 0,
+    resueltas: incidencias?.filter(i => i.estado === 'resuelto').length || 0,
     totalPlantas: datosRendimientoReales.length
   }), [incidencias, datosRendimientoReales]);
 
@@ -208,27 +244,33 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
           )}
         </h4>
         <div className="space-y-4">
-          {datosRendimientoReales.map((planta, index) => (
-            <div key={planta.id || index} className="space-y-2">
-              <div className="flex justify-between items-center">
-                <span className="text-sm text-secondary-600 truncate flex-1 pr-4">
-                  {planta.nombre}
-                </span>
-                <span className="text-sm font-semibold text-secondary-800 whitespace-nowrap">
-                  {planta.tasaResolucion}%
-                </span>
+          {datosRendimientoReales.length > 0 ? (
+            datosRendimientoReales.map((planta, index) => (
+              <div key={planta.id || index} className="space-y-2">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-secondary-600 truncate flex-1 pr-4">
+                    {planta.nombre}
+                  </span>
+                  <span className="text-sm font-semibold text-secondary-800 whitespace-nowrap">
+                    {planta.tasaResolucion || 0}%
+                  </span>
+                </div>
+                <BarraProgreso 
+                  porcentaje={planta.tasaResolucion || 0}
+                  color={
+                    (planta.tasaResolucion || 0) > 80 ? 'success' :
+                    (planta.tasaResolucion || 0) > 60 ? 'primary' :
+                    (planta.tasaResolucion || 0) > 40 ? 'warning' : 'error'
+                  }
+                  altura="h-2 sm:h-3"
+                />
               </div>
-              <BarraProgreso 
-                porcentaje={planta.tasaResolucion}
-                color={
-                  planta.tasaResolucion > 80 ? 'success' :
-                  planta.tasaResolucion > 60 ? 'primary' :
-                  planta.tasaResolucion > 40 ? 'warning' : 'error'
-                }
-                altura="h-2 sm:h-3"
-              />
+            ))
+          ) : (
+            <div className="text-center py-4 text-secondary-500">
+              No hay datos de plantas disponibles
             </div>
-          ))}
+          )}
         </div>
       </div>
 
@@ -237,43 +279,50 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
         <h4 className="text-sm font-medium text-secondary-700 mb-4 font-sans">
           Estado Operativo por Planta
         </h4>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {datosRendimientoReales.map((planta, index) => (
-            <div key={planta.id || index} className="text-center group">
-              <div className={clsx(
-                'relative h-20 sm:h-24 rounded-xl border-2 transition-all duration-300 group-hover:scale-105',
-                GRAFICO_CONFIG.colores[planta.estadoGeneral]?.bg || 'bg-secondary-50 border-secondary-200'
-              )}>
-                <div className="absolute inset-0 flex items-center justify-center p-2">
-                  <div>
-                    <div className={clsx(
-                      'text-lg sm:text-xl font-bold font-heading',
-                      GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
-                    )}>
-                      {planta.incidenciasActivas || 0}
-                    </div>
-                    <div className="text-xs text-secondary-500 mt-1 hidden sm:block">
-                      Activas
+        {datosRendimientoReales.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {datosRendimientoReales.map((planta, index) => (
+              <div key={planta.id || index} className="text-center group">
+                <div className={clsx(
+                  'relative h-20 sm:h-24 rounded-xl border-2 transition-all duration-300 group-hover:scale-105',
+                  GRAFICO_CONFIG.colores[planta.estadoGeneral]?.bg || 'bg-secondary-50 border-secondary-200'
+                )}>
+                  <div className="absolute inset-0 flex items-center justify-center p-2">
+                    <div>
+                      <div className={clsx(
+                        'text-lg sm:text-xl font-bold font-heading',
+                        GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
+                      )}>
+                        {planta.incidenciasActivas || 0}
+                      </div>
+                      <div className="text-xs text-secondary-500 mt-1 hidden sm:block">
+                        Activas
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="mt-2 space-y-1">
-                <div className="text-xs text-secondary-600 truncate px-1">
-                  {planta.nombre.split(' ')[0]}
+                <div className="mt-2 space-y-1">
+                  <div className="text-xs text-secondary-600 truncate px-1">
+                    {planta.nombre?.split(' ')[0] || 'Planta'}
+                  </div>
+                  <div className={clsx(
+                    'text-xs font-semibold',
+                    GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
+                  )}>
+                    {planta.estadoGeneral === 'optimal' ? 'Óptimo' :
+                     planta.estadoGeneral === 'attention' ? 'Atención' :
+                     planta.estadoGeneral === 'critical' ? 'Crítico' : 'Estable'}
+                  </div>
                 </div>
-                <div className={clsx(
-                  'text-xs font-semibold',
-                  GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
-                )}>
-                  {planta.estadoGeneral === 'optimal' ? 'Óptimo' :
-                   planta.estadoGeneral === 'attention' ? 'Atención' :
-                   planta.estadoGeneral === 'critical' ? 'Crítico' : 'Estable'}
-                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-8 text-secondary-500 bg-secondary-50 rounded-xl">
+            <div className="text-3xl mb-2">🏭</div>
+            <p className="text-sm">No hay plantas registradas</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -293,6 +342,9 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
           <div className="text-center py-8 text-secondary-500 bg-secondary-50 rounded-xl">
             <div className="text-4xl mb-3">📊</div>
             <p className="text-sm">No hay incidencias en la última semana</p>
+            <p className="text-xs text-secondary-400 mt-1">
+              Las nuevas incidencias aparecerán aquí automáticamente
+            </p>
           </div>
         ) : (
           <>
@@ -300,19 +352,23 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
               {datosIncidenciasReales.labels.map((dia, index) => (
                 <div key={dia} className="flex flex-col items-center space-y-2 flex-1 group">
                   <div className="flex items-end space-x-1 h-32 sm:h-36 w-full justify-center">
-                    {['pendientes', 'enProgreso', 'resueltas'].map((tipo) => (
+                    {[
+                      { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
+                      { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
+                      { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
+                    ].map(({ tipo, data }) => (
                       <div
                         key={tipo}
                         className={clsx(
                           'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help',
                           GRAFICO_CONFIG.colores[tipo]?.bar,
-                          datosIncidenciasReales[tipo][index] === 0 && 'opacity-0'
+                          data[index] === 0 && 'opacity-0'
                         )}
                         style={{
-                          height: `${(datosIncidenciasReales[tipo][index] / maxIncidencias) * 100}%`,
-                          minHeight: datosIncidenciasReales[tipo][index] > 0 ? '4px' : '0px'
+                          height: `${(data[index] / maxIncidencias) * 100}%`,
+                          minHeight: data[index] > 0 ? '8px' : '0px'
                         }}
-                        title={`${datosIncidenciasReales[tipo][index]} ${tipo}`}
+                        title={`${data[index]} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
                       />
                     ))}
                   </div>
@@ -413,7 +469,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
             })}
           </span>
           <span>
-            {metricasResumen.totalPlantas} plantas monitorizadas • {incidencias.length} incidencias totales
+            {metricasResumen.totalPlantas} plantas • {incidencias?.length || 0} incidencias
           </span>
         </div>
       </div>
