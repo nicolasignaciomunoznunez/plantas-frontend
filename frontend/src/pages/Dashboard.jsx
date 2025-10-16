@@ -144,7 +144,7 @@ export default function Dashboard() {
         metricasReales: metricas?.metricas
       },
       
-      plantasOptimizadas: plantasUnica.slice(0, 8),
+      plantasOptimizadas: plantasUnicas.slice(0, 8),
       plantasResumen: plantasConMetricas
     };
   }, [plantas, incidencias, mantenimientos, reportes, metricas, calcularMetricasPlanta]);
