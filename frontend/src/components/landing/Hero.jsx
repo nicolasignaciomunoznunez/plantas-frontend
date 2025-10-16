@@ -14,7 +14,7 @@ const Hero = () => {
       subtitle: "Soluciones innovadoras para plantas de agua potable rural",
       ctaText: "Ver Servicios",
       ctaLink: "#servicios",
-      gradient: "from-primary-700/70 via-primary-600/50 to-primary-800/70" // Más transparente
+      gradient: "from-primary-900/80 via-primary-800/70 to-primary-900/80" // Más oscuro
     },
     {
       image: "/images/portada1.jpg", 
@@ -23,7 +23,7 @@ const Hero = () => {
       subtitle: "Calidad y eficiencia en cada proyecto que emprendemos",
       ctaText: "Contáctanos",
       ctaLink: "#contacto",
-      gradient: "from-secondary-900/60 via-primary-800/50 to-primary-900/60" // Más transparente
+      gradient: "from-secondary-900/80 via-primary-900/70 to-primary-900/80" // Más oscuro
     }
   ];
 
@@ -38,7 +38,7 @@ const Hero = () => {
             img.onload = resolve;
             img.onerror = () => {
               console.warn(`Image failed to load: ${slide.image}`);
-              resolve(); // Continuar incluso si falla
+              resolve();
             };
           });
         });
@@ -54,7 +54,7 @@ const Hero = () => {
     preloadImages();
   }, []);
 
-  // Auto-slide with smooth transitions
+  // Auto-slide
   useEffect(() => {
     if (isLoading) return;
 
@@ -106,7 +106,7 @@ const Hero = () => {
 
   return (
     <section id="inicio" className="pt-16 lg:pt-20 relative">
-      {/* Loading State Mejorado */}
+      {/* Loading State */}
       {isLoading && (
         <div className="h-screen bg-gradient-primary flex items-center justify-center">
           <div className="text-center text-white animate-fade-in">
@@ -128,43 +128,41 @@ const Hero = () => {
             } ${isTransitioning ? 'transitioning' : ''}`}
             aria-hidden={index !== currentSlide}
           >
-            {/* Imagen de fondo con fallback */}
+            {/* Imagen de fondo */}
             <div 
               className="w-full h-full bg-cover bg-center bg-no-repeat"
               style={{ 
                 backgroundImage: `url('${slide.image}')`,
-                backgroundColor: '#1e40af' // Fallback color si la imagen no carga
+                backgroundColor: '#0c4a6e' // Fallback color más oscuro
               }}
             >
-              {/* Overlay con gradiente más transparente */}
+              {/* Overlay con gradiente MÁS OSCURO para mejor contraste */}
               <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}></div>
-              
-              {/* Patrón de textura sutil */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent"></div>
             </div>
             
             {/* Contenido del slide */}
             <div className="relative h-full flex items-center justify-center lg:justify-start">
-              <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-white">
+              <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl lg:max-w-4xl text-center lg:text-left animate-fade-in-up">
                   <div className="mb-4 lg:mb-6">
-                    <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold text-white/90 border border-white/30">
+                    <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold text-white border border-white/30">
                       R&V SPA
                     </span>
                   </div>
                   
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight font-heading">
+                  {/* TEXTO CON MEJOR CONTRASTE */}
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight font-heading text-white">
                     {slide.title}{' '}
-                    <span className="block bg-gradient-to-r from-white to-primary-100 bg-clip-text text-transparent">
+                    <span className="block text-white drop-shadow-lg">
                       {slide.highlighted}
                     </span>
                   </h1>
                   
-                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white/90 max-w-3xl mx-auto lg:mx-0">
+                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white max-w-3xl mx-auto lg:mx-0 drop-shadow-lg">
                     {slide.subtitle}
                   </p>
                   
-                  {/* CTA Buttons Mejorados */}
+                  {/* CTA Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center lg:justify-start">
                     <button
                       onClick={() => scrollToSection(slide.ctaLink.replace('#', ''))}
@@ -215,7 +213,7 @@ const Hero = () => {
           </svg>
         </button>
 
-        {/* Navigation Dots - ÚNICO indicador */}
+        {/* Navigation Dots */}
         <div className="absolute bottom-8 lg:bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-3 backdrop-blur-md bg-white/10 rounded-2xl p-3">
           {slides.map((_, index) => (
             <button
