@@ -91,21 +91,7 @@ const FAQ = () => {
                 ))}
               </div>
 
-              {/* Información adicional simplificada */}
-              <div className="mt-8 p-6 bg-primary-50 rounded-xl border border-primary-200 text-center">
-                <h4 className="font-bold text-primary-800 mb-2 text-lg">
-                  ¿Necesitas más información?
-                </h4>
-                <p className="text-primary-700 text-sm mb-4">
-                  Estamos aquí para resolver todas tus consultas
-                </p>
-                <button 
-                  onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full"
-                >
-                  Contactar Ahora
-                </button>
-              </div>
+             
             </div>
           </div>
 

@@ -107,31 +107,7 @@ const Services = () => {
           ))}
         </div>
 
-        {/* CTA Section Mejorado */}
-        <div className="text-center mt-16 lg:mt-20 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
-          <div className="bg-white rounded-2xl p-8 lg:p-10 shadow-medium border border-secondary-100 max-w-4xl mx-auto">
-            <h3 className="text-2xl lg:text-3xl font-bold text-secondary-800 mb-4 font-heading">
-              ¿Necesitas una solución personalizada?
-            </h3>
-            <p className="text-secondary-600 text-lg mb-6 lg:mb-8 max-w-2xl mx-auto">
-              Contáctanos para analizar tus requerimientos específicos y desarrollar una propuesta a medida para tu operación.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-primary-600 hover:bg-primary-700 text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-xl"
-              >
-                Solicitar Cotización
-              </button>
-              <button 
-                onClick={() => document.getElementById('proyectos')?.scrollIntoView({ behavior: 'smooth' })}
-                className="border-2 border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300"
-              >
-                Ver Proyectos
-              </button>
-            </div>
-          </div>
-        </div>
+     
       </div>
     </section>
   );

@@ -142,29 +142,7 @@ const Counter = () => {
           ))}
         </div>
 
-        {/* CTA adicional mejorado */}
-        <div className="text-center mt-16 lg:mt-20 animate-fade-in-up" style={{ animationDelay: '600ms' }}>
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 lg:p-10 border border-white/20 max-w-2xl mx-auto">
-            <p className="text-primary-100 text-lg sm:text-xl mb-6 lg:mb-8">
-              ¿Listo para agregar tu proyecto a nuestras estadísticas de éxito?
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button 
-                onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group bg-white text-primary-600 hover:bg-primary-50 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-large hover:shadow-xl relative overflow-hidden"
-              >
-                <span className="relative z-10">Comenzar Proyecto</span>
-                <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-primary-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-              </button>
-              <button 
-                onClick={() => document.getElementById('servicios')?.scrollIntoView({ behavior: 'smooth' })}
-                className="group border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 backdrop-blur-sm"
-              >
-                Ver Servicios
-              </button>
-            </div>
-          </div>
-        </div>
+     
       </div>
     </section>
   );
