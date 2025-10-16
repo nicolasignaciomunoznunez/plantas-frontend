@@ -327,6 +327,28 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
     </div>
   );
 
+
+  // Agrega esto ANTES del return en renderGraficoIncidencias()
+console.log('🔍 DEBUG - Gráfico de barras:', {
+  maxIncidencias,
+  datos: datosIncidenciasReales,
+  alturasCalculadas: datosIncidenciasReales.labels.map((dia, index) => ({
+    dia,
+    pendientes: {
+      valor: datosIncidenciasReales.pendientes[index],
+      altura: Math.max((datosIncidenciasReales.pendientes[index] / maxIncidencias) * 120, 8)
+    },
+    enProgreso: {
+      valor: datosIncidenciasReales.enProgreso[index],
+      altura: Math.max((datosIncidenciasReales.enProgreso[index] / maxIncidencias) * 120, 8)
+    },
+    resueltas: {
+      valor: datosIncidenciasReales.resueltas[index],
+      altura: Math.max((datosIncidenciasReales.resueltas[index] / maxIncidencias) * 120, 8)
+    }
+  }))
+});
+
   const renderGraficoIncidencias = () => (
     <div className="space-y-6 animate-fade-in">
       {/* Gráfico de Barras */}
