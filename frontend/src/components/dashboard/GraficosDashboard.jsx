@@ -393,22 +393,8 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
           </div>
         ) : (
           <>
-            {/* DEBUG VISUAL TEMPORAL */}
-            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <h5 className="text-sm font-semibold text-blue-800 mb-2">📊 DATOS DEL GRÁFICO</h5>
-              <div className="text-xs text-blue-700 space-y-1">
-                <div><strong>Total incidencias:</strong> {datosIncidenciasReales.total}</div>
-                <div><strong>Máx por día:</strong> {maxIncidencias}</div>
-                <div><strong>Datos por día:</strong></div>
-                <div className="grid grid-cols-7 gap-1 text-center">
-                  {datosIncidenciasReales.labels.map((dia, index) => (
-                    <div key={dia} className="text-xs">
-                      {dia}: P{datosIncidenciasReales.pendientes[index]}-E{datosIncidenciasReales.enProgreso[index]}-R{datosIncidenciasReales.resueltas[index]}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
+       
+       
 
             {/* Contenedor del gráfico con scroll horizontal en móvil */}
             <div className="overflow-x-auto pb-4 -mx-2 px-2">
