@@ -438,26 +438,27 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                         const altura = calcularAlturaBarra(valor);
                         
                         return (
-                          <div
-                            key={tipo}
-                            className={clsx(
-                              'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative',
-                              GRAFICO_CONFIG.colores[tipo]?.bar
-                            )}
-                            style={{
-                              height: altura,
-                              minHeight: '8px',
-                              opacity: valor > 0 ? 1 : 0
-                            }}
-                            title={`${valor} ${label}`}
-                          >
-                            {/* Etiqueta de valor - SIEMPRE visible */}
-                            {valor > 0 && (
-                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-100 whitespace-nowrap pointer-events-none z-20 border border-gray-600">
-                                {valor}
-                              </div>
-                            )}
-                          </div>
+                       <div
+  key={tipo}
+  className="w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative border border-gray-300 shadow-md"
+  style={{
+    height: calcularAlturaBarra(valor),
+    minHeight: '20px', // ✅ Más alto para mejor visibilidad
+    opacity: valor > 0 ? 1 : 0,
+    // ✅ COLORES SÓLIDOS GARANTIZADOS
+    backgroundColor: 
+      tipo === 'pendientes' ? '#ef4444' : // Rojo
+      tipo === 'enProgreso' ? '#3b82f6' : // Azul  
+      '#10b981' // Verde
+  }}
+  title={`${valor} ${label}`}
+>
+  {valor > 0 && (
+    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-100 whitespace-nowrap pointer-events-none z-20 font-bold">
+      {valor}
+    </div>
+  )}
+</div>
                         );
                       })}
                     </div>
