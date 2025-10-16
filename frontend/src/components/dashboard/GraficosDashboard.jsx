@@ -54,7 +54,7 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     [datos?.plantas]
   );
 
-  // ✅ Datos de incidencias por día - CORREGIDO (usa fecha actual como fallback)
+  // ✅ Datos de incidencias por día - CORREGIDO CON ESTRUCTURA REAL
   const datosIncidenciasReales = useMemo(() => {
     const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     
@@ -73,25 +73,23 @@ const useDatosGraficos = ({ datos, incidencias }) => {
       };
     }
     
-    // Procesar cada incidencia - CORREGIDO: usar fecha actual si no hay fecha
+    console.log('🔍 DEBUG - Procesando incidencias:', incidencias);
+    
+    // Procesar cada incidencia - CORREGIDO: usar estructura real de BD
     incidencias.forEach(incidencia => {
       try {
+        // ✅ CORRECCIÓN: Usar fechaReporte que sí existe en tu BD
         let fechaIncidencia;
-        
-        // ✅ CORRECCIÓN: Si no hay fecha, usar fecha actual
         if (incidencia.fechaReporte) {
           fechaIncidencia = new Date(incidencia.fechaReporte);
-        } else if (incidencia.createdAt) {
-          fechaIncidencia = new Date(incidencia.createdAt);
         } else {
-          // Si no hay fecha, asignar una fecha reciente aleatoria para demostración
-          const diasAtras = Math.floor(Math.random() * 7); // 0-6 días atrás
+          // Si no hay fechaReporte, usar fecha actual como fallback
           fechaIncidencia = new Date();
-          fechaIncidencia.setDate(fechaIncidencia.getDate() - diasAtras);
         }
         
         // Validar fecha
         if (isNaN(fechaIncidencia.getTime())) {
+          console.warn('Fecha inválida para incidencia:', incidencia.id, incidencia.fechaReporte);
           fechaIncidencia = new Date(); // Fallback a fecha actual
         }
         
@@ -103,7 +101,14 @@ const useDatosGraficos = ({ datos, incidencias }) => {
           const diaSemana = fechaIncidencia.getDay(); // 0=Domingo, 1=Lunes...
           const index = diaSemana === 0 ? 6 : diaSemana - 1; // Ajustar para Lunes=0
           
-          // Contar por estado - CORREGIDO: usar estados exactos del store
+          console.log(`📅 Incidencia ${incidencia.id}:`, {
+            fecha: fechaIncidencia,
+            diaSemana,
+            index,
+            estado: incidencia.estado
+          });
+          
+          // ✅ CORRECCIÓN: Usar el campo 'estado' que sí existe en tu BD
           switch(incidencia.estado) {
             case 'pendiente':
               pendientesPorDia[index]++;
@@ -115,13 +120,13 @@ const useDatosGraficos = ({ datos, incidencias }) => {
               resueltasPorDia[index]++;
               break;
             default:
-              // Si no es un estado reconocido, contar como pendiente
+              console.warn('Estado no reconocido:', incidencia.estado, 'en incidencia:', incidencia.id);
+              // Contar como pendiente por defecto
               pendientesPorDia[index]++;
           }
         }
       } catch (error) {
         console.warn('Error procesando incidencia:', incidencia.id, error);
-        // Continuar con la siguiente incidencia
       }
     });
     
@@ -129,16 +134,20 @@ const useDatosGraficos = ({ datos, incidencias }) => {
                  enProgresoPorDia.reduce((a, b) => a + b, 0) +
                  resueltasPorDia.reduce((a, b) => a + b, 0);
     
-    return {
+    const resultado = {
       labels: dias,
       pendientes: pendientesPorDia,
       enProgreso: enProgresoPorDia,
       resueltas: resueltasPorDia,
       total
     };
+    
+    console.log('📊 DEBUG - Resultado final del gráfico:', resultado);
+    
+    return resultado;
   }, [incidencias]);
 
-  // ✅ Altura máxima dinámica para gráficos de barras - MEJORADO
+  // ✅ Altura máxima dinámica para gráficos de barras
   const maxIncidencias = useMemo(() => {
     if (datosIncidenciasReales.total === 0) return 1;
     
@@ -150,9 +159,9 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     
     const maxValor = Math.max(...todosLosValores);
     
-    // ✅ MEJORA: Escala más inteligente
-    if (maxValor <= 2) return 2; // Para valores pequeños, escala de 0-2
-    if (maxValor <= 5) return 5; // Para valores medianos, escala de 0-5
+    // Escala adaptativa
+    if (maxValor <= 2) return 2;
+    if (maxValor <= 5) return 5;
     
     return Math.max(maxValor, 3);
   }, [datosIncidenciasReales]);
