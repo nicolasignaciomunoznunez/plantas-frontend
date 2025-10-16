@@ -9,18 +9,27 @@ import { useAuthStore } from '../stores/authStore';
 import GraficosDashboard from '../components/dashboard/GraficosDashboard';
 import ResumenActividad from '../components/dashboard/ResumenActividad';
 
+// 🎨 Constantes para mantener consistencia
+const DASHBOARD_CONFIG = {
+  limites: {
+    plantas: 12,
+    incidencias: 15,
+    mantenimientos: 12,
+    reportes: 50
+  },
+  colores: {
+    optimal: 'bg-success-500',
+    attention: 'bg-warning-500', 
+    critical: 'bg-error-500',
+    primary: 'bg-primary-600',
+    secondary: 'bg-secondary-200'
+  }
+};
+
 export default function Dashboard() {
-  // ✅ OBTENER USUARIO Y ROL
+  // ✅ Stores optimizados
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
-  
-  const { 
-    metricas,
-    ultimosDatos, 
-    loading: dashboardLoading, 
-    error, 
-    obtenerMetricas 
-  } = useDashboardStore();
-  
+  const { metricas, loading: dashboardLoading, error, obtenerMetricas } = useDashboardStore();
   const { plantas, loading: plantasLoading, obtenerPlantas } = usePlantasStore();
   const { incidencias, obtenerIncidencias } = useIncidenciasStore();
   const { mantenimientos, obtenerMantenimientos } = useMantenimientoStore();
@@ -35,13 +44,15 @@ export default function Dashboard() {
     reportes: false
   });
 
-  // ✅ DETERMINAR ROLES Y PERMISOS
-  const esCliente = user?.rol === 'cliente';
-  const esTecnico = user?.rol === 'tecnico';
-  const esAdmin = user?.rol === 'admin';
-  const puedeVerDashboard = esTecnico || esAdmin;
+  // ✅ Roles memoizados
+  const { esCliente, esTecnico, esAdmin, puedeVerDashboard } = useMemo(() => ({
+    esCliente: user?.rol === 'cliente',
+    esTecnico: user?.rol === 'tecnico',
+    esAdmin: user?.rol === 'admin',
+    puedeVerDashboard: ['tecnico', 'admin'].includes(user?.rol)
+  }), [user?.rol]);
 
-  // ✅ CALCULAR MÉTRICAS POR PLANTA (MEMOIZADO)
+  // ✅ Cálculo de métricas optimizado
   const calcularMetricasPlanta = useCallback((plantaId) => {
     const incidenciasPlanta = incidencias.filter(i => i.plantId === plantaId);
     const mantenimientosPlanta = mantenimientos.filter(m => m.plantId === plantaId);
@@ -51,107 +62,94 @@ export default function Dashboard() {
     const mantenimientosPreventivos = mantenimientosPlanta.filter(m => m.tipo === 'preventivo').length;
     const mantenimientosCompletados = mantenimientosPlanta.filter(m => m.estado === 'completado').length;
     
-    const tasaResolucion = incidenciasPlanta.length > 0 
-      ? Math.round((incidenciasResueltas / incidenciasPlanta.length) * 100)
-      : 100;
-
+    // Cálculos optimizados
+    const totalIncidencias = incidenciasPlanta.length;
     const totalMantenimientos = mantenimientosPlanta.length;
-    const mantenimientosCorrectivos = totalMantenimientos - mantenimientosPreventivos;
+    
+    const tasaResolucion = totalIncidencias > 0 
+      ? Math.round((incidenciasResueltas / totalIncidencias) * 100)
+      : 100;
 
     const ratioMantenimientoPreventivo = totalMantenimientos > 0
       ? Math.round((mantenimientosPreventivos / totalMantenimientos) * 100)
       : 0;
 
-    const ratioMantenimientoCorrectivo = totalMantenimientos > 0
-      ? Math.round((mantenimientosCorrectivos / totalMantenimientos) * 100)
-      : 0;
-
-    const tasaCumplimientoMantenimiento = mantenimientosPlanta.length > 0
-      ? Math.round((mantenimientosCompletados / mantenimientosPlanta.length) * 100)
+    const tasaCumplimientoMantenimiento = totalMantenimientos > 0
+      ? Math.round((mantenimientosCompletados / totalMantenimientos) * 100)
       : 100;
 
-    // Calcular estado general
+    // Estado general optimizado
     const incidenciasPendientes = incidenciasPlanta.filter(i => i.estado !== 'resuelto').length;
     const mantenimientosAtrasados = mantenimientosPlanta.filter(m => 
       m.estado !== 'completado' && new Date(m.fechaProgramada) < new Date()
     ).length;
 
     let estadoGeneral = 'optimal';
-    if (incidenciasPendientes > 0 || mantenimientosAtrasados > 0) estadoGeneral = 'attention';
     if (incidenciasPendientes > 2 || mantenimientosAtrasados > 1) estadoGeneral = 'critical';
+    else if (incidenciasPendientes > 0 || mantenimientosAtrasados > 0) estadoGeneral = 'attention';
 
     return {
-        incidenciasActivas: incidenciasPendientes,
-  totalIncidencias: incidenciasPlanta.length,
-  incidenciasResueltas,
-  tasaResolucion,
-  mantenimientosPendientes: mantenimientosPlanta.filter(m => m.estado !== 'completado').length,
-  totalMantenimientos: totalMantenimientos,
-  mantenimientosPreventivos,
-  mantenimientosCorrectivos,
-  mantenimientosCompletados,
-  ratioMantenimientoPreventivo,
-  ratioMantenimientoCorrectivo,
-  tasaCumplimientoMantenimiento,
-  reportesGenerados: reportesPlanta.length,
-  estadoGeneral,
-  nivelActividad: Math.min((incidenciasPlanta.length + mantenimientosPlanta.length + reportesPlanta.length) / 10 * 100, 100)
+      incidenciasActivas: incidenciasPendientes,
+      totalIncidencias,
+      incidenciasResueltas,
+      tasaResolucion,
+      mantenimientosPendientes: mantenimientosPlanta.filter(m => m.estado !== 'completado').length,
+      totalMantenimientos,
+      mantenimientosPreventivos,
+      mantenimientosCorrectivos: totalMantenimientos - mantenimientosPreventivos,
+      mantenimientosCompletados,
+      ratioMantenimientoPreventivo,
+      ratioMantenimientoCorrectivo: 100 - ratioMantenimientoPreventivo,
+      tasaCumplimientoMantenimiento,
+      reportesGenerados: reportesPlanta.length,
+      estadoGeneral,
+      nivelActividad: Math.min((totalIncidencias + totalMantenimientos + reportesPlanta.length) / 10 * 100, 100)
     };
   }, [incidencias, mantenimientos, reportes]);
 
-  // ✅ DATOS OPTIMIZADOS CON USEMEMO
+  // ✅ Datos optimizados con cálculos más eficientes
   const datosOptimizados = useMemo(() => {
     const incidenciasPendientes = incidencias.filter(i => i.estado === 'pendiente').length;
     const incidenciasEnProgreso = incidencias.filter(i => i.estado === 'en_progreso').length;
     const incidenciasResueltas = incidencias.filter(i => i.estado === 'resuelto').length;
     const mantenimientosPendientes = mantenimientos.filter(m => m.estado !== 'completado').length;
     
-    // Mantenimientos atrasados (fecha programada ya pasó)
     const mantenimientosAtrasados = mantenimientos.filter(m => 
       m.estado !== 'completado' && new Date(m.fechaProgramada) < new Date()
     ).length;
 
-    const plantasUnicas = plantas.filter((planta, index, self) => 
-      index === self.findIndex(p => p.id === planta.id)
-    );
-
+    // Plantas únicas optimizado
+    const plantasUnicas = [...new Map(plantas.map(planta => [planta.id, planta])).values()];
     const plantasConMetricas = plantasUnicas
+      .slice(0, 5)
       .map(planta => ({
-        id: planta.id,
-        nombre: planta.nombre,
-        ubicacion: planta.ubicacion,
+        ...planta,
         ...calcularMetricasPlanta(planta.id)
-      }))
-      .slice(0, 5);
+      }));
 
     return {
-      // Métricas rápidas para tarjetas
       metricasRapidas: {
         incidenciasPendientes,
         incidenciasEnProgreso,
         incidenciasResueltas,
         mantenimientosPendientes,
         mantenimientosAtrasados,
-        totalReportes: reportes?.length || 0
+        totalReportes: reportes?.length || 0,
+        totalPlantas: plantasUnicas.length
       },
       
-      // Datos para gráficos
       graficos: {
         plantas: plantasConMetricas,
-        incidencias: {
-          pendientes: incidenciasPendientes,
-          enProgreso: incidenciasEnProgreso,
-          resueltas: incidenciasResueltas
-        },
+        incidencias: { pendientes: incidenciasPendientes, enProgreso: incidenciasEnProgreso, resueltas: incidenciasResueltas },
         metricasReales: metricas?.metricas
       },
       
-      // Plantas para componentes
-      plantasOptimizadas: plantasUnicas.slice(0, 8)
+      plantasOptimizadas: plantasUnica.slice(0, 8),
+      plantasResumen: plantasConMetricas
     };
   }, [plantas, incidencias, mantenimientos, reportes, metricas, calcularMetricasPlanta]);
 
-  // ✅ CARGA ESTRATÉGICA DE DATOS - CORREGIDA
+  // ✅ Carga de datos optimizada
   useEffect(() => {
     if (esCliente) return;
 
@@ -166,25 +164,16 @@ export default function Dashboard() {
       }));
       
       try {
-        // ✅ CARGAR TODOS LOS DATOS ESENCIALES INICIALMENTE
-      await Promise.allSettled([
-  obtenerMetricas(),
-  obtenerPlantas(12),
-  obtenerIncidencias(15),
-  obtenerMantenimientos(12),
-  obtenerReportes(50, 1, true)
-]);
-
-        setCargandoSecciones({
-          metricas: false,
-          plantas: false,
-          incidencias: false,
-          mantenimientos: false,
-          reportes: false
-        });
-
+        await Promise.allSettled([
+          obtenerMetricas(),
+          obtenerPlantas(DASHBOARD_CONFIG.limites.plantas),
+          obtenerIncidencias(DASHBOARD_CONFIG.limites.incidencias),
+          obtenerMantenimientos(DASHBOARD_CONFIG.limites.mantenimientos),
+          obtenerReportes(DASHBOARD_CONFIG.limites.reportes, 1, true)
+        ]);
       } catch (err) {
         console.error('Error cargando datos:', err);
+      } finally {
         setCargandoSecciones({
           metricas: false,
           plantas: false,
@@ -196,258 +185,276 @@ export default function Dashboard() {
     };
 
     cargarDatosCompletos();
-  }, [esCliente, esAdmin]);
+  }, [esCliente, obtenerMetricas, obtenerPlantas, obtenerIncidencias, obtenerMantenimientos, obtenerReportes]);
 
-  // ✅ LOADING PRECISO
-  const loadingPrincipal = authLoading || cargandoSecciones.metricas || cargandoSecciones.plantas;
-  const loadingContenido = cargandoSecciones.incidencias || cargandoSecciones.mantenimientos || cargandoSecciones.reportes;
+  // ✅ Estados de loading optimizados
+  const loadingPrincipal = useMemo(() => 
+    authLoading || cargandoSecciones.metricas || cargandoSecciones.plantas,
+    [authLoading, cargandoSecciones.metricas, cargandoSecciones.plantas]
+  );
 
-  // ✅ SI ES CLIENTE, MOSTRAR ACCESO DENEGADO
-  if (esCliente) {
+  const loadingContenido = useMemo(() =>
+    cargandoSecciones.incidencias || cargandoSecciones.mantenimientos || cargandoSecciones.reportes,
+    [cargandoSecciones.incidencias, cargandoSecciones.mantenimientos, cargandoSecciones.reportes]
+  );
+
+  // ✅ Componente de Acceso Denegado
+  const AccesoDenegado = () => (
+    <div className="min-h-screen bg-gradient-light p-4 sm:p-6 flex items-center justify-center animate-fade-in">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-md w-full shadow-soft border border-secondary-100">
+        <div className="text-6xl mb-4">🚫</div>
+        <h2 className="text-xl sm:text-2xl font-bold text-secondary-800 mb-2 font-heading">
+          Acceso Restringido
+        </h2>
+        <p className="text-secondary-600 mb-6 text-sm sm:text-base leading-relaxed">
+          Como cliente, puedes gestionar tus incidencias desde la sección correspondiente.
+        </p>
+        <Link 
+          to="/incidencias"
+          className="inline-block bg-primary-600 text-white px-6 py-3 rounded-xl hover:bg-primary-700 transition-all duration-300 transform hover:scale-105 shadow-lg font-medium w-full sm:w-auto text-sm sm:text-base"
+        >
+          Ir a Mis Incidencias
+        </Link>
+      </div>
+    </div>
+  );
+
+  // ✅ Componente de Loading Mejorado
+  const SkeletonLoading = () => (
+    <div className="min-h-screen bg-gradient-light p-4 sm:p-6 animate-fade-in">
+      <div className="space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex justify-between items-center animate-pulse">
+          <div className="space-y-3">
+            <div className="h-8 bg-secondary-200 rounded-2xl w-48 sm:w-64"></div>
+            <div className="h-4 bg-secondary-200 rounded-2xl w-64 sm:w-96"></div>
+          </div>
+        </div>
+        
+        {/* Grid de Tarjetas Skeleton */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-pulse">
+              <div className="h-4 bg-secondary-200 rounded-xl w-1/2 mb-4"></div>
+              <div className="h-8 bg-secondary-200 rounded-xl w-3/4 mb-3"></div>
+              <div className="h-3 bg-secondary-200 rounded-xl w-full"></div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Contenido Principal Skeleton */}
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          <div className="xl:col-span-2 space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 h-80"></div>
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 h-64"></div>
+          </div>
+          <div className="space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 h-64"></div>
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 h-80"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // ✅ Renderizado condicional temprano
+  if (esCliente) return <AccesoDenegado />;
+  if (!puedeVerDashboard && !authLoading) return <AccesoDenegado />;
+  if (loadingPrincipal) return <SkeletonLoading />;
+
+  // ✅ Componente de Tarjetas Métricas
+  const TarjetasMetricas = () => {
+    const tarjetas = [
+      {
+        valor: datosOptimizados.metricasRapidas.incidenciasPendientes,
+        titulo: "Incidencias Pendientes",
+        descripcion: "Requieren atención inmediata",
+        color: "bg-error-50 border-error-200 text-error-600",
+        icono: "⚠️"
+      },
+      {
+        valor: datosOptimizados.metricasRapidas.mantenimientosPendientes,
+        titulo: "Mantenimientos",
+        descripcion: "Programados esta semana",
+        color: "bg-primary-50 border-primary-200 text-primary-600",
+        icono: "🔧"
+      },
+      {
+        valor: datosOptimizados.metricasRapidas.mantenimientosAtrasados,
+        titulo: "Atrasados",
+        descripcion: "Resolver urgentemente",
+        color: "bg-warning-50 border-warning-200 text-warning-600",
+        icono: "⏰"
+      },
+      {
+        valor: datosOptimizados.metricasRapidas.totalReportes,
+        titulo: "Reportes",
+        descripcion: "Generados este mes",
+        color: "bg-success-50 border-success-200 text-success-600",
+        icono: "📊"
+      }
+    ];
+
     return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-md w-full shadow-sm border border-gray-100">
-          <div className="text-6xl mb-4">🚫</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Acceso Restringido</h2>
-          <p className="text-gray-600 mb-6 text-sm sm:text-base">
-            Como cliente, puedes gestionar tus incidencias desde la sección correspondiente.
-          </p>
-          <button 
-            onClick={() => window.location.href = '/incidencias'}
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors font-medium w-full sm:w-auto"
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        {tarjetas.map((tarjeta, index) => (
+          <div 
+            key={index}
+            className={`${tarjeta.color} rounded-2xl p-4 sm:p-6 shadow-soft border-2 transition-all duration-300 hover:shadow-medium hover:scale-105 animate-fade-in-up`}
+            style={{ animationDelay: `${index * 100}ms` }}
           >
-            Ir a Mis Incidencias
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ✅ SI NO TIENE PERMISOS, MOSTRAR ERROR
-  if (!puedeVerDashboard && !authLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6 flex items-center justify-center">
-        <div className="bg-white rounded-2xl p-6 sm:p-8 text-center max-w-md w-full">
-          <div className="text-6xl mb-4">⚠️</div>
-          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sin permisos</h2>
-          <p className="text-gray-600 text-sm sm:text-base">
-            No tienes permisos para acceder al dashboard.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ✅ SKELETON LOADING MEJORADO
-  if (loadingPrincipal) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-6">
-        <div className="animate-pulse space-y-6">
-          {/* Header Skeleton */}
-          <div className="flex justify-between items-center">
-            <div>
-              <div className="h-8 bg-gray-200 rounded w-48 sm:w-64 mb-2"></div>
-              <div className="h-4 bg-gray-200 rounded w-64 sm:w-96"></div>
-            </div>
-          </div>
-          
-          {/* Tarjetas Métricas Skeleton - Responsive */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm">
-                <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-3 bg-gray-200 rounded w-full"></div>
+            <div className="flex items-center justify-between mb-3">
+              <div className="text-2xl">{tarjeta.icono}</div>
+              <div className="text-2xl sm:text-3xl font-bold font-heading">
+                {tarjeta.valor}
               </div>
-            ))}
-          </div>
-          
-          {/* Contenido Principal Skeleton */}
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-            <div className="xl:col-span-2 space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm h-64 sm:h-80"></div>
-              <div className="bg-white rounded-xl p-6 shadow-sm h-48 sm:h-64"></div>
             </div>
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-sm h-48 sm:h-64"></div>
-              <div className="bg-white rounded-xl p-6 shadow-sm h-64 sm:h-80"></div>
+            <div className="space-y-1">
+              <div className="font-semibold text-sm sm:text-base">{tarjeta.titulo}</div>
+              <div className="text-xs sm:text-sm opacity-80">{tarjeta.descripcion}</div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
     );
-  }
+  };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 space-y-4 sm:space-y-6">
-      {/* ✅ HEADER SIMPLIFICADO - RESPONSIVE */}
-      <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
-        <div className="space-y-2">
-          <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            {esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
-          </h1>
-          <p className="text-gray-500 flex items-center gap-2 text-sm sm:text-base">
-            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            {esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
-            {user?.nombre && ` • ${user.nombre}`}
-          </p>
+    <div className="min-h-screen bg-gradient-light p-4 sm:p-6 space-y-6 sm:space-y-8">
+      {/* ✅ HEADER MEJORADO */}
+      <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-down">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+          <div className="space-y-3">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-secondary-800 to-primary-600 bg-clip-text text-transparent font-heading">
+              {esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
+            </h1>
+            <p className="text-secondary-600 flex items-center gap-2 text-sm sm:text-base">
+              <span className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></span>
+              {esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
+              {user?.nombre && ` • ${user.nombre}`}
+            </p>
+          </div>
+          
+          {esAdmin && (
+            <Link
+              to="/plantas/crear"
+              className="bg-gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-large transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg w-full lg:w-auto justify-center"
+            >
+              <span className="text-lg">+</span>
+              Crear Nueva Planta
+            </Link>
+          )}
         </div>
       </div>
 
-      {/* ✅ TARJETAS DE CARGA DE TRABAJO - RESPONSIVE */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-        <div className="bg-orange-50 border border-orange-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <div className="text-2xl sm:text-3xl font-bold text-orange-600">
-            {datosOptimizados.metricasRapidas.incidenciasPendientes}
-          </div>
-          <div className="text-orange-700 font-medium text-sm sm:text-base">Incidencias Pendientes</div>
-          <div className="text-xs sm:text-sm text-orange-600 mt-2">Requieren atención inmediata</div>
-        </div>
-        
-        <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <div className="text-2xl sm:text-3xl font-bold text-blue-600">
-            {datosOptimizados.metricasRapidas.mantenimientosPendientes}
-          </div>
-          <div className="text-blue-700 font-medium text-sm sm:text-base">Mantenimientos</div>
-          <div className="text-xs sm:text-sm text-blue-600 mt-2">Programados esta semana</div>
-        </div>
-        
-        <div className="bg-red-50 border border-red-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <div className="text-2xl sm:text-3xl font-bold text-red-600">
-            {datosOptimizados.metricasRapidas.mantenimientosAtrasados}
-          </div>
-          <div className="text-red-700 font-medium text-sm sm:text-base">Atrasados</div>
-          <div className="text-xs sm:text-sm text-red-600 mt-2">Resolver urgentemente</div>
-        </div>
+      {/* ✅ TARJETAS DE MÉTRICAS */}
+      <TarjetasMetricas />
 
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-4 sm:p-6 shadow-sm">
-          <div className="text-2xl sm:text-3xl font-bold text-green-600">
-            {datosOptimizados.metricasRapidas.totalReportes}
-          </div>
-          <div className="text-green-700 font-medium text-sm sm:text-base">Reportes</div>
-          <div className="text-xs sm:text-sm text-green-600 mt-2">Generados este mes</div>
-        </div>
-      </div>
-
-      {/* ✅ BOTÓN CREAR PLANTA SOLO PARA ADMIN */}
-      {esAdmin && (
-        <div className="flex justify-end">
-          <button 
-            onClick={() => window.location.href = '/plantas/crear'}
-            className="bg-green-500 text-white px-4 sm:px-6 py-2 sm:py-3 rounded-xl hover:bg-green-600 transition-colors flex items-center gap-2 font-medium shadow-sm w-full sm:w-auto text-sm sm:text-base"
-          >
-            <span className="text-lg">+</span>
-            Crear Nueva Planta
-          </button>
-        </div>
-      )}
-
-      {/* ✅ MENSAJE DE ERROR */}
+      {/* ✅ MENSAJE DE ERROR MEJORADO */}
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 sm:px-6 py-3 sm:py-4 rounded-2xl flex items-center gap-3 shadow-sm">
-          <div className="w-6 h-6 bg-red-100 rounded-full flex items-center justify-center">
-            <span className="text-red-500 text-sm">!</span>
+        <div className="bg-error-50 border border-error-200 text-error-700 p-4 sm:p-6 rounded-2xl flex items-center gap-4 shadow-soft animate-fade-in">
+          <div className="w-8 h-8 bg-error-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <span className="text-error-500 text-sm font-bold">!</span>
           </div>
-          <div>
-            <p className="font-medium text-sm sm:text-base">Error al cargar datos</p>
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="flex-1">
+            <p className="font-semibold text-sm sm:text-base">Error al cargar datos</p>
+            <p className="text-error-600 text-sm mt-1">{error}</p>
           </div>
         </div>
       )}
 
       {/* ✅ CONTENIDO PRINCIPAL */}
       {loadingContenido ? (
-        <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 text-center py-8 sm:py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 text-sm sm:text-base">Cargando datos del sistema...</p>
+        <div className="bg-white rounded-2xl p-8 shadow-soft border border-secondary-100 text-center animate-pulse">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
+          <p className="text-secondary-600 font-medium">Cargando datos del sistema...</p>
         </div>
       ) : (
-        <>
-          <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
-            <div className="xl:col-span-2 space-y-4 sm:space-y-6">
-              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
-                <GraficosDashboard 
-                  datos={datosOptimizados.graficos}
-                  plantas={datosOptimizados.plantasOptimizadas}
-                  incidencias={incidencias}
-                  metricasReales={metricas?.metricas}
-                />
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+          {/* COLUMNA PRINCIPAL */}
+          <div className="xl:col-span-2 space-y-6">
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-scale-in">
+              <GraficosDashboard 
+                datos={datosOptimizados.graficos}
+                plantas={datosOptimizados.plantasOptimizadas}
+                incidencias={incidencias}
+                metricasReales={metricas?.metricas}
+              />
+            </div>
+            
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
+              <ResumenActividad 
+                incidencias={incidencias}
+                mantenimientos={mantenimientos}
+              />
+            </div>
+          </div>
+
+          {/* ✅ SIDEBAR MEJORADO */}
+          <div className="space-y-6">
+            {/* PLANTAS ACTIVAS */}
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-slide-in-right">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-semibold text-secondary-800 font-heading">
+                  Plantas Activas
+                </h3>
+                <Link
+                  to="/plantas"
+                  className="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors duration-200"
+                >
+                  Ver todas →
+                </Link>
               </div>
               
-              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
-                <ResumenActividad 
-                  incidencias={incidencias}
-                  mantenimientos={mantenimientos}
-                />
+              <div className="space-y-4">
+                {datosOptimizados.plantasResumen.map((planta, index) => (
+                  <Link 
+                    key={planta.id} 
+                    to={`/plantas/${planta.id}`}
+                    className="flex items-center p-4 border border-secondary-100 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-300 group animate-fade-in-up"
+                    style={{ animationDelay: `${index * 50}ms` }}
+                  >
+                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-medium">
+                      {planta.nombre.charAt(0)}
+                    </div>
+                    <div className="ml-4 flex-1 min-w-0">
+                      <h4 className="font-semibold text-secondary-800 group-hover:text-primary-700 transition-colors truncate">
+                        {planta.nombre}
+                      </h4>
+                      <p className="text-secondary-600 text-sm truncate">{planta.ubicacion}</p>
+                    </div>
+                    <div className={`w-3 h-3 rounded-full ${
+                      DASHBOARD_CONFIG.colores[planta.estadoGeneral]
+                    }`}></div>
+                  </Link>
+                ))}
               </div>
             </div>
 
-            {/* ✅ COLUMNA DERECHA - RESPONSIVE */}
-            <div className="space-y-4 sm:space-y-6">
-              {/* LISTA SIMPLE DE PLANTAS */}
-              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">Plantas Activas</h3>
-                  <Link
-                    to="/plantas"
-                    className="text-xs sm:text-sm text-blue-600 hover:text-blue-700 font-medium"
+            {/* RESUMEN RÁPIDO */}
+            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
+              <h3 className="text-lg font-semibold text-secondary-800 mb-6 font-heading">
+                Resumen Rápido
+              </h3>
+              <div className="space-y-4">
+                {[
+                  { label: 'Plantas totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
+                  { label: 'Incidencias resueltas', valor: datosOptimizados.metricasRapidas.incidenciasResueltas, color: 'text-success-600' },
+                  { label: 'Reportes generados', valor: datosOptimizados.metricasRapidas.totalReportes, color: 'text-primary-600' }
+                ].map((item, index) => (
+                  <div 
+                    key={index}
+                    className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg transition-all duration-200 hover:bg-secondary-100"
                   >
-                    Ver todas →
-                  </Link>
-                </div>
-                
-                <div className="space-y-3">
-                  {datosOptimizados.plantasOptimizadas.slice(0, 5).map((planta) => (
-                    <Link 
-                      key={planta.id} 
-                      to={`/plantas/${planta.id}`}
-                      className="flex items-center p-3 border border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 transition-all duration-200 group"
-                    >
-                      <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white font-semibold text-xs sm:text-sm">
-                        {planta.nombre.charAt(0)}
-                      </div>
-                      <div className="ml-3 flex-1 min-w-0">
-                        <h4 className="font-medium text-gray-900 group-hover:text-blue-700 transition-colors truncate text-sm sm:text-base">
-                          {planta.nombre}
-                        </h4>
-                        <p className="text-xs sm:text-sm text-gray-500 truncate">{planta.ubicacion}</p>
-                      </div>
-                      <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full ${
-                        planta.estadoGeneral === 'optimal' ? 'bg-green-400' :
-                        planta.estadoGeneral === 'attention' ? 'bg-yellow-400' : 'bg-red-400'
-                      }`}></div>
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              {/* RESUMEN RÁPIDO */}
-              <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100">
-                <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4">Resumen Rápido</h3>
-                <div className="space-y-3 sm:space-y-4">
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 text-sm sm:text-base">Plantas totales</span>
-                    <span className="font-semibold text-gray-900 text-sm sm:text-base">{plantas.length}</span>
+                    <span className="text-secondary-700 font-medium">{item.label}</span>
+                    <span className={`font-bold text-lg ${item.color}`}>{item.valor}</span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 text-sm sm:text-base">Incidencias resueltas</span>
-                    <span className="font-semibold text-green-600 text-sm sm:text-base">
-                      {datosOptimizados.metricasRapidas.incidenciasResueltas}
-                    </span>
-                  </div>
-                  <div className="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                    <span className="text-gray-700 text-sm sm:text-base">Reportes generados</span>
-                    <span className="font-semibold text-blue-600 text-sm sm:text-base">
-                      {datosOptimizados.metricasRapidas.totalReportes}
-                    </span>
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
-        </>
+        </div>
       )}
-
     </div>
   );
 }

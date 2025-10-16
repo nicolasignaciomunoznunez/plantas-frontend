@@ -1,23 +1,43 @@
 import { NavLink } from 'react-router-dom';
 import { useAuthStore } from '../../stores/authStore';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
+import { clsx } from 'clsx';
 
-export default function Sidebar({ isCollapsed, onToggleCollapse }) {
+// 🎨 Configuración centralizada
+const SIDEBAR_CONFIG = {
+  sizes: {
+    collapsed: {
+      width: 'w-20',
+      padding: 'px-3'
+    },
+    expanded: {
+      width: 'w-72 lg:w-64',
+      padding: 'px-4'
+    },
+    mobile: {
+      width: 'w-80'
+    }
+  },
+  transitions: {
+    duration: 'duration-300',
+    timing: 'ease-in-out'
+  },
+  breakpoints: {
+    mobile: 1024
+  }
+};
+
+export default function Sidebar({ isCollapsed, onToggleCollapse, className = '' }) {
   const { user } = useAuthStore();
-  const esCliente = user?.rol === 'cliente';
-  const esTecnico = user?.rol === 'tecnico';
-  const esAdmin = user?.rol === 'admin';
-
-  // ✅ ESTADO PARA MÓVIL
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
-  // ✅ DETECTAR SI ES MÓVIL
+  // ✅ Detectar móvil optimizado
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-      // En móvil, forzar colapsado
-      if (window.innerWidth < 1024) {
+      const mobile = window.innerWidth < SIDEBAR_CONFIG.breakpoints.mobile;
+      setIsMobile(mobile);
+      if (mobile) {
         onToggleCollapse(true);
       }
     };
@@ -27,8 +47,15 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
     return () => window.removeEventListener('resize', checkMobile);
   }, [onToggleCollapse]);
 
-  // ✅ NAVEGACIÓN ORIGINAL (sin cambios)
-  const navigation = [
+  // ✅ Roles memoizados
+  const { esCliente, esTecnico, esAdmin } = useMemo(() => ({
+    esCliente: user?.rol === 'cliente',
+    esTecnico: user?.rol === 'tecnico',
+    esAdmin: user?.rol === 'admin'
+  }), [user?.rol]);
+
+  // ✅ Navegación optimizada
+  const navigation = useMemo(() => [
     { 
       name: 'Dashboard', 
       href: '/dashboard', 
@@ -80,76 +107,90 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
       ),
       visible: !esCliente
     },
-  ];
+  ], [esCliente]);
 
-  const navigationFiltrada = navigation.filter(item => item.visible);
+  const navigationFiltrada = useMemo(() => 
+    navigation.filter(item => item.visible),
+    [navigation]
+  );
+
+  // ✅ Handlers optimizados
+  const handleCloseMobile = useCallback(() => {
+    setIsMobileOpen(false);
+  }, []);
+
+  const handleToggleMobile = useCallback(() => {
+    setIsMobileOpen(prev => !prev);
+  }, []);
+
+  const handleNavClick = useCallback(() => {
+    if (isMobile) {
+      setIsMobileOpen(false);
+    }
+  }, [isMobile]);
+
+  const handleToggleCollapse = useCallback(() => {
+    onToggleCollapse(!isCollapsed);
+  }, [isCollapsed, onToggleCollapse]);
+
+  // ✅ Clases dinámicas optimizadas
+  const sidebarClasses = clsx(
+    'bg-white shadow-soft border-r border-secondary-100',
+    'transition-all duration-300 ease-in-out',
+    'fixed lg:relative z-50 h-screen lg:h-full',
+    'flex flex-col',
+    isMobileOpen ? 'translate-x-0 shadow-large' : '-translate-x-full lg:translate-x-0',
+    isCollapsed ? SIDEBAR_CONFIG.sizes.collapsed.width : SIDEBAR_CONFIG.sizes.expanded.width,
+    className
+  );
 
   return (
     <>
-      {/* ✅ BOTÓN HAMBURGUESA PARA MÓVIL - MEJOR POSICIONADO */}
-      <button
-        onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-xl shadow-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-      >
-        <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-        </svg>
-      </button>
-
-      {/* ✅ OVERLAY MEJORADO */}
+      {/* ✅ Overlay para móvil */}
       {isMobileOpen && (
         <div 
           className="lg:hidden fixed inset-0 bg-black bg-opacity-60 z-40 transition-opacity duration-300"
-          onClick={() => setIsMobileOpen(false)}
+          onClick={handleCloseMobile}
         />
       )}
 
-      {/* ✅ SIDEBAR PRINCIPAL - CORREGIDO PARA MÓVIL */}
-      <div className={`
-        bg-white shadow-xl border-r border-gray-200 transition-all duration-300 ease-in-out
-        fixed lg:relative z-50 h-screen lg:h-full
-        ${isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
-        ${isCollapsed ? 'w-20 lg:w-20' : 'w-72 lg:w-64'}
-        flex flex-col
-      `}>
+      {/* ✅ Sidebar Principal */}
+      <div className={sidebarClasses}>
         <div className="flex flex-col h-full">
-          {/* Header del Sidebar - MEJORADO */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100 flex-shrink-0">
-            {(!isCollapsed || isMobileOpen) && (
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center shadow-sm">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                </div>
-                <div className="min-w-0">
-                  <h1 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent truncate">
+          {/* Header del Sidebar */}
+          <div className="flex items-center justify-between h-16 px-4 border-b border-secondary-100 flex-shrink-0">
+            {/* Logo y Branding */}
+            <div className={clsx(
+              "flex items-center gap-3 transition-all duration-300",
+              (isCollapsed && !isMobileOpen) ? "justify-center w-full" : "flex-1 min-w-0"
+            )}>
+              <div className="w-8 h-8 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
+                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+              </div>
+              
+              {(!isCollapsed || isMobileOpen) && (
+                <div className="min-w-0 flex-1">
+                  <h1 className="text-lg font-bold bg-gradient-to-r from-secondary-800 to-primary-600 bg-clip-text text-transparent truncate font-heading">
                     RYV SPA
                   </h1>
-                  <p className="text-xs text-gray-500 truncate">
+                  <p className="text-xs text-secondary-500 truncate">
                     {esCliente ? 'Portal Cliente' : 
                      esTecnico ? 'Panel Técnico' : 
                      'Gestión Plantas'}
                   </p>
                 </div>
-              </div>
-            )}
-            
-            {(isCollapsed && !isMobileOpen) && (
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mx-auto shadow-sm">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-            )}
+              )}
+            </div>
 
-            {/* Botón de colapsar/cerrar - MEJORADO */}
-            <div className="flex items-center gap-2">
-              {/* Botón cerrar móvil - MÁS VISIBLE */}
+            {/* Controles */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Botón cerrar móvil */}
               {isMobileOpen && (
                 <button
-                  onClick={() => setIsMobileOpen(false)}
-                  className="p-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-all duration-200 lg:hidden"
+                  onClick={handleCloseMobile}
+                  className="p-2 text-secondary-600 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200 lg:hidden"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -159,13 +200,14 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
 
               {/* Botón colapsar (solo desktop) */}
               <button
-                onClick={() => onToggleCollapse(!isCollapsed)}
-                className="hidden lg:block p-1.5 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+                onClick={handleToggleCollapse}
+                className="hidden lg:flex p-2 text-secondary-400 hover:text-primary-600 hover:bg-primary-50 rounded-xl transition-all duration-200"
               >
                 <svg 
-                  className={`w-4 h-4 transition-transform duration-200 ${
-                    isCollapsed ? 'rotate-180' : ''
-                  }`} 
+                  className={clsx(
+                    "w-4 h-4 transition-transform duration-200",
+                    isCollapsed ? "rotate-180" : ""
+                  )} 
                   fill="none" 
                   stroke="currentColor" 
                   viewBox="0 0 24 24"
@@ -176,61 +218,79 @@ export default function Sidebar({ isCollapsed, onToggleCollapse }) {
             </div>
           </div>
 
-          {/* Navegación FILTRADA - MEJOR SCROLL */}
+          {/* Navegación */}
           <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
             {navigationFiltrada.map((item) => (
               <NavLink
                 key={item.name}
                 to={item.href}
-                onClick={() => isMobile && setIsMobileOpen(false)}
+                onClick={handleNavClick}
                 className={({ isActive }) =>
-                  `group flex items-center rounded-xl transition-all duration-200 mx-1 ${
+                  clsx(
+                    "group flex items-center rounded-xl transition-all duration-200 mx-1 relative",
+                    "hover:bg-primary-50 hover:text-primary-700",
                     isActive 
-                      ? 'bg-gradient-to-r from-blue-50 to-blue-100 text-blue-700 border border-blue-200 shadow-sm' 
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                  } ${(isCollapsed && !isMobileOpen) ? 'px-3 py-3 justify-center' : 'px-4 py-3'}`
+                      ? 'bg-gradient-to-r from-primary-50 to-primary-100 text-primary-700 border border-primary-200 shadow-sm' 
+                      : 'text-secondary-600',
+                    (isCollapsed && !isMobileOpen) ? 'px-3 py-3 justify-center' : 'px-4 py-3'
+                  )
                 }
               >
-                <div className={`flex items-center ${(isCollapsed && !isMobileOpen) ? 'justify-center' : ''}`}>
-                  <div className={`transition-colors duration-200 ${
-                    (isCollapsed && !isMobileOpen) ? '' : 'mr-3'
-                  }`}>
+                <div className={clsx(
+                  "flex items-center transition-all duration-200",
+                  (isCollapsed && !isMobileOpen) ? "justify-center" : ""
+                )}>
+                  <div className={clsx(
+                    "transition-colors duration-200 flex-shrink-0",
+                    (isCollapsed && !isMobileOpen) ? "" : "mr-3"
+                  )}>
                     {item.icon}
                   </div>
                   {(!isCollapsed || isMobileOpen) && (
-                    <span className="font-medium text-sm whitespace-nowrap">{item.name}</span>
+                    <span className="font-medium text-sm whitespace-nowrap truncate">
+                      {item.name}
+                    </span>
                   )}
                 </div>
                 
-                {/* Tooltip para modo colapsado desktop */}
+                {/* Tooltip para modo colapsado */}
                 {(isCollapsed && !isMobileOpen) && (
-                  <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-sm rounded-md opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap shadow-lg">
+                  <div className="absolute left-full ml-2 px-3 py-2 bg-secondary-800 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none z-50 whitespace-nowrap shadow-large">
                     {item.name}
+                    <div className="absolute right-full top-1/2 transform -translate-y-1/2 border-4 border-transparent border-r-secondary-800"></div>
                   </div>
                 )}
               </NavLink>
             ))}
           </nav>
 
-          {/* Footer del Sidebar - MEJORADO */}
-          <div className={`p-4 border-t border-gray-100 flex-shrink-0 ${(isCollapsed && !isMobileOpen) ? 'text-center' : ''}`}>
-            <div className={`flex items-center ${(isCollapsed && !isMobileOpen) ? 'justify-center' : 'justify-between'}`}>
+          {/* Footer del Sidebar */}
+          <div className={clsx(
+            "p-4 border-t border-secondary-100 flex-shrink-0",
+            (isCollapsed && !isMobileOpen) ? "text-center" : ""
+          )}>
+            <div className={clsx(
+              "flex items-center",
+              (isCollapsed && !isMobileOpen) ? "justify-center" : "justify-between"
+            )}>
               {(!isCollapsed || isMobileOpen) && (
-                <div className="text-xs text-gray-500 min-w-0">
-                  <div className="flex items-center gap-1.5 mb-1">
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0"></div>
-                    <span className="truncate">
+                <div className="text-xs text-secondary-500 min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse flex-shrink-0"></div>
+                    <span className="truncate font-medium">
                       {esCliente ? 'Portal activo' : 'Sistema activo'}
                     </span>
                   </div>
-                  <div className="truncate">
-                    {user?.nombre && `Hola, ${user.nombre}`}
-                  </div>
+                  {user?.nombre && (
+                    <div className="truncate text-secondary-600">
+                      Hola, {user.nombre}
+                    </div>
+                  )}
                 </div>
               )}
               
               {(isCollapsed && !isMobileOpen) && (
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></div>
               )}
             </div>
           </div>

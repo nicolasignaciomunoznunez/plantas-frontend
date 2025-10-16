@@ -380,8 +380,7 @@ export default function Register() {
                       className="block w-full px-4 py-3 border border-secondary-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200 appearance-none bg-white"
                     >
                       <option value="cliente">Cliente</option>
-                      <option value="tecnico">Técnico</option>
-                      <option value="admin">Administrador</option>
+                      
                     </select>
                     <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                       <svg className="h-5 w-5 text-secondary-400" fill="currentColor" viewBox="0 0 20 20">

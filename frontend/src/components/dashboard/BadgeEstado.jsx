@@ -1,7 +1,10 @@
 // components/dashboard/BadgeEstado.jsx
-export default function BadgeEstado({ estado, size = 'md' }) {
-  // ✅ CONFIGURACIÓN RESPONSIVE
-  const sizeConfig = {
+import React from 'react';
+import { clsx } from 'clsx';
+
+// 🎨 Configuración centralizada para consistencia
+const BADGE_CONFIG = {
+  sizes: {
     sm: {
       text: 'text-xs',
       padding: 'px-2 py-0.5',
@@ -17,87 +20,195 @@ export default function BadgeEstado({ estado, size = 'md' }) {
       padding: 'px-3 py-1.5',
       icon: 'w-3.5 h-3.5 sm:w-4 sm:h-4'
     }
-  };
+  },
 
-  const { text: textSize, padding, icon: iconSize } = sizeConfig[size];
-
-  const config = {
-    pendiente: { 
-      clase: 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+  estados: {
+    // ✅ Estados de incidencias
+    pendiente: {
+      clase: 'bg-warning-50 text-warning-700 border-warning-200',
       texto: 'Pendiente',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
         </svg>
       )
     },
-    en_progreso: { 
-      clase: 'bg-blue-100 text-blue-800 border-blue-200', 
+    en_progreso: {
+      clase: 'bg-primary-50 text-primary-700 border-primary-200',
       texto: 'En Progreso',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z" clipRule="evenodd" />
         </svg>
       )
     },
-    resuelto: { 
-      clase: 'bg-green-100 text-green-800 border-green-200', 
+    resuelto: {
+      clase: 'bg-success-50 text-success-700 border-success-200',
       texto: 'Resuelto',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
         </svg>
       )
     },
-    completado: { 
-      clase: 'bg-green-100 text-green-800 border-green-200', 
+
+    // ✅ Estados de mantenimiento
+    completado: {
+      clase: 'bg-success-50 text-success-700 border-success-200',
       texto: 'Completado',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
         </svg>
       )
     },
-    // ✅ ESTADOS ADICIONALES PARA MÁS FLEXIBILIDAD
-    critical: {
-      clase: 'bg-red-100 text-red-800 border-red-200',
-      texto: 'Crítico',
+    programado: {
+      clase: 'bg-secondary-50 text-secondary-700 border-secondary-200',
+      texto: 'Programado',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clipRule="evenodd" />
         </svg>
       )
     },
+
+    // ✅ Estados del sistema
     optimal: {
-      clase: 'bg-green-100 text-green-800 border-green-200',
+      clase: 'bg-success-50 text-success-700 border-success-200',
       texto: 'Óptimo',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
         </svg>
       )
     },
     attention: {
-      clase: 'bg-orange-100 text-orange-800 border-orange-200',
+      clase: 'bg-warning-50 text-warning-700 border-warning-200',
       texto: 'Atención',
       icono: (
-        <svg className={iconSize} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+    critical: {
+      clase: 'bg-error-50 text-error-700 border-error-200',
+      texto: 'Crítico',
+      icono: (
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+        </svg>
+      )
+    },
+
+    // ✅ Estado por defecto
+    desconocido: {
+      clase: 'bg-secondary-50 text-secondary-600 border-secondary-200',
+      texto: 'Desconocido',
+      icono: (
+        <svg className="fill-current" viewBox="0 0 20 20">
+          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
         </svg>
       )
     }
-  };
+  }
+};
 
-  const { clase, texto, icono } = config[estado] || { 
-    clase: 'bg-gray-100 text-gray-800 border-gray-200', 
-    texto: estado?.charAt(0).toUpperCase() + estado?.slice(1) || 'Desconocido',
-    icono: <div className={`${iconSize} bg-current rounded-full`}></div>
-  };
+// 🎯 Interface de props para mejor autocompletado
+/**
+ * @typedef {Object} BadgeEstadoProps
+ * @property {'pendiente'|'en_progreso'|'resuelto'|'completado'|'programado'|'optimal'|'attention'|'critical'} estado
+ * @property {'sm'|'md'|'lg'} [size='md']
+ * @property {boolean} [showIcon=true]
+ * @property {string} [className]
+ */
+
+/**
+ * Componente BadgeEstado - Muestra estados con iconos y colores consistentes
+ * @param {BadgeEstadoProps} props
+ */
+export default function BadgeEstado({ 
+  estado, 
+  size = 'md', 
+  showIcon = true,
+  className = ''
+}) {
+  // 🛡️ Validación de estado
+  const estadoValido = BADGE_CONFIG.estados[estado] || BADGE_CONFIG.estados.desconocido;
+  const tamañoConfig = BADGE_CONFIG.sizes[size];
+
+  // 🎨 Clases base responsivas
+  const baseClasses = clsx(
+    'inline-flex items-center gap-1.5 rounded-full font-medium border transition-all duration-200',
+    tamañoConfig.text,
+    tamañoConfig.padding,
+    estadoValido.clase,
+    className
+  );
 
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full font-medium border ${clase} ${textSize} ${padding}`}>
-      {icono}
-      {texto}
+    <span className={baseClasses}>
+      {showIcon && (
+        <span className={`flex-shrink-0 ${tamañoConfig.icon}`}>
+          {estadoValido.icono}
+        </span>
+      )}
+      <span className="whitespace-nowrap">
+        {estadoValido.texto}
+      </span>
     </span>
   );
+}
+
+// 🎯 Componente adicional: BadgeContador para estados con números
+/**
+ * Badge especial para mostrar conteos con estado
+ */
+export function BadgeContador({ 
+  estado, 
+  count, 
+  size = 'md',
+  showZero = false 
+}) {
+  if (!showZero && (!count || count === 0)) return null;
+
+  const estadoValido = BADGE_CONFIG.estados[estado] || BADGE_CONFIG.estados.desconocido;
+  const tamañoConfig = BADGE_CONFIG.sizes[size];
+
+  return (
+    <span className={clsx(
+      'inline-flex items-center gap-1.5 rounded-full font-medium border transition-all duration-200',
+      tamañoConfig.text,
+      tamañoConfig.padding,
+      estadoValido.clase
+    )}>
+      <span className={tamañoConfig.icon}>
+        {estadoValido.icono}
+      </span>
+      <span className="font-semibold">
+        {count}
+      </span>
+    </span>
+  );
+}
+
+// 🎯 Hook personalizado para usar estados del badge
+export function useBadgeEstados() {
+  const obtenerConfigEstado = (estado) => {
+    return BADGE_CONFIG.estados[estado] || BADGE_CONFIG.estados.desconocido;
+  };
+
+  const obtenerClaseEstado = (estado) => {
+    return obtenerConfigEstado(estado).clase;
+  };
+
+  const listaEstadosDisponibles = () => {
+    return Object.keys(BADGE_CONFIG.estados).filter(estado => estado !== 'desconocido');
+  };
+
+  return {
+    obtenerConfigEstado,
+    obtenerClaseEstado,
+    listaEstadosDisponibles
+  };
 }

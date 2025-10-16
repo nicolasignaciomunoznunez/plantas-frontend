@@ -1,34 +1,133 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import { clsx } from 'clsx';
 
 export default function Layout() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
+  // ✅ Configuración responsive centralizada MEJORADA
+  const layoutConfig = useMemo(() => ({
+    sidebar: {
+      collapsed: {
+        width: 'w-20', // 80px
+        margin: 'lg:ml-20'
+      },
+      expanded: {
+        width: 'w-64', // 256px  
+        margin: 'lg:ml-64'
+      }
+    },
+    header: {
+      height: 'h-16',
+      zIndex: 'z-40'
+    },
+    main: {
+      padding: 'p-4 sm:p-6',
+      maxWidth: 'max-w-full'
+    },
+    transitions: {
+      duration: 'duration-300',
+      timing: 'ease-in-out'
+    }
+  }), []);
+
+  // ✅ Clases dinámicas optimizadas CON CLSX
+  const mainContentClasses = useMemo(() => 
+    clsx(
+      'flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out',
+      sidebarCollapsed ? layoutConfig.sidebar.collapsed.margin : layoutConfig.sidebar.expanded.margin
+    ),
+    [sidebarCollapsed, layoutConfig]
+  );
+
+  const sidebarClasses = useMemo(() =>
+    clsx(
+      'fixed lg:relative z-50 transition-all duration-300 ease-in-out',
+      sidebarCollapsed ? layoutConfig.sidebar.collapsed.width : layoutConfig.sidebar.expanded.width
+    ),
+    [sidebarCollapsed, layoutConfig]
+  );
+
+  const headerClasses = useMemo(() =>
+    clsx(
+      'sticky top-0 z-40 h-16 bg-white/80 backdrop-blur-sm border-b border-secondary-100',
+      'transition-all duration-300'
+    ),
+    []
+  );
+
+  // ✅ Handlers optimizados
+  const handleToggleSidebar = () => {
+    setSidebarCollapsed(prev => !prev);
+  };
+
+  const handleCloseSidebarMobile = () => {
+    setSidebarCollapsed(true);
+  };
+
   return (
-    <div className="flex h-screen bg-gray-50">
-      {/* ✅ Sidebar responsive - ya maneja su propio estado móvil */}
+    <div className="flex h-screen bg-gradient-light">
+      {/* ✅ Sidebar integrado */}
       <Sidebar 
         isCollapsed={sidebarCollapsed} 
-        onToggleCollapse={setSidebarCollapsed} 
+        onToggleCollapse={setSidebarCollapsed}
+        className={sidebarClasses}
       />
       
-      {/* ✅ Contenido principal con márgenes responsive */}
-      <div className={`
-        flex-1 flex flex-col min-w-0 transition-all duration-300
-        ${sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-64'}
-      `}>
-        {/* Header */}
-        <Header />
+      {/* ✅ Contenido principal */}
+      <div className={mainContentClasses}>
+        {/* Overlay para móvil - MEJORADO */}
+        {!sidebarCollapsed && (
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
+            onClick={handleCloseSidebarMobile}
+          />
+        )}
         
-        {/* Main content area */}
+        {/* ✅ Header integrado */}
+        <Header 
+          onToggleSidebar={handleToggleSidebar}
+          sidebarCollapsed={sidebarCollapsed}
+          className={headerClasses}
+        />
+        
+        {/* ✅ Área principal de contenido */}
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <div className="h-full p-4 lg:p-6">
+          <div className={clsx(
+            'h-full',
+            layoutConfig.main.padding,
+            layoutConfig.main.maxWidth
+          )}>
             <Outlet />
           </div>
         </main>
       </div>
     </div>
   );
+}
+
+// 🎯 Hook personalizado para gestión del layout (OPCIONAL)
+export function useLayout() {
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+
+  const toggleSidebar = useCallback(() => {
+    setSidebarCollapsed(prev => !prev);
+  }, []);
+
+  const closeSidebar = useCallback(() => {
+    setSidebarCollapsed(true);
+  }, []);
+
+  const openSidebar = useCallback(() => {
+    setSidebarCollapsed(false);
+  }, []);
+
+  return {
+    sidebarCollapsed,
+    toggleSidebar,
+    closeSidebar,
+    openSidebar
+  };
 }
