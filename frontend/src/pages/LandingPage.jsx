@@ -1,15 +1,14 @@
 // pages/LandingPage.jsx
-import React, { lazy, Suspense } from 'react';
-
-// Componentes que se cargan bajo demanda
-const Projects = lazy(() => import('../components/landing/Projects'));
-const FAQ = lazy(() => import('../components/landing/FAQ'));
-
-const LoadingFallback = () => (
-  <div className="h-96 bg-gray-100 animate-pulse rounded-lg flex items-center justify-center">
-    <div className="text-gray-400">Cargando...</div>
-  </div>
-);
+import React from 'react';
+import Header from '../components/landing/Header';
+import Hero from '../components/landing/Hero';
+import About from '../components/landing/About';
+import Services from '../components/landing/Services';
+import Projects from '../components/landing/Projects';
+import Counter from '../components/landing/Counter';
+import FAQ from '../components/landing/FAQ';
+import Contact from '../components/landing/Contact';
+import Footer from '../components/landing/Footer';
 
 const LandingPage = () => {
   return (
@@ -19,16 +18,14 @@ const LandingPage = () => {
         <Hero />
         <About />
         <Services />
-        <Suspense fallback={<LoadingFallback />}>
-          <Projects />
-        </Suspense>
+        <Projects />
         <Counter />
-        <Suspense fallback={<LoadingFallback />}>
-          <FAQ />
-        </Suspense>
+        <FAQ />
         <Contact />
       </main>
       <Footer />
     </div>
   );
 };
+
+export default LandingPage;
