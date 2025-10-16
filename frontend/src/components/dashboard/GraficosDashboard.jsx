@@ -365,9 +365,10 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                           data[index] === 0 && 'opacity-0'
                         )}
                         style={{
-                          height: `${(data[index] / maxIncidencias) * 100}%`,
-                          minHeight: data[index] > 0 ? '8px' : '0px'
-                        }}
+  height: `${Math.max((data[index] / maxIncidencias) * 120, 8)}px`, // ✅ NUEVO
+  minHeight: '8px'                                                  // ✅ NUEVO
+}}
+                      
                         title={`${data[index]} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
                       />
                     ))}
