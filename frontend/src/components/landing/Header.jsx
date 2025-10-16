@@ -1,14 +1,29 @@
+// components/landing/Header.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState('inicio');
 
-  // Efecto para header sticky con sombra
+  // Efecto para header sticky y detección de sección activa
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+      
+      // Detectar sección activa
+      const sections = ['inicio', 'nosotros', 'servicios', 'proyectos', 'contacto'];
+      const current = sections.find(section => {
+        const element = document.getElementById(section);
+        if (element) {
+          const rect = element.getBoundingClientRect();
+          return rect.top <= 100 && rect.bottom >= 100;
+        }
+        return false;
+      });
+      
+      if (current) setActiveSection(current);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -19,162 +34,161 @@ const Header = () => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+      setActiveSection(sectionId);
     }
     setIsMobileMenuOpen(false);
   };
 
+  const navItems = [
+    { id: 'inicio', label: 'Inicio' },
+    { id: 'nosotros', label: 'Sobre Nosotros' },
+    { id: 'servicios', label: 'Servicios' },
+    { id: 'proyectos', label: 'Proyectos' },
+  ];
+
   return (
-    <header className={`fixed top-0 left-0 w-full bg-white z-50 transition-all duration-300 ${
-      isScrolled ? 'shadow-lg py-2' : 'shadow-md py-4'
+    <header className={`fixed top-0 left-0 w-full bg-white/95 backdrop-blur-md z-50 transition-all duration-500 ${
+      isScrolled ? 'shadow-large py-3' : 'shadow-medium py-5'
     }`}>
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
-          {/* Logo */}
+          {/* Logo Mejorado */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <Link 
+              to="/" 
+              className="flex items-center group"
+              onClick={() => scrollToSection('inicio')}
+            >
               {/* Logo para desktop */}
               <img 
                 src="/images/finalogo.jpeg" 
-                alt="RYV SPA" 
-                className={`transition-all duration-300 ${
-                  isScrolled ? 'h-16' : 'h-20'
-                } w-auto hidden md:block`}
+                alt="RYV SPA - Soluciones integrales para plantas de agua potable" 
+                className={`transition-all duration-500 ${
+                  isScrolled ? 'h-14' : 'h-18'
+                } w-auto hidden md:block group-hover:scale-105`}
               />
               {/* Logo para móvil */}
               <img 
                 src="/images/finalogotr.png" 
                 alt="RYV SPA" 
-                className="h-14 w-auto md:hidden"
+                className="h-12 w-auto md:hidden transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
           </div>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-8">
-            <button 
-              onClick={() => scrollToSection('inicio')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2"
-            >
-              Inicio
-            </button>
-            <button 
-              onClick={() => scrollToSection('nosotros')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2"
-            >
-              Sobre nosotros
-            </button>
-            <button 
-              onClick={() => scrollToSection('servicios')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2"
-            >
-              Servicios
-            </button>
-            <button 
-              onClick={() => scrollToSection('proyectos')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 py-2"
-            >
-              Proyectos
-            </button>
+          {/* Desktop Navigation Mejorada */}
+          <nav className="hidden lg:flex items-center space-x-1">
+            {navItems.map((item) => (
+              <button 
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`px-6 py-3 rounded-xl font-medium transition-all duration-300 relative ${
+                  activeSection === item.id
+                    ? 'text-primary-600 bg-primary-50 shadow-soft'
+                    : 'text-secondary-600 hover:text-primary-600 hover:bg-primary-25'
+                }`}
+              >
+                {item.label}
+                {activeSection === item.id && (
+                  <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-1/2 h-0.5 bg-gradient-primary rounded-full"></div>
+                )}
+              </button>
+            ))}
             
-            {/* Botones de acción */}
-            <div className="flex items-center space-x-4 ml-4">
+            {/* Botones de acción mejorados */}
+            <div className="flex items-center space-x-3 ml-6 pl-6 border-l border-secondary-200">
               <Link 
                 to="/login"
-                className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium border border-gray-200"
+                className="px-6 py-3 rounded-xl font-medium border border-secondary-300 text-secondary-700 hover:bg-secondary-50 hover:border-secondary-400 transition-all duration-300 hover:shadow-soft"
               >
                 Iniciar Sesión
               </Link>
               <button 
                 onClick={() => scrollToSection('contacto')}
-                className="bg-blue-600 text-white px-6 py-2.5 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium shadow-lg hover:shadow-xl transform hover:scale-105"
+                className="px-6 py-3 rounded-xl font-medium bg-gradient-primary text-white hover:shadow-large transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
               >
-                Contactar
+                <span className="relative z-10">Contactar</span>
+                <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
           </nav>
 
-          {/* Tablet Navigation (sin botones) */}
-          <nav className="hidden md:flex lg:hidden items-center space-x-6">
+          {/* Tablet Navigation Mejorada */}
+          <nav className="hidden md:flex lg:hidden items-center space-x-2">
+            {navItems.slice(0, 3).map((item) => (
+              <button 
+                key={item.id}
+                onClick={() => scrollToSection(item.id)}
+                className={`px-4 py-2 rounded-lg font-medium text-sm transition-all duration-300 ${
+                  activeSection === item.id
+                    ? 'text-primary-600 bg-primary-50'
+                    : 'text-secondary-600 hover:text-primary-600 hover:bg-primary-25'
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
             <button 
-              onClick={() => scrollToSection('inicio')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 text-sm"
+              onClick={() => scrollToSection('contacto')}
+              className="px-4 py-2 rounded-lg font-medium text-sm bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300 ml-2"
             >
-              Inicio
-            </button>
-            <button 
-              onClick={() => scrollToSection('servicios')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 text-sm"
-            >
-              Servicios
-            </button>
-            <button 
-              onClick={() => scrollToSection('proyectos')}
-              className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 text-sm"
-            >
-              Proyectos
+              Contacto
             </button>
           </nav>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button Mejorado */}
           <button 
-            className="md:hidden text-gray-700 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200"
+            className="md:hidden p-3 rounded-xl bg-secondary-100 hover:bg-secondary-200 text-secondary-700 transition-all duration-300 relative group"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label="Menú móvil"
+            aria-label={isMobileMenuOpen ? "Cerrar menú" : "Abrir menú"}
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            <div className="w-6 h-6 relative">
+              <span className={`absolute left-0 w-6 h-0.5 bg-current transition-all duration-300 ${
+                isMobileMenuOpen ? 'top-3 rotate-45' : 'top-2'
+              }`}></span>
+              <span className={`absolute left-0 w-6 h-0.5 bg-current transition-all duration-300 ${
+                isMobileMenuOpen ? 'top-3 -rotate-45' : 'top-3'
+              }`}></span>
+              <span className={`absolute left-0 w-6 h-0.5 bg-current transition-all duration-300 ${
+                isMobileMenuOpen ? 'top-3 opacity-0' : 'top-4'
+              }`}></span>
+            </div>
           </button>
         </div>
 
-        {/* Mobile Menu */}
+        {/* Mobile Menu Mejorado */}
         {isMobileMenuOpen && (
-          <div className="md:hidden bg-white py-4 border-t border-gray-200 animate-fadeIn">
-            <div className="flex flex-col space-y-1">
-              <button 
-                onClick={() => scrollToSection('inicio')}
-                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-left"
-              >
-                Inicio
-              </button>
-              <button 
-                onClick={() => scrollToSection('nosotros')}
-                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-left"
-              >
-                Sobre nosotros
-              </button>
-              <button 
-                onClick={() => scrollToSection('servicios')}
-                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-left"
-              >
-                Servicios
-              </button>
-              <button 
-                onClick={() => scrollToSection('proyectos')}
-                className="text-gray-700 hover:text-blue-600 hover:bg-blue-50 font-medium py-3 px-4 rounded-lg transition-all duration-200 text-left"
-              >
-                Proyectos
-              </button>
+          <div className="md:hidden bg-white/95 backdrop-blur-md border-t border-secondary-200 mt-3 rounded-2xl shadow-large animate-fade-in-down">
+            <div className="flex flex-col space-y-1 p-2">
+              {navItems.map((item) => (
+                <button 
+                  key={item.id}
+                  onClick={() => scrollToSection(item.id)}
+                  className={`px-4 py-4 rounded-xl font-medium text-left transition-all duration-300 ${
+                    activeSection === item.id
+                      ? 'text-primary-600 bg-primary-50 border border-primary-200'
+                      : 'text-secondary-700 hover:text-primary-600 hover:bg-primary-25'
+                  }`}
+                >
+                  {item.label}
+                </button>
+              ))}
               
               {/* Divider */}
-              <div className="border-t border-gray-200 my-2"></div>
+              <div className="border-t border-secondary-200 my-2"></div>
               
-              {/* Botones de acción en móvil */}
-              <div className="flex flex-col space-y-2 px-4">
+              {/* Botones de acción en móvil mejorados */}
+              <div className="flex flex-col space-y-2 p-2">
                 <Link 
                   to="/login"
-                  className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200 transition-all duration-200 font-medium text-center border border-gray-200"
+                  className="px-4 py-4 rounded-xl font-medium text-center border border-secondary-300 text-secondary-700 hover:bg-secondary-50 transition-all duration-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   Iniciar Sesión
                 </Link>
                 <button 
                   onClick={() => scrollToSection('contacto')}
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-all duration-200 font-medium text-center shadow-lg"
+                  className="px-4 py-4 rounded-xl font-medium text-center bg-gradient-primary text-white hover:shadow-large transition-all duration-300"
                 >
                   Contactar
                 </button>

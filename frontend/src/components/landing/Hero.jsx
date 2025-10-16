@@ -4,78 +4,112 @@ import React, { useState, useEffect } from 'react';
 const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const slides = [
     {
       image: "/images/portada4.webp",
-      imageMobile: "/images/portada4-mobile.webp", // Versión optimizada para móvil
       title: "Ingeniería para un",
       highlighted: "futuro sostenible",
-      subtitle: "Soluciones innovadoras para plantas de agua potable",
+      subtitle: "Soluciones innovadoras para plantas de agua potable rural",
       ctaText: "Ver Servicios",
-      ctaLink: "#servicios"
+      ctaLink: "#servicios",
+      gradient: "from-primary-700/90 via-primary-600/70 to-primary-800/90"
     },
     {
       image: "/images/portada1.jpg", 
-      imageMobile: "/images/portada1-mobile.jpg",
-      title: "Tu planta de agua",
-      highlighted: "Nuestro Compromiso",
-      subtitle: "Calidad y eficiencia en cada proyecto",
+      title: "Expertos en",
+      highlighted: "mantenimiento industrial",
+      subtitle: "Calidad y eficiencia en cada proyecto que emprendemos",
       ctaText: "Contáctanos",
-      ctaLink: "#contacto"
+      ctaLink: "#contacto",
+      gradient: "from-secondary-900/80 via-primary-800/70 to-primary-900/90"
     }
   ];
 
-  // Preload images para mejor UX
+  // Preload images
   useEffect(() => {
     const preloadImages = async () => {
-      const imagePromises = slides.flatMap(slide => 
-        [slide.image, slide.imageMobile].filter(Boolean).map(src => {
+      try {
+        const imagePromises = slides.map(slide => {
           return new Promise((resolve, reject) => {
             const img = new Image();
-            img.src = src;
+            img.src = slide.image;
             img.onload = resolve;
             img.onerror = reject;
           });
-        })
-      );
-      
-      await Promise.all(imagePromises);
-      setIsLoading(false);
+        });
+        
+        await Promise.all(imagePromises);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error loading images:', error);
+        setIsLoading(false); // Continue even if images fail
+      }
     };
 
     preloadImages();
   }, []);
 
-  // Auto-slide
+  // Auto-slide with smooth transitions
   useEffect(() => {
+    if (isLoading) return;
+
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000); // Aumentado a 6s para mejor UX
+      setIsTransitioning(true);
+      setTimeout(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+        setIsTransitioning(false);
+      }, 500);
+    }, 6000);
 
     return () => clearInterval(interval);
-  }, [slides.length]);
+  }, [isLoading, slides.length]);
 
   const goToSlide = (index) => {
-    setCurrentSlide(index);
+    if (index === currentSlide || isTransitioning) return;
+    
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide(index);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const nextSlide = () => {
-    setCurrentSlide((prev) => (prev + 1) % slides.length);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setIsTransitioning(false);
+    }, 300);
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+      setIsTransitioning(false);
+    }, 300);
+  };
+
+  const scrollToSection = (sectionId) => {
+    const element = document.getElementById(sectionId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
   };
 
   return (
-    <section id="inicio" className="pt-16 lg:pt-24 relative">
-      {/* Loading State */}
+    <section id="inicio" className="pt-16 lg:pt-20 relative">
+      {/* Loading State Mejorado */}
       {isLoading && (
-        <div className="h-screen bg-gray-200 animate-pulse flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-            <p className="text-gray-600">Cargando...</p>
+        <div className="h-screen bg-gradient-primary flex items-center justify-center">
+          <div className="text-center text-white animate-fade-in">
+            <div className="w-20 h-20 border-4 border-white border-t-transparent rounded-full animate-spin mx-auto mb-6"></div>
+            <h2 className="text-2xl font-bold mb-2">RYV SPA</h2>
+            <p className="text-white/80">Cargando experiencia...</p>
           </div>
         </div>
       )}
@@ -84,112 +118,122 @@ const Hero = () => {
         {slides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
-              index === currentSlide ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`absolute inset-0 transition-all duration-700 ease-out ${
+              index === currentSlide 
+                ? 'opacity-100 scale-100' 
+                : 'opacity-0 scale-105'
+            } ${isTransitioning ? 'transitioning' : ''}`}
             aria-hidden={index !== currentSlide}
           >
-            {/* Imágenes optimizadas con picture element */}
-            <picture>
-              <source
-                media="(max-width: 768px)"
-                srcSet={slide.imageMobile || slide.image}
-              />
-              <source
-                media="(min-width: 769px)"
-                srcSet={slide.image}
-              />
-              <img
-                src={slide.image}
-                alt={`${slide.title} ${slide.highlighted}`}
-                className="w-full h-full object-cover"
-                loading={index === 0 ? "eager" : "lazy"}
-                decoding="async"
-              />
-            </picture>
+            {/* Imagen de fondo optimizada */}
+            <div 
+              className="w-full h-full bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url('${slide.image}')` }}
+            >
+              {/* Overlay con gradiente dinámico */}
+              <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}></div>
+              
+              {/* Patrón de textura sutil */}
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
+            </div>
             
-            {/* Overlay con gradiente para mejor legibilidad */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/40 to-transparent"></div>
-            
+            {/* Contenido del slide */}
             <div className="relative h-full flex items-center">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-white">
-                <div className="max-w-2xl lg:max-w-3xl">
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight">
+                <div className="max-w-2xl lg:max-w-4xl animate-fade-in-up">
+                  <div className="mb-4">
+                    <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold text-white/90 border border-white/30">
+                      R&V SPA
+                    </span>
+                  </div>
+                  
+                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight font-heading">
                     {slide.title}{' '}
-                    <span className="text-blue-400 block bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+                    <span className="block bg-gradient-to-r from-white to-primary-100 bg-clip-text text-transparent">
                       {slide.highlighted}
                     </span>
                   </h1>
-                  <p className="text-xl sm:text-2xl lg:text-3xl mb-6 lg:mb-8 opacity-90 leading-relaxed">
+                  
+                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white/90 max-w-3xl">
                     {slide.subtitle}
                   </p>
-                  {slide.ctaText && (
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <a
-                        href={slide.ctaLink}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl text-center"
-                      >
-                        {slide.ctaText}
-                      </a>
-                      <a
-                        href="#servicios"
-                        className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all duration-200 text-center"
-                      >
+                  
+                  {/* CTA Buttons Mejorados */}
+                  <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
+                    <button
+                      onClick={() => scrollToSection(slide.ctaLink.replace('#', ''))}
+                      className="group bg-white text-primary-600 hover:bg-primary-50 px-8 py-4 lg:px-10 lg:py-5 rounded-xl font-semibold text-lg lg:text-xl transition-all duration-300 transform hover:scale-105 shadow-large hover:shadow-xl relative overflow-hidden"
+                    >
+                      <span className="relative z-10">{slide.ctaText}</span>
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary-50 to-primary-100 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    </button>
+                    
+                    <button
+                      onClick={() => scrollToSection('servicios')}
+                      className="group border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 lg:px-10 lg:py-5 rounded-xl font-semibold text-lg lg:text-xl transition-all duration-300 backdrop-blur-sm"
+                    >
+                      <span className="flex items-center justify-center gap-2">
                         Conocer Más
-                      </a>
-                    </div>
-                  )}
+                        <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         ))}
         
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows Mejorados */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+          disabled={isTransitioning}
+          className="absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white p-4 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed group"
           aria-label="Slide anterior"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
         
         <button
           onClick={nextSlide}
-          className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-3 rounded-full transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-white"
+          disabled={isTransitioning}
+          className="absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 bg-white/10 hover:bg-white/20 backdrop-blur-md text-white p-4 rounded-xl transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50 disabled:opacity-50 disabled:cursor-not-allowed group"
           aria-label="Siguiente slide"
         >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
           </svg>
         </button>
 
-        {/* Navigation Docks Mejorados */}
-        <div className="absolute bottom-6 lg:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
+        {/* Navigation Dots Mejorados */}
+        <div className="absolute bottom-8 lg:bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-3 backdrop-blur-md bg-white/10 rounded-2xl p-3">
           {slides.map((_, index) => (
             <button
               key={index}
-              className={`w-3 h-3 lg:w-4 lg:h-4 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white ${
+              className={`w-3 h-3 lg:w-4 lg:h-4 rounded-full transition-all duration-500 focus:outline-none focus:ring-2 focus:ring-white/50 ${
                 index === currentSlide 
-                  ? 'bg-white scale-125' 
-                  : 'bg-white/50 hover:bg-white/70'
+                  ? 'bg-white scale-125 shadow-lg' 
+                  : 'bg-white/50 hover:bg-white/70 hover:scale-110'
               }`}
               onClick={() => goToSlide(index)}
               aria-label={`Ir al slide ${index + 1}`}
+              disabled={isTransitioning}
             />
           ))}
         </div>
 
-        {/* Progress Bar */}
-        <div className="absolute bottom-0 left-0 w-full h-1 bg-white/20">
-          <div 
-            className="h-full bg-blue-400 transition-all duration-100 ease-linear"
-            style={{ 
-              width: `${(currentSlide + 1) * (100 / slides.length)}%` 
-            }}
-          />
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce-gentle">
+          <div className="flex flex-col items-center text-white/70">
+            <span className="text-sm mb-2">Scroll</span>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+            </svg>
+          </div>
         </div>
       </div>
     </section>
