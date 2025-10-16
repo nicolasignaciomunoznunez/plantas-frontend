@@ -46,7 +46,7 @@ const GRAFICO_CONFIG = {
   }
 };
 
-// 🎯 Hook personalizado para datos de gráficos - CORREGIDO
+// 🎯 Hook personalizado para datos de gráficos - CORREGIDO CON ESTRUCTURA REAL
 const useDatosGraficos = ({ datos, incidencias }) => {
   // ✅ Datos de rendimiento memoizados
   const datosRendimientoReales = useMemo(() => 
@@ -100,13 +100,6 @@ const useDatosGraficos = ({ datos, incidencias }) => {
         if (fechaIncidencia >= unaSemanaAtras) {
           const diaSemana = fechaIncidencia.getDay(); // 0=Domingo, 1=Lunes...
           const index = diaSemana === 0 ? 6 : diaSemana - 1; // Ajustar para Lunes=0
-          
-          console.log(`📅 Incidencia ${incidencia.id}:`, {
-            fecha: fechaIncidencia,
-            diaSemana,
-            index,
-            estado: incidencia.estado
-          });
           
           // ✅ CORRECCIÓN: Usar el campo 'estado' que sí existe en tu BD
           switch(incidencia.estado) {
@@ -264,24 +257,21 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
     totalPlantas: datosRendimientoReales.length
   }), [incidencias, datosRendimientoReales]);
 
-  // ✅ Función para calcular altura de barras - MEJORADA
+  // ✅ FUNCIÓN CORREGIDA: Calcular altura de barras - GARANTIZADA VISIBLE
   const calcularAlturaBarra = (valor) => {
-    if (valor === 0) return '0px';
+    if (valor === 0) return '8px';
     
-    // Escala adaptativa basada en maxIncidencias
-    let porcentaje;
-    
+    // Para valores 1-2, usar alturas fijas y visibles
     if (maxIncidencias <= 2) {
-      // Para pocas incidencias, usar escala amplificada
-      porcentaje = (valor / maxIncidencias) * 80 + 20; // 20% - 100%
-    } else if (maxIncidencias <= 5) {
-      // Para cantidad media, escala normal
-      porcentaje = (valor / maxIncidencias) * 70 + 30; // 30% - 100%
-    } else {
-      // Para muchas incidencias, escala estándar
-      porcentaje = (valor / maxIncidencias) * 80 + 20; // 20% - 100%
+      const alturas = {
+        1: '60%',   // 1 incidencia = 60% de altura
+        2: '90%'    // 2 incidencias = 90% de altura
+      };
+      return alturas[valor] || '70%';
     }
     
+    // Para más valores, escala normal
+    const porcentaje = (valor / maxIncidencias) * 80 + 20;
     return `${Math.min(porcentaje, 100)}%`;
   };
 
@@ -403,6 +393,23 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
           </div>
         ) : (
           <>
+            {/* DEBUG VISUAL TEMPORAL */}
+            <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+              <h5 className="text-sm font-semibold text-blue-800 mb-2">📊 DATOS DEL GRÁFICO</h5>
+              <div className="text-xs text-blue-700 space-y-1">
+                <div><strong>Total incidencias:</strong> {datosIncidenciasReales.total}</div>
+                <div><strong>Máx por día:</strong> {maxIncidencias}</div>
+                <div><strong>Datos por día:</strong></div>
+                <div className="grid grid-cols-7 gap-1 text-center">
+                  {datosIncidenciasReales.labels.map((dia, index) => (
+                    <div key={dia} className="text-xs">
+                      {dia}: P{datosIncidenciasReales.pendientes[index]}-E{datosIncidenciasReales.enProgreso[index]}-R{datosIncidenciasReales.resueltas[index]}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
             {/* Contenedor del gráfico con scroll horizontal en móvil */}
             <div className="overflow-x-auto pb-4 -mx-2 px-2">
               <div className="min-w-max flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-2 relative">
@@ -418,7 +425,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                     key={dia} 
                     className={clsx(
                       "flex flex-col items-center space-y-2 flex-1 group min-w-0 px-1",
-                      dia === 'Dom' && "pr-2" // ✅ Espacio extra para domingo en móvil
+                      dia === 'Dom' && "pr-2"
                     )}
                   >
                     <div className="flex items-end space-x-[2px] sm:space-x-1 h-32 sm:h-36 w-full justify-center relative z-10">
@@ -435,19 +442,19 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                             key={tipo}
                             className={clsx(
                               'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative',
-                              GRAFICO_CONFIG.colores[tipo]?.bar,
-                              valor === 0 ? 'opacity-0' : 'opacity-100'
+                              GRAFICO_CONFIG.colores[tipo]?.bar
                             )}
                             style={{
                               height: altura,
-                              minHeight: valor > 0 ? '12px' : '0px'
+                              minHeight: '8px',
+                              opacity: valor > 0 ? 1 : 0
                             }}
                             title={`${valor} ${label}`}
                           >
-                            {/* Etiqueta de valor en hover */}
+                            {/* Etiqueta de valor - SIEMPRE visible */}
                             {valor > 0 && (
-                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-secondary-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-20">
-                                {valor} {label}
+                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-100 whitespace-nowrap pointer-events-none z-20 border border-gray-600">
+                                {valor}
                               </div>
                             )}
                           </div>
@@ -456,7 +463,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                     </div>
                     <div className={clsx(
                       "text-xs text-secondary-500 font-medium whitespace-nowrap",
-                      dia === 'Dom' && "text-center w-full" // ✅ Asegurar que Dom se centre
+                      dia === 'Dom' && "text-center w-full"
                     )}>
                       {dia}
                     </div>
@@ -485,7 +492,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
         )}
       </div>
 
-      {/* Resumen de Incidencias - CORREGIDO PARA MÓVIL */}
+      {/* Resumen de Incidencias */}
       <div className="grid grid-cols-3 gap-2 sm:gap-4 min-w-0">
         <TarjetaMetrica
           titulo="Pendientes"
