@@ -137,14 +137,21 @@ const useDatosGraficos = ({ datos, incidencias }) => {
 
   // ✅ Altura máxima dinámica para gráficos de barras - CORREGIDO
   const maxIncidencias = useMemo(() => {
-    if (datosIncidenciasReales.total === 0) return 5; // ✅ Mínimo 5 para mejor escala
+    if (datosIncidenciasReales.total === 0) return 1;
     
     const todosLosValores = [
       ...datosIncidenciasReales.pendientes,
       ...datosIncidenciasReales.enProgreso,
       ...datosIncidenciasReales.resueltas
     ];
-    return Math.max(...todosLosValores, 5); // ✅ Mínimo 5
+    
+    const maxValor = Math.max(...todosLosValores);
+    
+    // ✅ CORRECCIÓN: Si el máximo es 1, usar escala más pequeña
+    if (maxValor <= 1) return 1;
+    
+    // Para valores mayores, mantener la lógica original
+    return Math.max(maxValor, 3); // Mínimo 3 para mejor escala visual
   }, [datosIncidenciasReales]);
 
   return {
@@ -328,17 +335,19 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
   );
 
   const renderGraficoIncidencias = () => {
-    // DEBUG: Ver datos del gráfico
-    console.log('🔍 DEBUG - Gráfico de incidencias:', {
-      maxIncidencias,
-      datos: datosIncidenciasReales,
-      alturasCalculadas: datosIncidenciasReales.labels.map((dia, index) => ({
-        dia,
-        pendientes: datosIncidenciasReales.pendientes[index],
-        enProgreso: datosIncidenciasReales.enProgreso[index],
-        resueltas: datosIncidenciasReales.resueltas[index]
-      }))
-    });
+    // ✅ CORRECCIÓN: Calcular alturas de manera más inteligente
+    const calcularAlturaBarra = (valor) => {
+      if (valor === 0) return '0px';
+      
+      // Si maxIncidencias es 1 (solo hay valores 0 o 1)
+      if (maxIncidencias === 1) {
+        return '80%'; // Altura fija para cuando solo hay 1 incidencia
+      }
+      
+      // Para casos con más variación, usar escala porcentual
+      const porcentaje = (valor / maxIncidencias) * 100;
+      return `${Math.max(porcentaje, 30)}%`; // Mínimo 30% de altura para que sea visible
+    };
 
     return (
       <div className="space-y-6 animate-fade-in">
@@ -381,12 +390,12 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                     >
                       <div className="flex items-end space-x-[2px] sm:space-x-1 h-32 sm:h-36 w-full justify-center relative z-10">
                         {[
-                          { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
-                          { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
-                          { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
-                        ].map(({ tipo, data }) => {
+                          { tipo: 'pendientes', data: datosIncidenciasReales.pendientes, label: 'Pendientes' },
+                          { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso, label: 'En Progreso' },
+                          { tipo: 'resueltas', data: datosIncidenciasReales.resueltas, label: 'Resueltas' }
+                        ].map(({ tipo, data, label }) => {
                           const valor = data[index];
-                          const altura = valor > 0 ? Math.max((valor / maxIncidencias) * 100, 20) : 0;
+                          const altura = calcularAlturaBarra(valor);
                           
                           return (
                             <div
@@ -394,18 +403,20 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                               className={clsx(
                                 'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative',
                                 GRAFICO_CONFIG.colores[tipo]?.bar,
-                                valor === 0 && 'opacity-0'
+                                valor === 0 ? 'opacity-0' : 'opacity-100'
                               )}
                               style={{
-                                height: `${altura}%`,
+                                height: altura,
                                 minHeight: valor > 0 ? '8px' : '0px'
                               }}
-                              title={`${valor} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
+                              title={`${valor} ${label}`}
                             >
                               {/* Etiqueta de valor en hover */}
-                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-secondary-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
-                                {valor}
-                              </div>
+                              {valor > 0 && (
+                                <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-secondary-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-20">
+                                  {valor} {label}
+                                </div>
+                              )}
                             </div>
                           );
                         })}
