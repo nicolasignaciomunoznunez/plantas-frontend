@@ -363,7 +363,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ✅ CONTENIDO PRINCIPAL */}
+      {/* ✅ CONTENIDO PRINCIPAL - CORREGIDO */}
       {loadingContenido ? (
         <div className="bg-white rounded-2xl p-8 shadow-soft border border-secondary-100 text-center animate-pulse">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
@@ -374,12 +374,13 @@ export default function Dashboard() {
           {/* COLUMNA PRINCIPAL */}
           <div className="xl:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-scale-in">
-            <GraficosDashboard 
-  datos={datosOptimizados.graficos}           // ✅ Pasa el objeto completo
-  plantas={datosOptimizados.graficos.plantas}
-  incidencias={incidencias}
-  metricasReales={metricas?.metricas}
-/>
+              {/* ✅ CORREGIDO: Pasa los datos en la estructura correcta */}
+              <GraficosDashboard 
+                datos={{ plantas: datosOptimizados.graficos.plantas }}  // ✅ Estructura corregida
+                plantas={datosOptimizados.graficos.plantas}
+                incidencias={incidencias}
+                metricasReales={metricas?.metricas}
+              />
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
@@ -390,40 +391,40 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* ✅ SIDEBAR MEJORADO */}
+          {/* ✅ SIDEBAR MEJORADO - CORREGIDO PARA MÓVIL */}
           <div className="space-y-6">
-            {/* PLANTAS ACTIVAS */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-slide-in-right">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-semibold text-secondary-800 font-heading">
+            {/* PLANTAS ACTIVAS - CORREGIDO RESPONSIVE */}
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-soft border border-secondary-100 animate-slide-in-right">
+              <div className="flex justify-between items-center mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-semibold text-secondary-800 font-heading truncate">
                   Plantas Activas
                 </h3>
                 <Link
                   to="/plantas"
-                  className="text-primary-600 hover:text-primary-700 font-medium text-sm transition-colors duration-200"
+                  className="text-primary-600 hover:text-primary-700 font-medium text-xs sm:text-sm transition-colors duration-200 whitespace-nowrap flex-shrink-0 ml-2"
                 >
                   Ver todas →
                 </Link>
               </div>
               
-              <div className="space-y-4">
-                {datosOptimizados.plantasResumen.map((planta, index) => (
+              <div className="space-y-3 sm:space-y-4">
+                {datosOptimizados.plantasResumen.slice(0, 4).map((planta, index) => ( // ✅ Limitar a 4 en móvil
                   <Link 
                     key={planta.id} 
                     to={`/plantas/${planta.id}`}
-                    className="flex items-center p-4 border border-secondary-100 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-300 group animate-fade-in-up"
+                    className="flex items-center p-3 sm:p-4 border border-secondary-100 rounded-xl hover:border-primary-300 hover:bg-primary-50 transition-all duration-300 group animate-fade-in-up min-w-0"
                     style={{ animationDelay: `${index * 50}ms` }}
                   >
-                    <div className="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-semibold text-sm shadow-medium">
+                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center text-white font-semibold text-xs sm:text-sm shadow-medium flex-shrink-0">
                       {planta.nombre.charAt(0)}
                     </div>
-                    <div className="ml-4 flex-1 min-w-0">
-                      <h4 className="font-semibold text-secondary-800 group-hover:text-primary-700 transition-colors truncate">
+                    <div className="ml-3 sm:ml-4 flex-1 min-w-0">
+                      <h4 className="font-semibold text-secondary-800 group-hover:text-primary-700 transition-colors truncate text-sm sm:text-base">
                         {planta.nombre}
                       </h4>
-                      <p className="text-secondary-600 text-sm truncate">{planta.ubicacion}</p>
+                      <p className="text-secondary-600 text-xs sm:text-sm truncate">{planta.ubicacion}</p>
                     </div>
-                    <div className={`w-3 h-3 rounded-full ${
+                    <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
                       DASHBOARD_CONFIG.colores[planta.estadoGeneral]
                     }`}></div>
                   </Link>
@@ -431,12 +432,12 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* RESUMEN RÁPIDO */}
-            <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
-              <h3 className="text-lg font-semibold text-secondary-800 mb-6 font-heading">
+            {/* RESUMEN RÁPIDO - CORREGIDO RESPONSIVE */}
+            <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
+              <h3 className="text-base sm:text-lg font-semibold text-secondary-800 mb-4 sm:mb-6 font-heading">
                 Resumen Rápido
               </h3>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {[
                   { label: 'Plantas totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
                   { label: 'Incidencias resueltas', valor: datosOptimizados.metricasRapidas.incidenciasResueltas, color: 'text-success-600' },
@@ -444,10 +445,10 @@ export default function Dashboard() {
                 ].map((item, index) => (
                   <div 
                     key={index}
-                    className="flex justify-between items-center p-3 bg-secondary-50 rounded-lg transition-all duration-200 hover:bg-secondary-100"
+                    className="flex justify-between items-center p-2 sm:p-3 bg-secondary-50 rounded-lg transition-all duration-200 hover:bg-secondary-100 min-w-0"
                   >
-                    <span className="text-secondary-700 font-medium">{item.label}</span>
-                    <span className={`font-bold text-lg ${item.color}`}>{item.valor}</span>
+                    <span className="text-secondary-700 font-medium text-xs sm:text-sm truncate">{item.label}</span>
+                    <span className={`font-bold text-base sm:text-lg ${item.color} flex-shrink-0 ml-2`}>{item.valor}</span>
                   </div>
                 ))}
               </div>

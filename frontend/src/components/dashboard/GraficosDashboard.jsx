@@ -187,22 +187,22 @@ const BarraProgreso = ({
   );
 };
 
-// 🎯 Componente de Tarjeta de Métrica
+// 🎯 Componente de Tarjeta de Métrica - CORREGIDO PARA MÓVIL
 const TarjetaMetrica = ({ titulo, valor, subtitulo, color = 'primary', icono }) => (
   <div className={clsx(
-    'rounded-xl p-4 text-center transition-all duration-200 hover:shadow-medium',
+    'rounded-xl p-3 sm:p-4 text-center transition-all duration-200 hover:shadow-medium min-w-0',
     GRAFICO_CONFIG.colores[color]?.bg || 'bg-secondary-50'
   )}>
-    {icono && <div className="text-2xl mb-2">{icono}</div>}
+    {icono && <div className="text-xl sm:text-2xl mb-1 sm:mb-2">{icono}</div>}
     <div className={clsx(
-      'text-2xl font-bold font-heading mb-1',
+      'text-lg sm:text-2xl font-bold font-heading mb-1 truncate',
       GRAFICO_CONFIG.colores[color]?.text || 'text-secondary-700'
     )}>
       {valor}
     </div>
-    <div className="text-sm font-medium text-secondary-600 mb-1">{titulo}</div>
+    <div className="text-xs sm:text-sm font-medium text-secondary-600 mb-1 truncate">{titulo}</div>
     {subtitulo && (
-      <div className="text-xs text-secondary-500">{subtitulo}</div>
+      <div className="text-xs text-secondary-500 truncate">{subtitulo}</div>
     )}
   </div>
 );
@@ -327,123 +327,154 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
     </div>
   );
 
-  const renderGraficoIncidencias = () => (
-    <div className="space-y-6 animate-fade-in">
-      {/* Gráfico de Barras */}
-      <div>
-        <h4 className="text-sm font-medium text-secondary-700 mb-4 font-sans">
-          Incidencias de la Última Semana
-          <span className="text-xs text-secondary-500 ml-2">
-            (Total: {datosIncidenciasReales.total})
-          </span>
-        </h4>
+  const renderGraficoIncidencias = () => {
+    // DEBUG: Ver datos del gráfico
+    console.log('🔍 DEBUG - Gráfico de incidencias:', {
+      maxIncidencias,
+      datos: datosIncidenciasReales,
+      alturasCalculadas: datosIncidenciasReales.labels.map((dia, index) => ({
+        dia,
+        pendientes: datosIncidenciasReales.pendientes[index],
+        enProgreso: datosIncidenciasReales.enProgreso[index],
+        resueltas: datosIncidenciasReales.resueltas[index]
+      }))
+    });
 
-        {datosIncidenciasReales.total === 0 ? (
-          <div className="text-center py-8 text-secondary-500 bg-secondary-50 rounded-xl">
-            <div className="text-4xl mb-3">📊</div>
-            <p className="text-sm">No hay incidencias en la última semana</p>
-            <p className="text-xs text-secondary-400 mt-1">
-              Las nuevas incidencias aparecerán aquí automáticamente
-            </p>
-          </div>
-        ) : (
-          <>
-            {/* Contenedor del gráfico con scroll horizontal en móvil */}
-            <div className="overflow-x-auto pb-2 -mx-2 px-2">
-              <div className="min-w-max flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-4">
-                {datosIncidenciasReales.labels.map((dia, index) => (
-                  <div 
-                    key={dia} 
-                    className={clsx(
-                      "flex flex-col items-center space-y-2 flex-1 group min-w-0 px-1",
-                      dia === 'Dom' && "pr-2" // ✅ Espacio extra para domingo en móvil
-                    )}
-                  >
-                    <div className="flex items-end space-x-1 h-32 sm:h-36 w-full justify-center">
-                      {[
-                        { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
-                        { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
-                        { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
-                      ].map(({ tipo, data }) => (
-                        <div
-                          key={tipo}
-                          className={clsx(
-                            'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help',
-                            GRAFICO_CONFIG.colores[tipo]?.bar,
-                            data[index] === 0 && 'opacity-0'
-                          )}
-                          style={{
-                            height: `${Math.max((data[index] / maxIncidencias) * 100, 25)}%`, // ✅ Porcentaje del contenedor
-                            minHeight: '8px'
-                          }}
-                          title={`${data[index]} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
-                        />
-                      ))}
+    return (
+      <div className="space-y-6 animate-fade-in">
+        {/* Gráfico de Barras */}
+        <div>
+          <h4 className="text-sm font-medium text-secondary-700 mb-4 font-sans">
+            Incidencias de la Última Semana
+            <span className="text-xs text-secondary-500 ml-2">
+              (Total: {datosIncidenciasReales.total})
+            </span>
+          </h4>
+
+          {datosIncidenciasReales.total === 0 ? (
+            <div className="text-center py-8 text-secondary-500 bg-secondary-50 rounded-xl">
+              <div className="text-4xl mb-3">📊</div>
+              <p className="text-sm">No hay incidencias en la última semana</p>
+              <p className="text-xs text-secondary-400 mt-1">
+                Las nuevas incidencias aparecerán aquí automáticamente
+              </p>
+            </div>
+          ) : (
+            <>
+              {/* Contenedor del gráfico con scroll horizontal en móvil */}
+              <div className="overflow-x-auto pb-4 -mx-2 px-2">
+                <div className="min-w-max flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-2 relative">
+                  {/* Líneas de guía horizontales */}
+                  <div className="absolute inset-0 flex flex-col justify-between pointer-events-none">
+                    {[0, 1, 2, 3, 4].map((line) => (
+                      <div key={line} className="border-t border-secondary-100"></div>
+                    ))}
+                  </div>
+                  
+                  {datosIncidenciasReales.labels.map((dia, index) => (
+                    <div 
+                      key={dia} 
+                      className={clsx(
+                        "flex flex-col items-center space-y-2 flex-1 group min-w-0 px-1",
+                        dia === 'Dom' && "pr-2" // ✅ Espacio extra para domingo en móvil
+                      )}
+                    >
+                      <div className="flex items-end space-x-[2px] sm:space-x-1 h-32 sm:h-36 w-full justify-center relative z-10">
+                        {[
+                          { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
+                          { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
+                          { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
+                        ].map(({ tipo, data }) => {
+                          const valor = data[index];
+                          const altura = valor > 0 ? Math.max((valor / maxIncidencias) * 100, 20) : 0;
+                          
+                          return (
+                            <div
+                              key={tipo}
+                              className={clsx(
+                                'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative',
+                                GRAFICO_CONFIG.colores[tipo]?.bar,
+                                valor === 0 && 'opacity-0'
+                              )}
+                              style={{
+                                height: `${altura}%`,
+                                minHeight: valor > 0 ? '8px' : '0px'
+                              }}
+                              title={`${valor} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
+                            >
+                              {/* Etiqueta de valor en hover */}
+                              <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-secondary-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none">
+                                {valor}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                      <div className={clsx(
+                        "text-xs text-secondary-500 font-medium whitespace-nowrap",
+                        dia === 'Dom' && "text-center w-full" // ✅ Asegurar que Dom se centre
+                      )}>
+                        {dia}
+                      </div>
                     </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Leyenda */}
+              <div className="flex flex-wrap justify-center gap-4 sm:gap-6 mt-4 px-2">
+                {[
+                  { tipo: 'pendientes', label: 'Pendientes' },
+                  { tipo: 'enProgreso', label: 'En Progreso' },
+                  { tipo: 'resueltas', label: 'Resueltas' }
+                ].map(({ tipo, label }) => (
+                  <div key={tipo} className="flex items-center space-x-2">
                     <div className={clsx(
-                      "text-xs text-secondary-500 font-medium whitespace-nowrap",
-                      dia === 'Dom' && "text-center w-full" // ✅ Asegurar que Dom se centre
-                    )}>
-                      {dia}
-                    </div>
+                      'w-3 h-3 rounded flex-shrink-0',
+                      GRAFICO_CONFIG.colores[tipo]?.bar
+                    )}></div>
+                    <span className="text-xs text-secondary-600 whitespace-nowrap">{label}</span>
                   </div>
                 ))}
               </div>
-            </div>
+            </>
+          )}
+        </div>
 
-            {/* Leyenda */}
-            <div className="flex justify-center space-x-6 mt-4">
-              {[
-                { tipo: 'pendientes', label: 'Pendientes' },
-                { tipo: 'enProgreso', label: 'En Progreso' },
-                { tipo: 'resueltas', label: 'Resueltas' }
-              ].map(({ tipo, label }) => (
-                <div key={tipo} className="flex items-center space-x-2">
-                  <div className={clsx(
-                    'w-3 h-3 rounded',
-                    GRAFICO_CONFIG.colores[tipo]?.bar
-                  )}></div>
-                  <span className="text-xs text-secondary-600">{label}</span>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        {/* Resumen de Incidencias - CORREGIDO PARA MÓVIL */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 min-w-0">
+          <TarjetaMetrica
+            titulo="Pendientes"
+            valor={metricasResumen.pendientes}
+            color="pendiente"
+            icono="⏳"
+          />
+          <TarjetaMetrica
+            titulo="En Progreso"
+            valor={metricasResumen.enProgreso}
+            color="en_progreso"
+            icono="🔄"
+          />
+          <TarjetaMetrica
+            titulo="Resueltas"
+            valor={metricasResumen.resueltas}
+            color="resuelta"
+            icono="✅"
+          />
+        </div>
       </div>
-
-      {/* Resumen de Incidencias */}
-      <div className="grid grid-cols-3 gap-4">
-        <TarjetaMetrica
-          titulo="Pendientes"
-          valor={metricasResumen.pendientes}
-          color="pendiente"
-          icono="⏳"
-        />
-        <TarjetaMetrica
-          titulo="En Progreso"
-          valor={metricasResumen.enProgreso}
-          color="en_progreso"
-          icono="🔄"
-        />
-        <TarjetaMetrica
-          titulo="Resueltas"
-          valor={metricasResumen.resueltas}
-          color="resuelta"
-          icono="✅"
-        />
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
-    <div className="bg-white rounded-2xl shadow-soft border border-secondary-100 p-6 animate-fade-in-up">
+    <div className="bg-white rounded-2xl shadow-soft border border-secondary-100 p-4 sm:p-6 animate-fade-in-up">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
-        <div>
-          <h3 className="text-xl font-bold text-secondary-800 font-heading">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+        <div className="min-w-0">
+          <h3 className="text-lg sm:text-xl font-bold text-secondary-800 font-heading truncate">
             Métricas del Sistema
           </h3>
-          <p className="text-secondary-600 text-sm mt-1">
+          <p className="text-secondary-600 text-sm mt-1 truncate">
             {tipoGrafico === 'rendimiento' ? 'Rendimiento y estado de plantas' : 'Seguimiento de incidencias'}
           </p>
         </div>
@@ -457,14 +488,15 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
               key={key}
               onClick={() => handleCambiarGrafico(key)}
               className={clsx(
-                'flex items-center space-x-2 px-3 py-2 text-sm rounded-md transition-all duration-200 font-medium',
+                'flex items-center space-x-2 px-3 py-2 text-sm rounded-md transition-all duration-200 font-medium min-w-0 flex-1 sm:flex-initial',
                 tipoGrafico === key
                   ? 'bg-white text-primary-600 shadow-sm'
                   : 'text-secondary-600 hover:text-secondary-800'
               )}
             >
-              <span>{icon}</span>
+              <span className="text-base">{icon}</span>
               <span className="hidden sm:inline">{label}</span>
+              <span className="sm:hidden text-xs">{label === 'Gestión' ? 'Gest.' : 'Incid.'}</span>
             </button>
           ))}
         </div>
@@ -482,7 +514,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
               minute: '2-digit' 
             })}
           </span>
-          <span>
+          <span className="text-center sm:text-left">
             {metricasResumen.totalPlantas} plantas • {incidencias?.length || 0} incidencias
           </span>
         </div>
