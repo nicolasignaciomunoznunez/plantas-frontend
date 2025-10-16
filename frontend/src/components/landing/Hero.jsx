@@ -12,7 +12,7 @@ const Hero = () => {
       highlighted: "futuro sostenible", 
       subtitle: "Soluciones innovadoras para plantas de agua potable rural",
       ctaText: "Ver Servicios",
-      ctaLink: "#servicios"
+      ctaLink: "servicios" // ✅ CORREGIDO: sin #
     },
     {
       image: "/images/portada1.jpg",
@@ -20,7 +20,7 @@ const Hero = () => {
       highlighted: "mantenimiento industrial",
       subtitle: "Calidad y eficiencia en cada proyecto que emprendemos", 
       ctaText: "Contáctanos",
-      ctaLink: "#contacto"
+      ctaLink: "contacto" // ✅ CORREGIDO: sin #
     }
   ];
 
@@ -94,7 +94,7 @@ const Hero = () => {
             </div>
             
             {/* Contenido del texto */}
-            <div className="absolute inset-0 flex items-center justify-center lg:justify-start">
+            <div className="absolute inset-0 flex items-center justify-center lg:justify-start z-10"> {/* ✅ z-10 agregado */}
               <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="max-w-2xl lg:max-w-4xl text-center lg:text-left">
                   {/* Badge */}
@@ -104,31 +104,31 @@ const Hero = () => {
                     </span>
                   </div>
                   
-                  {/* Título PRINCIPAL - TEXTO BLANCO SOBRE OVERLAY OSCURO */}
-                  <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 lg:mb-6 leading-tight text-white">
+                  {/* Título PRINCIPAL */}
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 lg:mb-6 leading-tight text-white"> {/* ✅ Texto más pequeño en móvil */}
                     {slide.title}{' '}
-                    <span className="block text-white font-heading">
+                    <span className="block text-white font-heading mt-2">
                       {slide.highlighted}
                     </span>
                   </h1>
                   
                   {/* Subtítulo */}
-                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white max-w-3xl mx-auto lg:mx-0">
+                  <p className="text-lg sm:text-xl lg:text-2xl mb-6 lg:mb-8 leading-relaxed text-white max-w-3xl mx-auto lg:mx-0"> {/* ✅ Texto más pequeño */}
                     {slide.subtitle}
                   </p>
                   
                   {/* Botones */}
-                  <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center lg:justify-start">
+                  <div className="flex flex-col sm:flex-row gap-3 lg:gap-4 justify-center lg:justify-start"> {/* ✅ Gap más pequeño */}
                     <button
-                      onClick={() => scrollToSection(slide.ctaLink.replace('#', ''))}
-                      className="bg-white text-gray-900 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+                      onClick={() => scrollToSection(slide.ctaLink)} 
+                      className="bg-white text-gray-900 hover:bg-gray-100 px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-semibold text-base lg:text-lg transition-all duration-300 transform hover:scale-105 shadow-lg" 
                     >
                       {slide.ctaText}
                     </button>
                     
                     <button
                       onClick={() => scrollToSection('servicios')}
-                      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300"
+                      className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-6 py-3 lg:px-8 lg:py-4 rounded-xl font-semibold text-base lg:text-lg transition-all duration-300" 
                     >
                       Conocer Más
                     </button>
@@ -139,29 +139,29 @@ const Hero = () => {
           </div>
         ))}
         
-        {/* Controles de navegación */}
+        {/* Controles de navegación - SOLO EN DESKTOP */}
         <button
           onClick={prevSlide}
-          className="absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-xl transition-all duration-300 backdrop-blur-sm"
+          className="hidden lg:block absolute left-4 lg:left-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-xl transition-all duration-300 backdrop-blur-sm z-20" 
         >
           ‹
         </button>
         
         <button
           onClick={nextSlide}
-          className="absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-xl transition-all duration-300 backdrop-blur-sm"
+          className="hidden lg:block absolute right-4 lg:right-8 top-1/2 transform -translate-y-1/2 bg-white/20 hover:bg-white/30 text-white p-4 rounded-xl transition-all duration-300 backdrop-blur-sm z-20" 
         >
           ›
         </button>
 
-        {/* Dots de navegación */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3 backdrop-blur-sm bg-white/10 rounded-2xl p-3">
+        {/* Dots de navegación - MÁS PEQUEÑOS EN MÓVIL */}
+        <div className="absolute bottom-6 lg:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-2 lg:space-x-3 backdrop-blur-sm bg-white/10 rounded-xl lg:rounded-2xl p-2 lg:p-3 z-20"> {/* ✅ Bottom ajustado */}
           {slides.map((_, index) => (
             <button
               key={index}
-              className={`w-3 h-3 rounded-full transition-all ${
+              className={`w-2 h-2 lg:w-3 lg:h-3 rounded-full transition-all ${
                 index === currentSlide ? 'bg-white scale-125' : 'bg-white/50 hover:bg-white/70'
-              }`}
+              }`} 
               onClick={() => goToSlide(index)}
             />
           ))}
