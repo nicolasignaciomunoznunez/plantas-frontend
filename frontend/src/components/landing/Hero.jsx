@@ -14,7 +14,7 @@ const Hero = () => {
       subtitle: "Soluciones innovadoras para plantas de agua potable rural",
       ctaText: "Ver Servicios",
       ctaLink: "#servicios",
-      gradient: "from-primary-700/90 via-primary-600/70 to-primary-800/90"
+      gradient: "from-primary-700/70 via-primary-600/50 to-primary-800/70" // Más transparente
     },
     {
       image: "/images/portada1.jpg", 
@@ -23,7 +23,7 @@ const Hero = () => {
       subtitle: "Calidad y eficiencia en cada proyecto que emprendemos",
       ctaText: "Contáctanos",
       ctaLink: "#contacto",
-      gradient: "from-secondary-900/80 via-primary-800/70 to-primary-900/90"
+      gradient: "from-secondary-900/60 via-primary-800/50 to-primary-900/60" // Más transparente
     }
   ];
 
@@ -36,7 +36,10 @@ const Hero = () => {
             const img = new Image();
             img.src = slide.image;
             img.onload = resolve;
-            img.onerror = reject;
+            img.onerror = () => {
+              console.warn(`Image failed to load: ${slide.image}`);
+              resolve(); // Continuar incluso si falla
+            };
           });
         });
         
@@ -44,7 +47,7 @@ const Hero = () => {
         setIsLoading(false);
       } catch (error) {
         console.error('Error loading images:', error);
-        setIsLoading(false); // Continue even if images fail
+        setIsLoading(false);
       }
     };
 
@@ -125,23 +128,26 @@ const Hero = () => {
             } ${isTransitioning ? 'transitioning' : ''}`}
             aria-hidden={index !== currentSlide}
           >
-            {/* Imagen de fondo optimizada */}
+            {/* Imagen de fondo con fallback */}
             <div 
               className="w-full h-full bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url('${slide.image}')` }}
+              style={{ 
+                backgroundImage: `url('${slide.image}')`,
+                backgroundColor: '#1e40af' // Fallback color si la imagen no carga
+              }}
             >
-              {/* Overlay con gradiente dinámico */}
+              {/* Overlay con gradiente más transparente */}
               <div className={`absolute inset-0 bg-gradient-to-r ${slide.gradient}`}></div>
               
               {/* Patrón de textura sutil */}
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/10 via-transparent to-transparent"></div>
+              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent"></div>
             </div>
             
             {/* Contenido del slide */}
-            <div className="relative h-full flex items-center">
+            <div className="relative h-full flex items-center justify-center lg:justify-start">
               <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-white">
-                <div className="max-w-2xl lg:max-w-4xl animate-fade-in-up">
-                  <div className="mb-4">
+                <div className="max-w-2xl lg:max-w-4xl text-center lg:text-left animate-fade-in-up">
+                  <div className="mb-4 lg:mb-6">
                     <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold text-white/90 border border-white/30">
                       R&V SPA
                     </span>
@@ -154,12 +160,12 @@ const Hero = () => {
                     </span>
                   </h1>
                   
-                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white/90 max-w-3xl">
+                  <p className="text-xl sm:text-2xl lg:text-3xl mb-8 lg:mb-10 leading-relaxed text-white/90 max-w-3xl mx-auto lg:mx-0">
                     {slide.subtitle}
                   </p>
                   
                   {/* CTA Buttons Mejorados */}
-                  <div className="flex flex-col sm:flex-row gap-4 lg:gap-6">
+                  <div className="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center lg:justify-start">
                     <button
                       onClick={() => scrollToSection(slide.ctaLink.replace('#', ''))}
                       className="group bg-white text-primary-600 hover:bg-primary-50 px-8 py-4 lg:px-10 lg:py-5 rounded-xl font-semibold text-lg lg:text-xl transition-all duration-300 transform hover:scale-105 shadow-large hover:shadow-xl relative overflow-hidden"
@@ -186,7 +192,7 @@ const Hero = () => {
           </div>
         ))}
         
-        {/* Navigation Arrows Mejorados */}
+        {/* Navigation Arrows */}
         <button
           onClick={prevSlide}
           disabled={isTransitioning}
@@ -209,7 +215,7 @@ const Hero = () => {
           </svg>
         </button>
 
-        {/* Navigation Dots Mejorados */}
+        {/* Navigation Dots - ÚNICO indicador */}
         <div className="absolute bottom-8 lg:bottom-12 left-1/2 transform -translate-x-1/2 flex space-x-3 backdrop-blur-md bg-white/10 rounded-2xl p-3">
           {slides.map((_, index) => (
             <button
@@ -224,16 +230,6 @@ const Hero = () => {
               disabled={isTransitioning}
             />
           ))}
-        </div>
-
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 animate-bounce-gentle">
-          <div className="flex flex-col items-center text-white/70">
-            <span className="text-sm mb-2">Scroll</span>
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-            </svg>
-          </div>
         </div>
       </div>
     </section>
