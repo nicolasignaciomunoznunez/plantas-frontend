@@ -135,16 +135,16 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     };
   }, [incidencias]);
 
-  // ✅ Altura máxima dinámica para gráficos de barras
+  // ✅ Altura máxima dinámica para gráficos de barras - CORREGIDO
   const maxIncidencias = useMemo(() => {
-    if (datosIncidenciasReales.total === 0) return 1;
+    if (datosIncidenciasReales.total === 0) return 5; // ✅ Mínimo 5 para mejor escala
     
     const todosLosValores = [
       ...datosIncidenciasReales.pendientes,
       ...datosIncidenciasReales.enProgreso,
       ...datosIncidenciasReales.resueltas
     ];
-    return Math.max(...todosLosValores, 1);
+    return Math.max(...todosLosValores, 5); // ✅ Mínimo 5
   }, [datosIncidenciasReales]);
 
   return {
@@ -327,28 +327,6 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
     </div>
   );
 
-
-  // Agrega esto ANTES del return en renderGraficoIncidencias()
-console.log('🔍 DEBUG - Gráfico de barras:', {
-  maxIncidencias,
-  datos: datosIncidenciasReales,
-  alturasCalculadas: datosIncidenciasReales.labels.map((dia, index) => ({
-    dia,
-    pendientes: {
-      valor: datosIncidenciasReales.pendientes[index],
-      altura: Math.max((datosIncidenciasReales.pendientes[index] / maxIncidencias) * 120, 8)
-    },
-    enProgreso: {
-      valor: datosIncidenciasReales.enProgreso[index],
-      altura: Math.max((datosIncidenciasReales.enProgreso[index] / maxIncidencias) * 120, 8)
-    },
-    resueltas: {
-      valor: datosIncidenciasReales.resueltas[index],
-      altura: Math.max((datosIncidenciasReales.resueltas[index] / maxIncidencias) * 120, 8)
-    }
-  }))
-});
-
   const renderGraficoIncidencias = () => (
     <div className="space-y-6 animate-fade-in">
       {/* Gráfico de Barras */}
@@ -370,34 +348,47 @@ console.log('🔍 DEBUG - Gráfico de barras:', {
           </div>
         ) : (
           <>
-            <div className="flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-4">
-              {datosIncidenciasReales.labels.map((dia, index) => (
-                <div key={dia} className="flex flex-col items-center space-y-2 flex-1 group">
-                  <div className="flex items-end space-x-1 h-32 sm:h-36 w-full justify-center">
-                    {[
-                      { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
-                      { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
-                      { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
-                    ].map(({ tipo, data }) => (
-                      <div
-                        key={tipo}
-                        className={clsx(
-                          'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help',
-                          GRAFICO_CONFIG.colores[tipo]?.bar,
-                          data[index] === 0 && 'opacity-0'
-                        )}
-                        style={{
-  height: `${Math.max((data[index] / maxIncidencias) * 120, 8)}px`, // ✅ NUEVO
-  minHeight: '8px'                                                  // ✅ NUEVO
-}}
-                      
-                        title={`${data[index]} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
-                      />
-                    ))}
+            {/* Contenedor del gráfico con scroll horizontal en móvil */}
+            <div className="overflow-x-auto pb-2 -mx-2 px-2">
+              <div className="min-w-max flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-4">
+                {datosIncidenciasReales.labels.map((dia, index) => (
+                  <div 
+                    key={dia} 
+                    className={clsx(
+                      "flex flex-col items-center space-y-2 flex-1 group min-w-0 px-1",
+                      dia === 'Dom' && "pr-2" // ✅ Espacio extra para domingo en móvil
+                    )}
+                  >
+                    <div className="flex items-end space-x-1 h-32 sm:h-36 w-full justify-center">
+                      {[
+                        { tipo: 'pendientes', data: datosIncidenciasReales.pendientes },
+                        { tipo: 'enProgreso', data: datosIncidenciasReales.enProgreso },
+                        { tipo: 'resueltas', data: datosIncidenciasReales.resueltas }
+                      ].map(({ tipo, data }) => (
+                        <div
+                          key={tipo}
+                          className={clsx(
+                            'w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help',
+                            GRAFICO_CONFIG.colores[tipo]?.bar,
+                            data[index] === 0 && 'opacity-0'
+                          )}
+                          style={{
+                            height: `${Math.max((data[index] / maxIncidencias) * 100, 25)}%`, // ✅ Porcentaje del contenedor
+                            minHeight: '8px'
+                          }}
+                          title={`${data[index]} ${tipo === 'enProgreso' ? 'en progreso' : tipo}`}
+                        />
+                      ))}
+                    </div>
+                    <div className={clsx(
+                      "text-xs text-secondary-500 font-medium whitespace-nowrap",
+                      dia === 'Dom' && "text-center w-full" // ✅ Asegurar que Dom se centre
+                    )}>
+                      {dia}
+                    </div>
                   </div>
-                  <div className="text-xs text-secondary-500 font-medium">{dia}</div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             {/* Leyenda */}
