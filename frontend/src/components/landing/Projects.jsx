@@ -104,16 +104,9 @@ const Projects = () => {
                   {project.description}
                 </p>
                 
-                {/* Línea decorativa */}
-                <div className="w-12 h-0.5 bg-gradient-to-r from-primary-500 to-transparent mb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            
 
-                {/* Botón de acción sutil */}
-                <button className="text-primary-600 hover:text-primary-700 font-semibold text-sm transition-colors duration-300 flex items-center gap-2 group/btn">
-                  
-                  <svg className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
+                
               </div>
             </div>
           ))}
