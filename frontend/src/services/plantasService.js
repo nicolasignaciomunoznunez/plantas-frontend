@@ -61,4 +61,10 @@ export const plantasService = {
     const response = await api.get(`/api/plantas/cliente/${clienteId}`);
     return response.data;
   },
+  
+  // Asignar/desasignar planta a usuario
+asignarPlantaUsuario: async (datos) => {
+  const response = await api.post('/api/plantas/asignar', datos);
+  return response.data;
+},
 };

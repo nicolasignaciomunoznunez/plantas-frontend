@@ -122,6 +122,15 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           } />
+
+                    <Route path="administracion" element={
+                    <ProtectedRoute roles={['superadmin', 'admin']}>
+                    <Administracion />
+                   </ProtectedRoute>
+                 } />
+
+
+
         </Route>
 
         {/* ✅ REDIRECCIONES PARA RUTAS DIRECTAS */}
