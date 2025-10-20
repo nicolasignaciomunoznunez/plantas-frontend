@@ -84,41 +84,41 @@ function App() {
           
           {/* PLANTAS: Admin y Técnico pueden ver */}
           <Route path="plantas" element={
-            <ProtectedRoute roles={['admin']}>
+            <ProtectedRoute roles={['superadmin']}>
               <Plantas />
             </ProtectedRoute>
           } />
           
           <Route path="plantas/:id" element={
-            <ProtectedRoute roles={['admin', 'tecnico']}>
+            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
               <PlantaDetalle />
             </ProtectedRoute>
           } />
           
           {/* INCIDENCIAS: Todos los roles pueden ver */}
           <Route path="incidencias" element={
-            <ProtectedRoute roles={['admin', 'tecnico', 'cliente']}>
+            <ProtectedRoute roles={['superadmin','admin', 'tecnico', 'cliente']}>
               <Incidencias />
             </ProtectedRoute>
           } />
           
           {/* MANTENIMIENTOS: Admin y Técnico */}
           <Route path="mantenimientos" element={
-            <ProtectedRoute roles={['admin', 'tecnico']}>
+            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
               <Mantenimiento />
             </ProtectedRoute>
           } />
           
           {/* REPORTES: Admin y Técnico */}
           <Route path="reportes" element={
-            <ProtectedRoute roles={['admin', 'tecnico']}>
+            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
               <Reportes />
             </ProtectedRoute>
           } />
           
           {/* ✅ PERFIL: Todos los usuarios autenticados pueden ver */}
           <Route path="perfil" element={
-            <ProtectedRoute roles={['admin', 'tecnico', 'cliente']}>
+            <ProtectedRoute roles={['superadmin','admin', 'tecnico', 'cliente']}>
               <ProfilePage />
             </ProtectedRoute>
           } />
