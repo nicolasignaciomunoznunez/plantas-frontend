@@ -6,6 +6,7 @@ import { useIncidenciasStore } from '../stores/incidenciasStore';
 import { useMantenimientoStore } from '../stores/mantenimientoStore';
 import { useReportesStore } from '../stores/reportesStore';
 import { useAuthStore } from '../stores/authStore';
+
 import GraficosDashboard from '../components/dashboard/GraficosDashboard';
 import ResumenActividad from '../components/dashboard/ResumenActividad';
 
@@ -44,12 +45,13 @@ export default function Dashboard() {
     reportes: false
   });
 
-  // ✅ Roles memoizados
-  const { esCliente, esTecnico, esAdmin, puedeVerDashboard } = useMemo(() => ({
+  // ✅ CORREGIDO: Incluir superadmin en los roles
+  const { esCliente, esTecnico, esAdmin, esSuperAdmin, puedeVerDashboard } = useMemo(() => ({
     esCliente: user?.rol === 'cliente',
     esTecnico: user?.rol === 'tecnico',
     esAdmin: user?.rol === 'admin',
-    puedeVerDashboard: ['tecnico', 'admin'].includes(user?.rol)
+    esSuperAdmin: user?.rol === 'superadmin', // ✅ AGREGADO
+    puedeVerDashboard: ['superadmin', 'admin', 'tecnico'].includes(user?.rol) // ✅ CORREGIDO
   }), [user?.rol]);
 
   // ✅ Cálculo de métricas optimizado
@@ -257,7 +259,7 @@ export default function Dashboard() {
     </div>
   );
 
-  // ✅ Renderizado condicional temprano
+  // ✅ Renderizado condicional temprano - CORREGIDO
   if (esCliente) return <AccesoDenegado />;
   if (!puedeVerDashboard && !authLoading) return <AccesoDenegado />;
   if (loadingPrincipal) return <SkeletonLoading />;
@@ -321,21 +323,24 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-light p-4 sm:p-6 space-y-6 sm:space-y-8">
-      {/* ✅ HEADER MEJORADO */}
+      {/* ✅ HEADER MEJORADO - CORREGIDO */}
       <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-down">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="space-y-3">
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-secondary-800 to-primary-600 bg-clip-text text-transparent font-heading">
-              {esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
+              {esSuperAdmin ? 'Panel Super Admin' :  
+               esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
             </h1>
             <p className="text-secondary-600 flex items-center gap-2 text-sm sm:text-base">
               <span className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></span>
-              {esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
+              {esSuperAdmin ? 'Gestión total del sistema' : 
+               esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
               {user?.nombre && ` • ${user.nombre}`}
             </p>
           </div>
           
-          {esAdmin && (
+          {/* ✅ CORREGIDO: Incluir superadmin en el botón */}
+          {(esSuperAdmin || esAdmin) && (
             <Link
               to="/plantas/crear"
               className="bg-gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-large transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg w-full lg:w-auto justify-center"
@@ -374,9 +379,8 @@ export default function Dashboard() {
           {/* COLUMNA PRINCIPAL */}
           <div className="xl:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-scale-in">
-              {/* ✅ CORREGIDO: Pasa los datos en la estructura correcta */}
               <GraficosDashboard 
-                datos={{ plantas: datosOptimizados.graficos.plantas }}  // ✅ Estructura corregida
+                datos={{ plantas: datosOptimizados.graficos.plantas }}
                 plantas={datosOptimizados.graficos.plantas}
                 incidencias={incidencias}
                 metricasReales={metricas?.metricas}
@@ -408,7 +412,7 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-3 sm:space-y-4">
-                {datosOptimizados.plantasResumen.slice(0, 4).map((planta, index) => ( // ✅ Limitar a 4 en móvil
+                {datosOptimizados.plantasResumen.slice(0, 4).map((planta, index) => (
                   <Link 
                     key={planta.id} 
                     to={`/plantas/${planta.id}`}
