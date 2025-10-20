@@ -124,16 +124,16 @@ function App() {
             </ProtectedRoute>
           } />
 
-                    <Route path="administracion" element={
-                    <ProtectedRoute roles={['superadmin', 'admin']}>
-                    <Administracion />
-                   </ProtectedRoute>
-                 } />
-
-
-
+              
         </Route>
-
+  {/* ✅ RUTA DE ADMINISTRACIÓN (FUERA de /dashboard) */}
+    <Route path="/administracion" element={
+      <ProtectedRoute roles={['superadmin', 'admin']}>
+        <Layout> {/* ← Si necesitas el layout */}
+          <Administracion />
+        </Layout>
+      </ProtectedRoute>
+    } />
         {/* ✅ REDIRECCIONES PARA RUTAS DIRECTAS */}
         {isAuthenticated && (
           <>
