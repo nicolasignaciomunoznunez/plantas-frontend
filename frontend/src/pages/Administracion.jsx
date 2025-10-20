@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import GestionUsuarios from '../components/administracion/GestionUsuarios';
+import GestionUsuarios from '../components/adminsitracion/GestionUsuarios';
 import AsignacionPlantas from '../components/administracion/AsignacionPlantas';
 
 export default function Administracion() {
