@@ -17,7 +17,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.get(`/plantas/${id}`);
+      const response = await api.get(`/api/plantas/${id}`);
       
       return response.data;
     } catch (error) {
