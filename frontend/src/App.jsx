@@ -13,7 +13,8 @@ import Incidencias from './pages/Incidencias';
 import Mantenimiento from './pages/Mantenimiento';
 import Reportes from './pages/Reportes';
 import LandingPage from './pages/LandingPage'; 
-import ProfilePage from './pages/Profile'; // ✅ NUEVA PÁGINA
+import ProfilePage from './pages/Profile'; 
+import Administracion from './pages/Administracion';
 
 function App() {
   const { isAuthenticated, login, setLoading, isLoading } = useAuthStore();
