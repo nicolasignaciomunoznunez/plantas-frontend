@@ -127,13 +127,16 @@ function App() {
               
         </Route>
   {/* ✅ RUTA DE ADMINISTRACIÓN (FUERA de /dashboard) */}
-    <Route path="/administracion" element={
-      <ProtectedRoute roles={['superadmin', 'admin']}>
-        <Layout> {/* ← Si necesitas el layout */}
-          <Administracion />
-        </Layout>
-      </ProtectedRoute>
-    } />
+   <Route path="/administracion" element={
+  <ProtectedRoute roles={['superadmin', 'admin']}>
+    <Layout /> {/* ← Sin children, usa Outlet */}
+  </ProtectedRoute>
+}>
+  <Route index element={<Administracion />} /> {/* ← Contenido via Outlet */}
+</Route>
+
+
+
         {/* ✅ REDIRECCIONES PARA RUTAS DIRECTAS */}
         {isAuthenticated && (
           <>
