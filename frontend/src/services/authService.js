@@ -85,4 +85,16 @@ cambiarContraseña: async (datosContraseña) => {
   return response.data;
 },
 
+// Obtener todos los usuarios (para superadmin/admin)
+obtenerUsuarios: async () => {
+  const response = await api.get('/api/auth/usuarios');
+  return response.data;
+},
+
+// Actualizar rol de usuario
+actualizarRolUsuario: async (usuarioId, nuevoRol) => {
+  const response = await api.put(`/api/auth/usuarios/${usuarioId}/rol`, { nuevoRol });
+  return response.data;
+},
+
 };
