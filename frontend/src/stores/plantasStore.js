@@ -119,19 +119,24 @@ export const usePlantasStore = create((set, get) => ({
 obtenerPlantasPorCliente: async (clienteId) => {
   set({ loading: true, error: null });
   try {
-    const response = await api.get(`/api/plantas/cliente/${clienteId}`);
+    console.log('🔍 [STORE] Obteniendo plantas para cliente:', clienteId);
     
-    if (response.data.success) {
+    // ✅ LLAMAR AL SERVICE (no usar api directamente)
+    const response = await plantasService.obtenerPlantasCliente(clienteId);
+    
+    console.log('📊 [STORE] Respuesta del service:', response);
+    
+    if (response.success) {
       set({ loading: false });
-      return response.data.plantas || [];
+      return response.plantas || [];
     } else {
-      set({ error: response.data.message, loading: false });
+      set({ error: response.message, loading: false });
       return [];
     }
   } catch (error) {
-    console.error('Error obteniendo plantas del cliente:', error);
+    console.error('❌ [STORE] Error obteniendo plantas del cliente:', error);
     set({ 
-      error: error.response?.data?.message || 'Error al obtener plantas', 
+      error: error.message || 'Error al obtener plantas', 
       loading: false 
     });
     return [];
