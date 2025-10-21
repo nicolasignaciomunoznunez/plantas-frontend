@@ -1,4 +1,3 @@
-// components/landing/About.jsx
 import React from 'react';
 
 const About = () => {
@@ -6,21 +5,21 @@ const About = () => {
     {
       icon: "🎯",
       title: "Misión",
-      description: "Garantizar el funcionamiento óptimo de plantas de agua potable mediante soluciones tecnológicas innovadoras y mantenimiento especializado.",
+      description: "Garantizar el funcionamiento óptimo de plantas industriales mediante soluciones tecnológicas innovadoras y mantenimiento especializado en múltiples sectores.",
       gradient: "from-primary-500 to-primary-600",
       delay: "100"
     },
     {
       icon: "👁️",
       title: "Visión", 
-      description: "Ser referentes en ingeniería aplicada al sector hídrico, contribuyendo al desarrollo sostenible de comunidades.",
+      description: "Ser referentes en ingeniería aplicada al sector industrial, expandiendo nuestro expertise a diversos tipos de plantas y procesos productivos.",
       gradient: "from-primary-600 to-primary-700",
       delay: "200"
     },
     {
       icon: "⭐",
       title: "Valores",
-      description: "Compromiso, innovación, calidad y responsabilidad ambiental en cada proyecto que emprendemos.",
+      description: "Compromiso, innovación, calidad y adaptabilidad para enfrentar los desafíos únicos de cada proyecto industrial.",
       gradient: "from-primary-400 to-primary-500",
       delay: "300"
     }
@@ -28,9 +27,18 @@ const About = () => {
 
   const stats = [
     { number: "5+", label: "Años de experiencia", suffix: "" },
-    { number: "30+", label: "Clientes satisfechos", suffix: "" },
-    { number: "50+", label: "Proyectos completados", suffix: "" },
-    { number: "10+", label: "Comunidades impactadas", suffix: "" }
+    { number: "50+", label: "Clientes industriales", suffix: "" },
+    { number: "100+", label: "Proyectos completados", suffix: "" },
+    { number: "15+", label: "Sectores atendidos", suffix: "" }
+  ];
+
+  const industries = [
+    { name: "Plantas de Agua", icon: "💧", color: "from-blue-500 to-cyan-600" },
+    { name: "Energía Solar", icon: "☀️", color: "from-amber-500 to-orange-500" },
+    { name: "Manufactura", icon: "🏭", color: "from-gray-600 to-gray-700" },
+    { name: "Alimentos", icon: "🍎", color: "from-red-500 to-pink-600" },
+    { name: "Química", icon: "🧪", color: "from-purple-500 to-indigo-600" },
+    { name: "Minería", icon: "⛏️", color: "from-yellow-600 to-amber-600" }
   ];
 
   return (
@@ -44,19 +52,47 @@ const About = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 to-transparent"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Mejorado con Animación */}
-        <div className="text-center max-w-4xl mx-auto mb-16 lg:mb-20 animate-fade-in-up">
+        {/* Header Mejorado con Enfoque Industrial Amplio */}
+        <div className="text-center max-w-5xl mx-auto mb-16 lg:mb-20 animate-fade-in-up">
           <span className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4 shadow-soft">
-            Sobre Nosotros
+            Expertos en Soluciones Industriales
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 leading-tight font-heading">
-            Líderes en <span className="text-primary-600 bg-gradient-primary bg-clip-text text-transparent">soluciones hídricas</span> con más de 5 años de experiencia
+            Especialistas en <span className="text-primary-600 bg-gradient-primary bg-clip-text text-transparent">Plantas Industriales</span> de Todo Tipo
           </h2>
-          <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed max-w-3xl mx-auto">
-            Especialistas en soluciones integrales para el óptimo funcionamiento de plantas de agua potable. 
-            Combinamos <strong className="text-primary-600">innovación tecnológica</strong> con <strong className="text-primary-600">experiencia probada</strong> para servir 
-            a comunidades y garantizar acceso al agua de calidad.
+          <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed max-w-4xl mx-auto">
+            Con más de <strong className="text-primary-600">5 años de experiencia</strong> en múltiples sectores industriales, 
+            combinamos <strong className="text-primary-600">innovación tecnológica</strong> con <strong className="text-primary-600">expertise probado</strong> 
+            para optimizar operaciones en plantas de agua, energía, manufactura y más.
           </p>
+        </div>
+
+        {/* Sectores Industriales que Atendemos */}
+        <div className="mb-16 lg:mb-20 animate-fade-in-up">
+          <div className="text-center mb-12">
+            <h3 className="text-2xl lg:text-3xl font-bold text-secondary-800 mb-4 font-heading">
+              Sectores Industriales que Atendemos
+            </h3>
+            <p className="text-secondary-600 text-lg max-w-2xl mx-auto">
+              Nuestra experiencia se extiende a múltiples industrias, adaptando soluciones a cada necesidad específica
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {industries.map((industry, index) => (
+              <div 
+                key={index}
+                className="bg-white rounded-2xl p-4 text-center shadow-soft hover:shadow-large transition-all duration-300 border border-secondary-100 hover:border-primary-200 group"
+              >
+                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${industry.color} flex items-center justify-center text-xl text-white mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
+                  {industry.icon}
+                </div>
+                <span className="text-sm font-semibold text-secondary-800 group-hover:text-primary-600 transition-colors">
+                  {industry.name}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Grid de Valores Mejorado */}
@@ -85,14 +121,14 @@ const About = () => {
           ))}
         </div>
 
-        {/* Estadísticas Destacadas */}
+        {/* Estadísticas Destacadas - Enfoque Industrial */}
         <div className="bg-white rounded-2xl shadow-medium p-8 lg:p-12 border border-secondary-100 animate-scale-in mb-16 lg:mb-20">
           <div className="text-center mb-12">
             <h3 className="text-2xl lg:text-3xl font-bold text-secondary-800 mb-4 font-heading">
-              Nuestro Impacto en Números
+              Nuestro Impacto Industrial
             </h3>
             <p className="text-secondary-600 text-lg max-w-2xl mx-auto">
-              Resultados tangibles que respaldan nuestra experiencia y compromiso con la excelencia
+              Resultados tangibles que respaldan nuestra versatilidad y compromiso con la excelencia industrial
             </p>
           </div>
           
@@ -116,7 +152,7 @@ const About = () => {
           </div>
         </div>
 
-        {/* CTA Section Mejorado */}
+        {/* CTA Section Mejorado - Enfoque Industrial Amplio */}
         <div className="text-center animate-fade-in-up">
           <div className="bg-gradient-primary rounded-2xl p-8 lg:p-12 text-white shadow-large max-w-4xl mx-auto relative overflow-hidden">
             {/* Elementos decorativos del CTA */}
@@ -124,17 +160,26 @@ const About = () => {
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
             
             <h3 className="text-2xl lg:text-3xl font-bold mb-4 relative z-10 font-heading">
-              ¿Listo para optimizar tu planta de agua?
+              ¿Proyecto Industrial en Mente?
             </h3>
             <p className="text-primary-100 text-lg lg:text-xl mb-6 max-w-2xl mx-auto relative z-10">
-              Contamos con la experiencia y tecnología para llevar tu operación al siguiente nivel.
+              Desde plantas de agua hasta energía solar, tenemos la experiencia y tecnología para tu sector.
             </p>
+            
+            {/* Especialidades destacadas */}
+            <div className="flex flex-wrap justify-center gap-3 mb-6 relative z-10">
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">💧 Plantas de Agua</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">☀️ Energía Solar</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">🏭 Manufactura</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">⚡ Automatización</span>
+            </div>
+            
             <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
               <button className="bg-white text-primary-600 hover:bg-primary-50 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-medium">
-                Solicitar Auditoría
+                Consultoría Industrial
               </button>
               <button className="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
-                Conocer Casos de Éxito
+                Ver Portafolio
               </button>
             </div>
           </div>
