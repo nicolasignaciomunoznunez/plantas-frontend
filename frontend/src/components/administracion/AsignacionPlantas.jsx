@@ -70,51 +70,62 @@ export default function AsignacionPlantas() {
   };
 
   // ✅ NUEVA LÓGICA: Asignar múltiples
-  const asignarPlantaUsuario = async (usuarioId, plantaId, asignar = true) => {
-    try {
-      setAsignando(true);
-      
-      const usuario = usuarios.find(u => u.id === usuarioId);
-      
-      if (asignar) {
-        // Para asignar: usar los nuevos métodos muchos-a-muchos
-        if (usuario.rol === 'tecnico') {
-          // Obtener técnicos actuales y agregar el nuevo
-          const plantaCompleta = plantasCompletas[plantaId];
-          const tecnicosActuales = plantaCompleta?.tecnicos?.map(t => t.id) || [];
-          // Si todavía usa el sistema antiguo, incluir tecnicoId
-          if (plantaCompleta.tecnicoId && !tecnicosActuales.includes(plantaCompleta.tecnicoId)) {
-            tecnicosActuales.push(plantaCompleta.tecnicoId);
-          }
-          const nuevosTecnicos = [...tecnicosActuales, usuarioId];
-          
-          await plantasService.asignarMultiplesTecnicos(plantaId, nuevosTecnicos);
-        } else if (usuario.rol === 'cliente') {
-          // Para clientes, mantener lógica 1-a-1 por ahora (pueden tener solo 1 planta)
-          const response = await plantasService.asignarPlantaUsuario({
-            usuarioId,
-            plantaId,
-            accion: 'asignar'
-          });
+const asignarPlantaUsuario = async (usuarioId, plantaId, asignar = true) => {
+  try {
+    setAsignando(true);
+    
+    const usuario = usuarios.find(u => u.id === usuarioId);
+    
+    if (asignar) {
+      if (usuario.rol === 'tecnico') {
+        // ✅ TÉCNICO: Usar sistema muchos-a-muchos
+        const plantaCompleta = plantasCompletas[plantaId];
+        const tecnicosActuales = plantaCompleta?.tecnicos?.map(t => t.id) || [];
+        
+        // Verificar si ya está asignado
+        if (tecnicosActuales.includes(usuarioId)) {
+          alert('Este técnico ya está asignado a esta planta');
+          return;
         }
-      } else {
-        // Para desasignar
+        
+        // Agregar a la lista
+        const nuevosTecnicos = [...tecnicosActuales, usuarioId];
+        await plantasService.asignarMultiplesTecnicos(plantaId, nuevosTecnicos);
+        
+      } else if (usuario.rol === 'cliente') {
+        // ✅ CLIENTE: Usar sistema 1-a-1 (método existente)
         const response = await plantasService.asignarPlantaUsuario({
           usuarioId,
           plantaId,
-          accion: 'desasignar'
+          accion: 'asignar'
         });
+        
+        if (!response.success && response.message.includes('ya tiene una planta')) {
+          alert('Este cliente ya tiene una planta asignada');
+          return;
+        }
       }
-
-      // Recargar datos
-      await cargarDatos();
-
-    } catch (error) {
-      console.error('Error asignando planta:', error);
-    } finally {
-      setAsignando(false);
+    } else {
+      // Desasignar
+      const response = await plantasService.asignarPlantaUsuario({
+        usuarioId,
+        plantaId,
+        accion: 'desasignar'
+      });
     }
-  };
+
+    // Recargar datos
+    await cargarDatos();
+
+  } catch (error) {
+    console.error('Error asignando planta:', error);
+    if (error.message.includes('ya tiene una planta')) {
+      alert('Este cliente ya tiene una planta asignada');
+    }
+  } finally {
+    setAsignando(false);
+  }
+};
 
   // Filtrar usuarios por rol
   const usuariosFiltrados = usuarios.filter(usuario => 
