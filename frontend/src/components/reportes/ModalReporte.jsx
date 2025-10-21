@@ -1,5 +1,5 @@
-// components/reportes/ModalReporte.jsx - MEJORADO
-import { useState } from 'react';
+// components/reportes/ModalReporte.jsx - MEJORADO Y RESPONSIVE
+import { useState, useEffect } from 'react';
 import { useReportesStore } from '../../stores/reportesStore';
 import { useAuthStore } from '../../stores/authStore';
 
@@ -12,8 +12,20 @@ export default function ModalReporte({ isOpen, onClose, plantas }) {
     tipo: 'general',
     descripcion: '',
     periodo: 'mensual',
-     titulo: ''  // ✅ AGREGAR TITULO
+    titulo: ''  // ✅ AGREGAR TITULO
   });
+
+  // Cerrar modal con tecla Escape
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        handleClose();
+      }
+    };
+    
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -23,36 +35,35 @@ export default function ModalReporte({ isOpen, onClose, plantas }) {
     }));
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  
-  if (!formData.plantId) {
-    alert('Selecciona una planta');
-    return;
-  }
-
-  
-  try {
-    // ✅ SOLO crear el registro en BD (sin enviar rutaArchivo)
-    const response = await generarReporte({
-      ...formData,
-      generadoPor: user?.id,
-      fecha: new Date().toISOString().split('T')[0],
-       titulo: formData.titulo || `Reporte ${formData.tipo} - ${formData.periodo}`  // ✅ ENVIAR TITULO
-    });
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     
-    // Inmediatamente descargar el PDF real usando el ID
-    if (response.reporte?.id) {
-      await useReportesStore.getState().descargarReporte(response.reporte.id);
+    if (!formData.plantId) {
+      alert('Selecciona una planta');
+      return;
     }
-    
-    onClose();
-    setFormData({ plantId: '', tipo: 'general', descripcion: '', periodo: 'mensual' });
-  } catch (error) {
-    console.error('Error al generar reporte:', error);
-    alert('Error al generar reporte: ' + (error.response?.data?.message || error.message));
-  }
-};
+
+    try {
+      // ✅ SOLO crear el registro en BD (sin enviar rutaArchivo)
+      const response = await generarReporte({
+        ...formData,
+        generadoPor: user?.id,
+        fecha: new Date().toISOString().split('T')[0],
+        titulo: formData.titulo || `Reporte ${formData.tipo} - ${formData.periodo}`  // ✅ ENVIAR TITULO
+      });
+      
+      // Inmediatamente descargar el PDF real usando el ID
+      if (response.reporte?.id) {
+        await useReportesStore.getState().descargarReporte(response.reporte.id);
+      }
+      
+      onClose();
+      setFormData({ plantId: '', tipo: 'general', descripcion: '', periodo: 'mensual', titulo: '' });
+    } catch (error) {
+      console.error('Error al generar reporte:', error);
+      alert('Error al generar reporte: ' + (error.response?.data?.message || error.message));
+    }
+  };
 
   const handleClose = () => {
     onClose();
@@ -62,7 +73,7 @@ const handleSubmit = async (e) => {
       tipo: 'general',
       descripcion: '',
       periodo: 'mensual',
-      titulo:''
+      titulo: ''
     });
   };
 
@@ -87,40 +98,41 @@ const handleSubmit = async (e) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-50 backdrop-blur-sm">
+    <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm overflow-y-auto">
       <div 
-        className="bg-white rounded-2xl shadow-xl w-full max-w-2xl transform transition-all duration-300 scale-100"
+        className="bg-white rounded-xl sm:rounded-2xl shadow-xl w-full max-w-2xl mx-auto my-4 transform transition-all duration-300 scale-100 max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div className="flex justify-between items-center p-4 sm:p-6 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
-            <div>
-              <h2 className="text-xl font-bold text-gray-900">
+            <div className="min-w-0 flex-1">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 truncate">
                 Generar Nuevo Reporte
               </h2>
-              <p className="text-sm text-gray-500">
+              <p className="text-xs sm:text-sm text-gray-500 truncate">
                 Configura los parámetros para generar el reporte
               </p>
             </div>
           </div>
           <button
             onClick={handleClose}
-            className="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-all duration-200 flex-shrink-0"
+            aria-label="Cerrar modal"
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Formulario */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Campo Planta */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
@@ -132,7 +144,7 @@ const handleSubmit = async (e) => {
               required
               value={formData.plantId}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
             >
               <option value="">Seleccionar planta...</option>
               {plantas.map((planta) => (
@@ -142,36 +154,39 @@ const handleSubmit = async (e) => {
               ))}
             </select>
           </div>
-<div className="space-y-2">
-    <label htmlFor="titulo" className="block text-sm font-medium text-gray-700">
-        Título del Reporte *
-    </label>
-    <input
-        type="text"
-        id="titulo"
-        name="titulo"
-        required
-        value={formData.titulo}
-        onChange={handleChange}
-        placeholder="Ej: Reporte Mensual de Operaciones"
-        className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
-    />
-</div>
+          
+          {/* Campo Título */}
+          <div className="space-y-2">
+            <label htmlFor="titulo" className="block text-sm font-medium text-gray-700">
+              Título del Reporte *
+            </label>
+            <input
+              type="text"
+              id="titulo"
+              name="titulo"
+              required
+              value={formData.titulo}
+              onChange={handleChange}
+              placeholder="Ej: Reporte Mensual de Operaciones"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+            />
+          </div>
+
           {/* Campos Tipo y Período */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2">
             {/* Campo Tipo */}
             <div className="space-y-2">
               <label htmlFor="tipo" className="block text-sm font-medium text-gray-700">
                 Tipo de Reporte *
               </label>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <select
                   id="tipo"
                   name="tipo"
                   required
                   value={formData.tipo}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                  className="flex-1 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                 >
                   <option value="general">General</option>
                   <option value="mantenimiento">Mantenimiento</option>
@@ -179,7 +194,7 @@ const handleSubmit = async (e) => {
                   <option value="rendimiento">Rendimiento</option>
                   <option value="calidad">Calidad del Agua</option>
                 </select>
-                <span className={`px-4 py-3 rounded-xl text-sm font-medium border ${tiposReporte[formData.tipo]?.color}`}>
+                <span className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border ${tiposReporte[formData.tipo]?.color} text-center`}>
                   {tiposReporte[formData.tipo]?.label}
                 </span>
               </div>
@@ -190,14 +205,14 @@ const handleSubmit = async (e) => {
               <label htmlFor="periodo" className="block text-sm font-medium text-gray-700">
                 Período *
               </label>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <select
                   id="periodo"
                   name="periodo"
                   required
                   value={formData.periodo}
                   onChange={handleChange}
-                  className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
+                  className="flex-1 px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
                 >
                   <option value="diario">Diario</option>
                   <option value="semanal">Semanal</option>
@@ -205,7 +220,7 @@ const handleSubmit = async (e) => {
                   <option value="trimestral">Trimestral</option>
                   <option value="anual">Anual</option>
                 </select>
-                <span className={`px-4 py-3 rounded-xl text-sm font-medium border ${periodosReporte[formData.periodo]?.color}`}>
+                <span className={`px-3 py-2 sm:px-4 sm:py-3 rounded-lg sm:rounded-xl text-xs sm:text-sm font-medium border ${periodosReporte[formData.periodo]?.color} text-center`}>
                   {periodosReporte[formData.periodo]?.label}
                 </span>
               </div>
@@ -223,7 +238,7 @@ const handleSubmit = async (e) => {
               rows={3}
               value={formData.descripcion}
               onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none hover:border-gray-400"
+              className="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 resize-none hover:border-gray-400"
               placeholder="Descripción adicional del reporte..."
             />
             <p className="text-xs text-gray-500">
@@ -232,17 +247,17 @@ const handleSubmit = async (e) => {
           </div>
 
           {/* Información del reporte */}
-          <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-            <h4 className="text-sm font-medium text-blue-800 mb-3 flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="bg-blue-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-blue-200">
+            <h4 className="text-sm font-medium text-blue-800 mb-2 sm:mb-3 flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               Información del reporte
             </h4>
-            <div className="text-sm text-blue-700 space-y-2">
-              <div className="flex justify-between">
+            <div className="text-xs sm:text-sm text-blue-700 space-y-1 sm:space-y-2">
+              <div className="flex justify-between flex-wrap gap-1">
                 <span className="font-medium">Archivo:</span>
-                <span>reporte_{formData.tipo}_{formData.plantId || 'X'}_{new Date().toISOString().split('T')[0]}.pdf</span>
+                <span className="text-right break-all">reporte_{formData.tipo}_{formData.plantId || 'X'}_{new Date().toISOString().split('T')[0]}.pdf</span>
               </div>
               <div className="flex justify-between">
                 <span className="font-medium">Fecha:</span>
@@ -256,34 +271,34 @@ const handleSubmit = async (e) => {
           </div>
 
           {/* Información del usuario */}
-          <div className="bg-gray-50 rounded-xl p-4 border border-gray-200">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+          <div className="bg-gray-50 rounded-lg sm:rounded-xl p-3 sm:p-4 border border-gray-200">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-md sm:rounded-lg flex items-center justify-center flex-shrink-0">
                 <span className="text-white text-xs font-semibold">
                   {user?.nombre?.charAt(0)?.toUpperCase() || 'U'}
                 </span>
               </div>
-              <div className="text-sm">
-                <p className="text-gray-900 font-medium">{user?.nombre || 'Usuario'}</p>
-                <p className="text-gray-500 capitalize">{user?.rol || 'sin rol'}</p>
+              <div className="text-sm min-w-0 flex-1">
+                <p className="text-gray-900 font-medium truncate">{user?.nombre || 'Usuario'}</p>
+                <p className="text-gray-500 capitalize truncate">{user?.rol || 'sin rol'}</p>
               </div>
             </div>
           </div>
 
           {/* Botones de acción */}
-          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-100">
+          <div className="flex flex-col-reverse sm:flex-row justify-end gap-2 sm:space-x-3 pt-4 border-t border-gray-100">
             <button
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="px-6 py-3 text-sm font-medium text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-300 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-4 py-2 sm:px-6 sm:py-3 text-sm font-medium text-gray-700 hover:text-gray-900 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg sm:rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex-1 sm:flex-none"
             >
               Cancelar
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-4 py-2 sm:px-6 sm:py-3 text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 flex-1 sm:flex-none"
             >
               {loading ? (
                 <>
