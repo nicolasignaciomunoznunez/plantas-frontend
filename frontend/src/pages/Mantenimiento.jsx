@@ -213,7 +213,7 @@ export default function Mantenimiento() {
   };
 
   const loading = mantenimientosLoading || plantasLoading;
-  const puedeGestionar = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGestionar =user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
   const hayResultados = mantenimientosFiltrados.length > 0;
   const hayFiltrosActivos = filtros.estado !== 'todos' || filtros.tipo !== 'todos' || filtros.planta !== 'todas' || filtros.busqueda;
 

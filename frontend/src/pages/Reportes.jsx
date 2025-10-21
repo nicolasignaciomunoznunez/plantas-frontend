@@ -126,7 +126,7 @@ export default function Reportes() {
     };
   }, [reportes, plantas]);
 
-  const puedeGenerarReportes = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGenerarReportes = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
   const hayFiltrosActivos = filtroPlanta !== 'todas' || fechaInicio || fechaFin;
 
   // Limpiar filtros
