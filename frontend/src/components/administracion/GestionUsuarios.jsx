@@ -78,122 +78,140 @@ export default function GestionUsuarios() {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="flex justify-center items-center py-16">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Cargando usuarios...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-fade-in-up">
       {/* Header */}
-      <div className="border-b border-gray-200 pb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Gestión de Usuarios</h2>
-        <p className="text-gray-600 mt-1">
-          Gestiona los roles y permisos de los usuarios del sistema
+      <div className="text-center space-y-4">
+        <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900">
+          Gestión de Usuarios
+        </h2>
+        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+          Administra los roles y permisos de todos los usuarios del sistema
         </p>
       </div>
 
       {/* Estadísticas */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-gray-900">{estadisticas.total}</div>
-          <div className="text-sm text-gray-600">Total</div>
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6">
+        <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 md:p-6 shadow-lg text-center">
+          <div className="text-2xl md:text-3xl font-bold">{estadisticas.total}</div>
+          <div className="text-blue-100 text-xs md:text-sm font-medium mt-1 md:mt-2">Total</div>
         </div>
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-purple-700">{estadisticas.superadmin}</div>
-          <div className="text-sm text-purple-600">Super Admin</div>
+        
+        <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-4 md:p-6 shadow-lg text-center">
+          <div className="text-2xl md:text-3xl font-bold">{estadisticas.superadmin}</div>
+          <div className="text-purple-100 text-xs md:text-sm font-medium mt-1 md:mt-2">Super Admin</div>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-blue-700">{estadisticas.admin}</div>
-          <div className="text-sm text-blue-600">Admin</div>
+        
+        <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 text-white rounded-2xl p-4 md:p-6 shadow-lg text-center">
+          <div className="text-2xl md:text-3xl font-bold">{estadisticas.admin}</div>
+          <div className="text-cyan-100 text-xs md:text-sm font-medium mt-1 md:mt-2">Administrador</div>
         </div>
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-orange-700">{estadisticas.tecnico}</div>
-          <div className="text-sm text-orange-600">Técnicos</div>
+        
+        <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl p-4 md:p-6 shadow-lg text-center">
+          <div className="text-2xl md:text-3xl font-bold">{estadisticas.tecnico}</div>
+          <div className="text-orange-100 text-xs md:text-sm font-medium mt-1 md:mt-2">Técnicos</div>
         </div>
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-          <div className="text-2xl font-bold text-green-700">{estadisticas.cliente}</div>
-          <div className="text-sm text-green-600">Clientes</div>
+        
+        <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-4 md:p-6 shadow-lg text-center">
+          <div className="text-2xl md:text-3xl font-bold">{estadisticas.cliente}</div>
+          <div className="text-green-100 text-xs md:text-sm font-medium mt-1 md:mt-2">Clientes</div>
         </div>
       </div>
 
       {/* Filtros */}
-      <div className="bg-gray-50 rounded-xl p-4">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+      <div className="bg-white rounded-2xl p-6 shadow-soft border border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700">
               Filtrar por Rol
             </label>
             <select
               value={filtros.rol}
               onChange={(e) => setFiltros({...filtros, rol: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white text-sm md:text-base"
             >
-              <option value="">Todos los roles</option>
-              <option value="superadmin">Super Admin</option>
-              <option value="admin">Administrador</option>
-              <option value="tecnico">Técnico</option>
-              <option value="cliente">Cliente</option>
+              <option value="">🎭 Todos los roles</option>
+              <option value="superadmin">👑 Super Admin</option>
+              <option value="admin">⚡ Administrador</option>
+              <option value="tecnico">👨‍🔧 Técnico</option>
+              <option value="cliente">👥 Cliente</option>
             </select>
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <label className="block text-sm font-semibold text-gray-700">
               Buscar Usuario
             </label>
             <input
               type="text"
-              placeholder="Nombre o email..."
+              placeholder="🔍 Nombre o email..."
               value={filtros.busqueda}
               onChange={(e) => setFiltros({...filtros, busqueda: e.target.value})}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white text-sm md:text-base"
             />
           </div>
 
           <div className="flex items-end">
             <button
               onClick={cargarUsuarios}
-              className="w-full bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
+              className="w-full bg-gray-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold shadow-lg hover:bg-gray-700 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2 text-sm md:text-base"
             >
-              Actualizar Lista
+              <span>🔄</span>
+              Actualizar
             </button>
           </div>
         </div>
       </div>
 
       {/* Lista de Usuarios */}
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Usuarios del Sistema ({usuariosFiltrados.length})
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+          <h3 className="text-xl md:text-2xl font-heading font-bold text-gray-900">
+            👥 Usuarios del Sistema ({usuariosFiltrados.length})
           </h3>
-          <span className="text-sm text-gray-500">
-            {user.rol === 'superadmin' ? 'Puedes cambiar todos los roles' : 'Solo puedes ver usuarios'}
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            {user.rol === 'superadmin' ? '⚡ Puedes cambiar todos los roles' : '👀 Solo modo lectura'}
           </span>
         </div>
 
         {usuariosFiltrados.length === 0 ? (
-          <div className="text-center py-8 text-gray-500">
-            No hay usuarios que coincidan con los filtros
+          <div className="bg-white rounded-2xl p-8 md:p-12 text-center shadow-soft border border-gray-100">
+            <div className="text-4xl md:text-6xl mb-4">🔍</div>
+            <h3 className="text-lg md:text-xl font-semibold text-gray-900 mb-2">
+              No se encontraron usuarios
+            </h3>
+            <p className="text-gray-600 text-sm md:text-base">
+              No hay usuarios que coincidan con los filtros aplicados
+            </p>
           </div>
         ) : (
-          usuariosFiltrados.map(usuario => (
-            <UsuarioItem
-              key={usuario.id}
-              usuario={usuario}
-              onCambiarRol={cambiarRolUsuario}
-              actualizando={actualizando}
-              puedeEditar={user.rol === 'superadmin' && usuario.rol !== 'superadmin'}
-            />
-          ))
+          <div className="grid grid-cols-1 gap-4 md:gap-6">
+            {usuariosFiltrados.map(usuario => (
+              <UsuarioItem
+                key={usuario.id}
+                usuario={usuario}
+                onCambiarRol={cambiarRolUsuario}
+                actualizando={actualizando}
+                puedeEditar={user.rol === 'superadmin' && usuario.rol !== 'superadmin'}
+              />
+            ))}
+          </div>
         )}
       </div>
     </div>
   );
 }
 
-// Componente individual de usuario
+// ✅ COMPONENTE USUARIO INDIVIDUAL - RESPONSIVE
 function UsuarioItem({ usuario, onCambiarRol, actualizando, puedeEditar }) {
   const [mostrarOpciones, setMostrarOpciones] = useState(false);
   const [cambiandoRol, setCambiandoRol] = useState(false);
@@ -207,17 +225,29 @@ function UsuarioItem({ usuario, onCambiarRol, actualizando, puedeEditar }) {
     setMostrarOpciones(false);
     
     if (!resultado.success) {
-      alert(`Error: ${resultado.message}`);
+      alert(`❌ Error: ${resultado.message}`);
+    } else {
+      alert('✅ Rol actualizado correctamente');
     }
   };
 
   const getRolColor = (rol) => {
     switch (rol) {
-      case 'superadmin': return 'bg-purple-100 text-purple-800';
-      case 'admin': return 'bg-blue-100 text-blue-800';
-      case 'tecnico': return 'bg-orange-100 text-orange-800';
-      case 'cliente': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'superadmin': return 'bg-gradient-to-br from-purple-500 to-purple-600 text-white border-purple-200';
+      case 'admin': return 'bg-gradient-to-br from-cyan-500 to-cyan-600 text-white border-cyan-200';
+      case 'tecnico': return 'bg-gradient-to-br from-orange-500 to-orange-600 text-white border-orange-200';
+      case 'cliente': return 'bg-gradient-to-br from-green-500 to-green-600 text-white border-green-200';
+      default: return 'bg-gradient-to-br from-gray-500 to-gray-600 text-white border-gray-200';
+    }
+  };
+
+  const getRolIcono = (rol) => {
+    switch (rol) {
+      case 'superadmin': return '👑';
+      case 'admin': return '⚡';
+      case 'tecnico': return '👨‍🔧';
+      case 'cliente': return '👥';
+      default: return '👤';
     }
   };
 
@@ -232,25 +262,31 @@ function UsuarioItem({ usuario, onCambiarRol, actualizando, puedeEditar }) {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+    <div className="bg-white rounded-2xl p-4 md:p-6 shadow-soft border border-gray-100 hover:shadow-lg transition-all duration-300">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center space-x-3 md:space-x-4">
+          <div className="w-12 h-12 md:w-16 md:h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg">
             {usuario.nombre.charAt(0)}
           </div>
-          <div>
-            <h4 className="font-semibold text-gray-900">{usuario.nombre}</h4>
-            <p className="text-gray-600 text-sm">{usuario.email}</p>
-            <div className="flex items-center space-x-2 mt-1">
-              <span className={`px-2 py-1 rounded-full text-xs font-medium ${getRolColor(usuario.rol)}`}>
-                {getRolNombre(usuario.rol)}
+          <div className="flex-1 min-w-0">
+            <h4 className="font-heading font-semibold text-gray-900 text-base md:text-lg truncate">
+              {usuario.nombre}
+            </h4>
+            <p className="text-gray-600 text-xs md:text-sm truncate">{usuario.email}</p>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className={`px-3 py-1 rounded-full text-xs font-semibold border ${getRolColor(usuario.rol)}`}>
+                {getRolIcono(usuario.rol)} {getRolNombre(usuario.rol)}
               </span>
-              <span className="text-gray-500 text-sm">
+              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                usuario.estaVerificado 
+                  ? 'bg-green-100 text-green-800 border border-green-200' 
+                  : 'bg-yellow-100 text-yellow-800 border border-yellow-200'
+              }`}>
                 {usuario.estaVerificado ? '✅ Verificado' : '⏳ Pendiente'}
               </span>
               {usuario.ultimoInicioSesion && (
-                <span className="text-gray-500 text-sm">
-                  Último acceso: {new Date(usuario.ultimoInicioSesion).toLocaleDateString()}
+                <span className="text-gray-500 text-xs">
+                  📅 {new Date(usuario.ultimoInicioSesion).toLocaleDateString()}
                 </span>
               )}
             </div>
@@ -262,47 +298,75 @@ function UsuarioItem({ usuario, onCambiarRol, actualizando, puedeEditar }) {
             <button
               onClick={() => setMostrarOpciones(!mostrarOpciones)}
               disabled={actualizando || cambiandoRol}
-              className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50"
+              className="bg-blue-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold shadow-lg hover:bg-blue-700 hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:hover:scale-100 flex items-center gap-2 text-sm md:text-base w-full sm:w-auto justify-center"
             >
-              {cambiandoRol ? 'Cambiando...' : 'Cambiar Rol'}
+              {cambiandoRol ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  Cambiando...
+                </>
+              ) : (
+                <>
+                  <span>🔄</span>
+                  Cambiar Rol
+                </>
+              )}
             </button>
           ) : (
-            <span className="text-gray-500 text-sm">Solo lectura</span>
+            <span className="text-gray-500 text-sm bg-gray-100 px-3 py-2 rounded-lg inline-block">
+              👀 Solo lectura
+            </span>
           )}
 
           {/* Menú desplegable de roles */}
           {mostrarOpciones && puedeEditar && (
-            <div className="absolute right-0 top-12 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-48">
-              <div className="p-2">
-                <div className="text-xs font-medium text-gray-500 px-2 py-1">Cambiar a:</div>
-                {['admin', 'tecnico', 'cliente'].map(rol => (
-                  <button
-                    key={rol}
-                    onClick={() => handleCambiarRol(rol)}
-                    disabled={cambiandoRol}
-                    className="w-full text-left px-3 py-2 text-sm hover:bg-gray-100 rounded-md disabled:opacity-50 flex items-center justify-between"
-                  >
-                    <span>{getRolNombre(rol)}</span>
-                    {usuario.rol === rol && <span className="text-blue-600">✓</span>}
-                  </button>
-                ))}
+            <>
+              {/* Overlay para cerrar al hacer click fuera */}
+              <div 
+                className="fixed inset-0 z-20"
+                onClick={() => setMostrarOpciones(false)}
+              />
+              
+              <div className="absolute right-0 top-12 md:top-14 bg-white border border-gray-200 rounded-2xl shadow-xl z-30 min-w-48 md:min-w-56 animate-fade-in-up">
+                <div className="p-3 md:p-4">
+                  <div className="text-xs font-semibold text-gray-500 px-2 py-1 mb-2">Cambiar rol a:</div>
+                  {['admin', 'tecnico', 'cliente'].map(rol => (
+                    <button
+                      key={rol}
+                      onClick={() => handleCambiarRol(rol)}
+                      disabled={cambiandoRol}
+                      className={`w-full text-left px-3 py-2 md:px-4 md:py-3 text-sm md:text-base hover:bg-gray-50 rounded-xl transition-all duration-200 disabled:opacity-50 flex items-center justify-between ${
+                        usuario.rol === rol ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <span>{getRolIcono(rol)}</span>
+                        <span>{getRolNombre(rol)}</span>
+                      </div>
+                      {usuario.rol === rol && <span className="text-blue-600 font-bold">✓</span>}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            </>
           )}
         </div>
       </div>
 
       {/* Información adicional */}
-      <div className="mt-3 pt-3 border-t border-gray-100 text-sm text-gray-600">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
-          <div>
-            <strong>ID:</strong> {usuario.id}
+      <div className="mt-4 md:mt-6 pt-4 border-t border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4 text-xs md:text-sm text-gray-600">
+          <div className="bg-gray-50 rounded-lg p-2 md:p-3">
+            <strong className="text-gray-700">🆔 ID:</strong> {usuario.id}
           </div>
-          <div>
-            <strong>Registrado:</strong> {new Date(usuario.createdAt).toLocaleDateString()}
+          <div className="bg-gray-50 rounded-lg p-2 md:p-3">
+            <strong className="text-gray-700">📅 Registrado:</strong> {new Date(usuario.createdAt).toLocaleDateString()}
           </div>
-          <div>
-            <strong>Estado:</strong> {usuario.estaVerificado ? 'Activo' : 'Pendiente de verificación'}
+          <div className="bg-gray-50 rounded-lg p-2 md:p-3">
+            <strong className="text-gray-700">🎯 Estado:</strong> 
+            <span className={usuario.estaVerificado ? 'text-green-600 font-medium' : 'text-yellow-600 font-medium'}>
+              {usuario.estaVerificado ? ' Activo' : ' Pendiente'}
+            </span>
           </div>
         </div>
       </div>
