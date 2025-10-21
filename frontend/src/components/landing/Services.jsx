@@ -2,6 +2,7 @@ import React from 'react';
 
 const Services = () => {
   const services = [
+    // ✅ SERVICIOS EXISTENTES (Mantenidos)
     {
       title: "Planes de contingencia y mitigación",
       description: "Elaboramos estrategias integrales para anticipar y responder de manera efectiva a situaciones imprevistas, minimizando riesgos y asegurando la continuidad operativa.",
@@ -37,6 +38,26 @@ const Services = () => {
       description: "Realizamos auditorías energéticas, identificamos oportunidades de ahorro y diseñamos estrategias para optimizar el consumo y mejorar la eficiencia energética.",
       icon: "💡",
       gradient: "from-primary-400 to-primary-500"
+    },
+    
+    // ✅ NUEVOS SERVICIOS - ENERGÍA SOLAR (Relacionados con plantas)
+    {
+      title: "Instalación de Paneles Solares Industriales",
+      description: "Diseñamos e implementamos sistemas fotovoltaicos para plantas industriales, reduciendo costos energéticos y promoviendo sostenibilidad operativa.",
+      icon: "☀️",
+      gradient: "from-amber-500 to-orange-500"
+    },
+    {
+      title: "Monitoreo de Eficiencia Energética Solar",
+      description: "Sistemas inteligentes de seguimiento para optimizar el rendimiento de instalaciones solares en plantas industriales y comerciales.",
+      icon: "📈",
+      gradient: "from-green-500 to-emerald-600"
+    },
+    {
+      title: "Mantenimiento de Sistemas Fotovoltaicos",
+      description: "Servicios especializados de limpieza, revisión y reparación de paneles solares para garantizar máximo rendimiento en plantas industriales.",
+      icon: "🧹",
+      gradient: "from-blue-400 to-cyan-500"
     }
   ];
 
@@ -47,7 +68,10 @@ const Services = () => {
       "🔧": "Herramientas industriales",
       "🤖": "Automatización robótica",
       "📊": "Análisis de datos",
-      "💡": "Eficiencia energética"
+      "💡": "Eficiencia energética",
+      "☀️": "Energía solar",
+      "📈": "Monitoreo y análisis",
+      "🧹": "Limpieza y mantenimiento"
     };
     return labels[icon] || "Servicio industrial";
   };
@@ -61,10 +85,10 @@ const Services = () => {
             Nuestros Servicios
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 leading-tight font-heading">
-            Soluciones para <span className="text-primary-600">Optimizar tus Operaciones</span>
+            Soluciones Integrales para <span className="text-primary-600">Plantas Industriales</span>
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed">
-            Desarrollamos estrategias personalizadas que garantizan eficiencia, seguridad y continuidad operativa en cada proyecto industrial.
+            Desde mantenimiento industrial hasta energía solar, desarrollamos estrategias personalizadas que garantizan eficiencia, seguridad y sostenibilidad operativa.
           </p>
         </div>
 
@@ -73,7 +97,12 @@ const Services = () => {
           {services.map((service, index) => (
             <div 
               key={index}
-              className="group bg-white rounded-2xl shadow-soft hover:shadow-large transition-all duration-500 p-6 lg:p-8 border border-secondary-100 hover:border-primary-200 hover:-translate-y-2 animate-fade-in-up"
+              className={`group bg-white rounded-2xl shadow-soft hover:shadow-large transition-all duration-500 p-6 lg:p-8 border border-secondary-100 hover:border-primary-200 hover:-translate-y-2 animate-fade-in-up ${
+                // Destacar servicios solares
+                service.icon === "☀️" || service.icon === "📈" || service.icon === "🧹" 
+                  ? 'ring-2 ring-amber-200 ring-opacity-50' 
+                  : ''
+              }`}
               style={{ animationDelay: `${index * 100}ms` }}
             >
               {/* Icono con Gradiente */}
@@ -86,6 +115,13 @@ const Services = () => {
                   {service.icon}
                 </div>
                 <div className="absolute -inset-2 bg-gradient-to-r from-primary-100 to-primary-50 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                
+                {/* Badge para servicios solares */}
+                {(service.icon === "☀️" || service.icon === "📈" || service.icon === "🧹") && (
+                  <div className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-bold px-2 py-1 rounded-full shadow-md">
+                    SOLAR
+                  </div>
+                )}
               </div>
 
               {/* Contenido */}
@@ -96,12 +132,35 @@ const Services = () => {
                 {service.description}
               </p>
 
-           
+              {/* Categoría sutil */}
+              <div className="mt-4 pt-4 border-t border-secondary-100">
+                <span className="text-xs font-medium text-secondary-500 uppercase tracking-wide">
+                  {service.icon === "☀️" || service.icon === "📈" || service.icon === "🧹" 
+                    ? "Energía Solar" 
+                    : "Plantas Industriales"
+                  }
+                </span>
+              </div>
             </div>
           ))}
         </div>
 
-     
+        {/* Sección de Especialización */}
+        <div className="mt-16 lg:mt-20 bg-gradient-to-r from-primary-500 to-primary-600 rounded-2xl p-8 lg:p-12 text-white text-center animate-fade-in-up">
+          <h3 className="text-2xl lg:text-3xl font-bold mb-4 font-heading">
+            Especialistas en Optimización de Plantas
+          </h3>
+          <p className="text-lg lg:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
+            Combinamos <strong>mantenimiento industrial tradicional</strong> con <strong>soluciones de energía solar moderna</strong> 
+            para crear plantas más eficientes, sostenibles y rentables.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm font-medium">⚡ Energía</span>
+            <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm font-medium">🔧 Mantenimiento</span>
+            <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm font-medium">☀️ Solar</span>
+            <span className="bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm font-medium">📊 Control</span>
+          </div>
+        </div>
       </div>
     </section>
   );
