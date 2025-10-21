@@ -101,7 +101,7 @@ export default function Incidencias() {
     setFiltroBusqueda('');
   }, []);
 
-  const puedeGestionar = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGestionar = user?.rol === 'superadmin' ||user?.rol === 'admin' || user?.rol === 'tecnico';
   const hayFiltrosActivos = filtroEstado !== 'todos' || filtroBusqueda !== '';
 
   // Función para exportar incidencias
