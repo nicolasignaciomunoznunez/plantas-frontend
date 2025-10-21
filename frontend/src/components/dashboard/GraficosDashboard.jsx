@@ -347,9 +347,9 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                   </div>
                 </div>
                 <div className="mt-2 space-y-1">
-                  <div className="text-xs text-secondary-600 truncate px-1">
-                    {planta.nombre?.split(' ')[0] || 'Planta'}
-                  </div>
+                 <div className="text-xs text-secondary-600 truncate px-1" title={planta.nombre || 'Planta'}>
+  {planta.nombre || 'Planta'}
+</div>
                   <div className={clsx(
                     'text-xs font-semibold',
                     GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
