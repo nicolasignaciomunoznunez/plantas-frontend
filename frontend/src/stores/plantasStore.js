@@ -116,6 +116,29 @@ export const usePlantasStore = create((set, get) => ({
     }
   },
 
+obtenerPlantasPorCliente: async (clienteId) => {
+  set({ loading: true, error: null });
+  try {
+    const response = await api.get(`/api/plantas/cliente/${clienteId}`);
+    
+    if (response.data.success) {
+      set({ loading: false });
+      return response.data.plantas || [];
+    } else {
+      set({ error: response.data.message, loading: false });
+      return [];
+    }
+  } catch (error) {
+    console.error('Error obteniendo plantas del cliente:', error);
+    set({ 
+      error: error.response?.data?.message || 'Error al obtener plantas', 
+      loading: false 
+    });
+    return [];
+  }
+},
+
+
   // Limpiar planta seleccionada
   limpiarPlantaSeleccionada: () => set({ plantaSeleccionada: null }),
 }));

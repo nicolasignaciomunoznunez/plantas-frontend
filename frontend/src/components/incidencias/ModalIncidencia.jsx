@@ -10,8 +10,11 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
     loading 
   } = useIncidenciasStore();
   
-  const { plantas, obtenerPlantas } = usePlantasStore();
+  const { plantas, obtenerPlantas, obtenerPlantasPorCliente } = usePlantasStore();
   const { user } = useAuthStore();
+  
+  const [plantasPermitidas, setPlantasPermitidas] = useState([]);
+  const [cargandoPlantas, setCargandoPlantas] = useState(false);
   
   const [formData, setFormData] = useState({
     plantId: plantaPreSeleccionada || '',
@@ -21,11 +24,48 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
   });
   const [errors, setErrors] = useState({});
 
+  // ✅ CORREGIDO: Cargar plantas según el rol del usuario
   useEffect(() => {
-    if (isOpen) {
-      obtenerPlantas(50);
+    const cargarPlantasPermitidas = async () => {
+      if (!isOpen || !user) return;
+      
+      setCargandoPlantas(true);
+      try {
+        if (user.rol === 'cliente') {
+          // Para cliente: obtener solo sus plantas asignadas
+          console.log('🔍 Cargando plantas para cliente:', user.id);
+          const plantasCliente = await obtenerPlantasPorCliente(user.id);
+          setPlantasPermitidas(plantasCliente);
+          console.log('📊 Plantas del cliente:', plantasCliente);
+          
+          // Si solo tiene una planta, seleccionarla automáticamente
+          if (plantasCliente.length === 1 && !plantaPreSeleccionada) {
+            setFormData(prev => ({ ...prev, plantId: plantasCliente[0].id }));
+          }
+        } else {
+          // Para admin/superadmin/tecnico: cargar todas las plantas
+          console.log('🔍 Cargando todas las plantas para:', user.rol);
+          await obtenerPlantas(50);
+          setPlantasPermitidas(plantas);
+        }
+      } catch (error) {
+        console.error('❌ Error cargando plantas:', error);
+        // Fallback: usar plantas ya cargadas
+        setPlantasPermitidas(plantas);
+      } finally {
+        setCargandoPlantas(false);
+      }
+    };
+
+    cargarPlantasPermitidas();
+  }, [isOpen, user]);
+
+  // ✅ Actualizar plantasPermitidas cuando cambian las plantas (para roles no-cliente)
+  useEffect(() => {
+    if (user?.rol !== 'cliente' && plantas.length > 0) {
+      setPlantasPermitidas(plantas);
     }
-  }, [isOpen]);
+  }, [plantas, user]);
 
   useEffect(() => {
     if (incidencia) {
@@ -160,30 +200,61 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
 
         {/* Formulario - RESPONSIVE */}
         <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
-          {/* Campo Planta */}
+          {/* Campo Planta - CORREGIDO */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
               Planta *
             </label>
-            <select
-              id="plantId"
-              name="plantId"
-              required
-              value={formData.plantId}
-              onChange={handleChange}
-              className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base ${
-                errors.plantId 
-                  ? 'border-red-300 bg-red-50' 
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
-            >
-              <option value="">Seleccionar planta...</option>
-              {plantas.map((planta) => (
-                <option key={planta.id} value={planta.id}>
-                  {planta.nombre} - {planta.ubicacion}
-                </option>
-              ))}
-            </select>
+            
+            {cargandoPlantas ? (
+              // Loading state
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 rounded-lg sm:rounded-xl text-gray-500 text-sm sm:text-base text-center">
+                Cargando plantas...
+              </div>
+            ) : user?.rol === 'cliente' && plantasPermitidas.length === 0 ? (
+              // Cliente sin plantas asignadas
+              <div className="px-3 sm:px-4 py-2 sm:py-3 bg-yellow-50 border border-yellow-200 rounded-lg sm:rounded-xl text-yellow-700 text-sm sm:text-base">
+                No tienes plantas asignadas. Contacta al administrador.
+              </div>
+            ) : user?.rol === 'cliente' && plantasPermitidas.length === 1 ? (
+              // Cliente con una sola planta - mostrar fija
+              <div>
+                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base">
+                  {plantasPermitidas[0]?.nombre} - {plantasPermitidas[0]?.ubicacion}
+                </div>
+                <input 
+                  type="hidden" 
+                  name="plantId" 
+                  value={plantasPermitidas[0]?.id} 
+                  onChange={handleChange}
+                />
+              </div>
+            ) : (
+              // Select normal para múltiples plantas o otros roles
+              <select
+                id="plantId"
+                name="plantId"
+                required
+                value={formData.plantId}
+                onChange={handleChange}
+                disabled={cargandoPlantas}
+                className={`w-full px-3 sm:px-4 py-2 sm:py-3 border rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 text-sm sm:text-base ${
+                  errors.plantId 
+                    ? 'border-red-300 bg-red-50' 
+                    : cargandoPlantas
+                    ? 'border-gray-300 bg-gray-100 text-gray-500'
+                    : 'border-gray-300 hover:border-gray-400'
+                }`}
+              >
+                <option value="">{cargandoPlantas ? 'Cargando...' : 'Seleccionar planta...'}</option>
+                {plantasPermitidas.map((planta) => (
+                  <option key={planta.id} value={planta.id}>
+                    {planta.nombre} - {planta.ubicacion}
+                  </option>
+                ))}
+              </select>
+            )}
+            
             {errors.plantId && (
               <p className="text-sm text-red-600 flex items-center gap-1">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,6 +265,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
             )}
           </div>
 
+          {/* Resto de los campos se mantienen igual */}
           {/* Campo Título */}
           <div className="space-y-2">
             <label htmlFor="titulo" className="block text-sm font-medium text-gray-700">
@@ -310,7 +382,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || cargandoPlantas}
               className="px-4 sm:px-6 py-2 sm:py-3 text-sm font-medium text-white bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 rounded-lg sm:rounded-xl shadow-sm hover:shadow-md transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 justify-center flex-1 xs:flex-none"
             >
               {loading ? (
