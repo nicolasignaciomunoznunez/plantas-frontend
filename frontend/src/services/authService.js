@@ -1,6 +1,6 @@
-// services/authService.js - VERSIÓN CORREGIDA
+// src/services/authService.js - VERSIÓN CORREGIDA
 import { api } from './api';
-import { getAuthCache, updateAuthCache, clearAuthCache } from '../App'; // ✅ Importar desde App
+import { getAuthCache, updateAuthCache, clearAuthCache } from '../utils/cache';
 
 export const authService = {
   // Login con debug
@@ -49,7 +49,6 @@ export const authService = {
       return response.data;
     } catch (error) {
       console.error('❌ [AUTH SERVICE] Error en checkAuth:', error);
-      // ⚠️ IMPORTANTE: Si hay error, retornamos success: false
       return { 
         success: false, 
         message: error.response?.data?.message || 'Error de autenticación' 
@@ -139,10 +138,5 @@ export const authService = {
       
       throw error;
     }
-  },
-
-  // ✅ Funciones de cache para uso externo
-  clearAuthCache,
-  updateAuthCache,
-  getAuthCache
+  }
 };

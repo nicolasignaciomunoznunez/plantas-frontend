@@ -1,35 +1,8 @@
-// stores/authStore.js - VERSIÓN CORREGIDA
+// stores/authStore.js - EXTENDIDA CON PERFIL
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { authService } from '../services/authService';
-
-// ✅ Cache local dentro del mismo archivo (solución temporal)
-let authCache = {
-  user: null,
-  lastCheck: null,
-  CACHE_TTL: 10 * 60 * 1000, // 10 minutos
-};
-
-// ✅ Funciones de cache locales
-const clearAuthCache = () => {
-  authCache.user = null;
-  authCache.lastCheck = null;
-  console.log('✅ [AUTH STORE] Cache limpiado');
-};
-
-const updateAuthCache = (userData) => {
-  authCache.user = userData;
-  authCache.lastCheck = Date.now();
-  console.log('✅ [AUTH STORE] Cache actualizado');
-};
-
-const getAuthCache = () => {
-  if (authCache.user && authCache.lastCheck && 
-      (Date.now() - authCache.lastCheck) < authCache.CACHE_TTL) {
-    return authCache.user;
-  }
-  return null;
-};
+import { getAuthCache, updateAuthCache, clearAuthCache } from '../utils/cache';
 
 export const useAuthStore = create(
   persist(
@@ -40,10 +13,10 @@ export const useAuthStore = create(
       isLoading: true,
       error: null,
 
-      // ✅ LOGIN OPTIMIZADO - SINCRONIZA CACHE + STORE
       login: (userData, authToken) => {
         console.log('✅ [AUTH STORE] Login ejecutado', { 
           userData, 
+          tieneRol: !!userData?.rol,
           rol: userData?.rol 
         });
         
@@ -59,33 +32,25 @@ export const useAuthStore = create(
         });
       },
 
-      // ✅ LOGOUT OPTIMIZADO - LIMPIA TODO
-      logout: async () => {
+      logout: () => {
         console.log('✅ [AUTH STORE] Logout ejecutado');
         
-        try {
-          // Llamar al backend para logout
-          await authService.logout();
-        } catch (error) {
-          console.log('⚠️ [AUTH STORE] Error en logout backend, continuando...');
-        } finally {
-          // ✅ LIMPIAR CACHE Y STORE SIEMPRE
-          clearAuthCache();
-          set({ 
-            user: null, 
-            token: null, 
-            isAuthenticated: false,
-            isLoading: false,
-            error: null 
-          });
-        }
+        // ✅ LIMPIAR CACHE
+        clearAuthCache();
+        
+        set({ 
+          user: null, 
+          token: null, 
+          isAuthenticated: false,
+          isLoading: false,
+          error: null 
+        });
       },
 
       setLoading: (loading) => {
         set({ isLoading: loading });
       },
 
-      // ✅ UPDATE USER SINCRONIZADO
       updateUser: (userData) => {
         const currentUser = get().user;
         const updatedUser = { ...currentUser, ...userData };
@@ -102,13 +67,10 @@ export const useAuthStore = create(
         return Array.isArray(roles) ? roles.includes(user.rol) : user.rol === roles;
       },
 
-      // ✅ ACTUALIZAR PERFIL OPTIMIZADO
+      // ✅ NUEVAS ACCIONES PARA PERFIL
       actualizarPerfil: async (datosPerfil) => {
         set({ isLoading: true, error: null });
-        
         try {
-          console.log('🔄 [AUTH STORE] Actualizando perfil...');
-          
           const response = await authService.actualizarPerfil(datosPerfil);
           
           if (response.success) {
@@ -120,11 +82,9 @@ export const useAuthStore = create(
             
             set({ 
               user: usuarioActualizado, 
-              isLoading: false,
-              error: null 
+              isLoading: false 
             });
             
-            console.log('✅ [AUTH STORE] Perfil actualizado exitosamente');
             return { 
               success: true, 
               message: response.message,
@@ -154,7 +114,73 @@ export const useAuthStore = create(
         }
       },
 
-      // ✅ NUEVA FUNCIÓN: Sincronizar desde cache (para App.jsx)
+      cambiarContraseña: async (datosContraseña) => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authService.cambiarContraseña(datosContraseña);
+          
+          set({ isLoading: false, error: null });
+          return response;
+        } catch (error) {
+          console.error('❌ [AUTH STORE] Error completo cambiar contraseña:', error);
+          
+          const backendMessage = error.response?.data?.message;
+          const errorMessage = backendMessage || 'Error de conexión al cambiar contraseña';
+          set({ 
+            error: errorMessage, 
+            isLoading: false 
+          });
+          return { 
+            success: false, 
+            message: errorMessage 
+          };
+        }
+      },
+
+      // ✅ Obtener perfil fresco del servidor
+      obtenerPerfilActualizado: async () => {
+        set({ isLoading: true, error: null });
+        try {
+          const response = await authService.getProfile();
+          
+          if (response.success) {
+            // ✅ SINCRONIZAR CACHE
+            updateAuthCache(response.usuario);
+            
+            set({ 
+              user: response.usuario, 
+              isLoading: false 
+            });
+            
+            return { 
+              success: true, 
+              usuario: response.usuario 
+            };
+          } else {
+            set({ 
+              error: response.message, 
+              isLoading: false 
+            });
+            return { 
+              success: false, 
+              message: response.message 
+            };
+          }
+        } catch (error) {
+          console.error('❌ [AUTH STORE] Error obteniendo perfil:', error);
+          const errorMessage = error.response?.data?.message || 'Error de conexión al obtener perfil';
+          set({ 
+            error: errorMessage, 
+            isLoading: false 
+          });
+          return { 
+            success: false, 
+            message: errorMessage 
+          };
+        }
+      },
+
+      // ✅ NUEVA FUNCIÓN: Sincronizar desde cache
       syncFromCache: () => {
         const cachedUser = getAuthCache();
         if (cachedUser) {
