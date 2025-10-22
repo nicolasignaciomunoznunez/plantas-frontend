@@ -150,18 +150,7 @@ function App() {
           <Route index element={<Administracion />} />
         </Route>
 
-        {/* ✅ REDIRECCIONES PARA RUTAS DIRECTAS */}
-        {isAuthenticated && (
-          <>
-            <Route path="/plantas" element={<Navigate to="/dashboard/plantas" replace />} />
-            <Route path="/incidencias" element={<Navigate to="/dashboard/incidencias" replace />} />
-            <Route path="/mantenimientos" element={<Navigate to="/dashboard/mantenimientos" replace />} />
-            <Route path="/reportes" element={<Navigate to="/dashboard/reportes" replace />} />
-            <Route path="/perfil" element={<Navigate to="/dashboard/perfil" replace />} />
-          </>
-        )}
-
-        {/* ✅ REDIRECCIÓN GLOBAL */}
+        {/* ✅ REDIRECCIÓN GLOBAL - ELIMINADAS RUTAS DUPLICADAS */}
         <Route path="*" element={
           <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
         } />
