@@ -151,7 +151,7 @@ const Services = () => {
             Especialistas en Optimización de Plantas
           </h3>
           <p className="text-lg lg:text-xl text-primary-100 max-w-3xl mx-auto leading-relaxed">
-            Combinamos <strong>mantenimiento industrial tradicional</strong> con <strong>soluciones de energía solar moderna</strong> 
+            Combinamos <strong>mantenimiento industrial tradicional</strong> con <strong>soluciones de energía solar modernas </strong> 
             para crear plantas más eficientes, sostenibles y rentables.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">

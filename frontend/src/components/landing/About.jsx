@@ -32,11 +32,7 @@ const About = () => {
     { number: "15+", label: "Sectores atendidos", suffix: "" }
   ];
 
-  const industries = [
-    { name: "Plantas de Agua", icon: "💧", color: "from-blue-500 to-cyan-600" },
-    { name: "Energía Solar", icon: "☀️", color: "from-amber-500 to-orange-500" },
   
-  ];
 
   return (
     <section id="nosotros" className="py-16 lg:py-24 bg-gradient-light relative overflow-hidden">
@@ -64,34 +60,7 @@ const About = () => {
           </p>
         </div>
 
-        {/* Sectores Industriales que Atendemos */}
-        <div className="mb-16 lg:mb-20 animate-fade-in-up">
-          <div className="text-center mb-12">
-            <h3 className="text-2xl lg:text-3xl font-bold text-secondary-800 mb-4 font-heading">
-              Sectores Industriales que Atendemos
-            </h3>
-            <p className="text-secondary-600 text-lg max-w-2xl mx-auto">
-              Nuestra experiencia se extiende a múltiples industrias, adaptando soluciones a cada necesidad específica
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-            {industries.map((industry, index) => (
-              <div 
-                key={index}
-                className="bg-white rounded-2xl p-4 text-center shadow-soft hover:shadow-large transition-all duration-300 border border-secondary-100 hover:border-primary-200 group"
-              >
-                <div className={`w-12 h-12 rounded-2xl bg-gradient-to-r ${industry.color} flex items-center justify-center text-xl text-white mx-auto mb-3 group-hover:scale-110 transition-transform duration-300`}>
-                  {industry.icon}
-                </div>
-                <span className="text-sm font-semibold text-secondary-800 group-hover:text-primary-600 transition-colors">
-                  {industry.name}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-
+   
         {/* Grid de Valores Mejorado */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 lg:mb-20">
           {values.map((value, index) => (
