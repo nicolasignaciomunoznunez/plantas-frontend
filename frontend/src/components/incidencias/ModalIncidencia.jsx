@@ -156,7 +156,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
 
   if (!isOpen) return null;
 
-  const puedeGestionarEstado = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGestionarEstado = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
   const esEdicion = !!incidencia;
 
   const estados = {

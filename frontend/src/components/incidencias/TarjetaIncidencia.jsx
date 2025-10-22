@@ -57,7 +57,7 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
     }
   };
 
-  const puedeEditar = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeEditar = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
 
   const getRolBadgeColor = () => {
     switch (user?.rol) {

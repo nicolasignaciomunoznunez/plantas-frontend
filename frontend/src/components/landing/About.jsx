@@ -28,17 +28,14 @@ const About = () => {
   const stats = [
     { number: "5+", label: "Años de experiencia", suffix: "" },
     { number: "50+", label: "Clientes industriales", suffix: "" },
-    { number: "100+", label: "Proyectos completados", suffix: "" },
+    { number: "60+", label: "Proyectos completados", suffix: "" },
     { number: "15+", label: "Sectores atendidos", suffix: "" }
   ];
 
   const industries = [
     { name: "Plantas de Agua", icon: "💧", color: "from-blue-500 to-cyan-600" },
     { name: "Energía Solar", icon: "☀️", color: "from-amber-500 to-orange-500" },
-    { name: "Manufactura", icon: "🏭", color: "from-gray-600 to-gray-700" },
-    { name: "Alimentos", icon: "🍎", color: "from-red-500 to-pink-600" },
-    { name: "Química", icon: "🧪", color: "from-purple-500 to-indigo-600" },
-    { name: "Minería", icon: "⛏️", color: "from-yellow-600 to-amber-600" }
+  
   ];
 
   return (
@@ -62,8 +59,8 @@ const About = () => {
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed max-w-4xl mx-auto">
             Con más de <strong className="text-primary-600">5 años de experiencia</strong> en múltiples sectores industriales, 
-            combinamos <strong className="text-primary-600">innovación tecnológica</strong> con <strong className="text-primary-600">expertise probado</strong> 
-            para optimizar operaciones en plantas de agua, energía, manufactura y más.
+            integramos <strong className="text-primary-600">tecnológica de vanguardia y sólido</strong> con <strong className="text-primary-600">expertise para maximizar </strong> 
+            la eficiencia operativa en plantas de agua y energía, entre otras..
           </p>
         </div>
 
@@ -170,18 +167,10 @@ const About = () => {
             <div className="flex flex-wrap justify-center gap-3 mb-6 relative z-10">
               <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">💧 Plantas de Agua</span>
               <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">☀️ Energía Solar</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">🏭 Manufactura</span>
               <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">⚡ Automatización</span>
             </div>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-10">
-              <button className="bg-white text-primary-600 hover:bg-primary-50 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-medium">
-                Consultoría Industrial
-              </button>
-              <button className="border-2 border-white text-white hover:bg-white hover:text-primary-600 px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-300">
-                Ver Portafolio
-              </button>
-            </div>
+       
           </div>
         </div>
       </div>

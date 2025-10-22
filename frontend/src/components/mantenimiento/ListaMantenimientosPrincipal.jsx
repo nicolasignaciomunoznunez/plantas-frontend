@@ -49,7 +49,7 @@ export default function ListaMantenimientosPrincipal({ mantenimientos, onEditarM
         <div className="space-y-3">
           {mantenimientos.map((mantenimiento) => {
             const estaActualizando = mantenimientoActualizando === mantenimiento.id;
-            const puedeGestionar = user?.rol === 'admin' || user?.rol === 'tecnico';
+            const puedeGestionar = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
 
             return (
               <div 

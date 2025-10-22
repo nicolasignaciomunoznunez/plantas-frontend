@@ -141,7 +141,7 @@ export default function ModalMantenimiento({ isOpen, onClose, mantenimiento, pla
   }, [isOpen, handleClose]);
 
   const esEdicion = !!mantenimiento;
-  const puedeGestionarEstado = user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGestionarEstado = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
 
   // ✅ ELIMINAMOS: tiposMantenimiento y estadosMantenimiento - USAMOS BADGES
 
