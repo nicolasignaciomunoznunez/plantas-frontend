@@ -1,10 +1,6 @@
-import { useEffect, useState, useMemo, useCallback } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { useDashboardStore } from '../stores/dashboardStore';
-import { usePlantasStore } from '../stores/plantasStore';
-import { useIncidenciasStore } from '../stores/incidenciasStore';
-import { useMantenimientoStore } from '../stores/mantenimientoStore';
-import { useReportesStore } from '../stores/reportesStore';
 import { useAuthStore } from '../stores/authStore';
 
 import GraficosDashboard from '../components/dashboard/GraficosDashboard';
@@ -28,13 +24,15 @@ const DASHBOARD_CONFIG = {
 };
 
 export default function Dashboard() {
-  // ✅ Stores optimizados
+  // ✅ Stores optimizados - SOLO 2 stores necesarios
   const { user, isAuthenticated, isLoading: authLoading } = useAuthStore();
-  const { metricas, loading: dashboardLoading, error, obtenerMetricas } = useDashboardStore();
-  const { plantas, loading: plantasLoading, obtenerPlantas } = usePlantasStore();
-  const { incidencias, obtenerIncidencias } = useIncidenciasStore();
-  const { mantenimientos, obtenerMantenimientos } = useMantenimientoStore();
-  const { reportes, obtenerReportes } = useReportesStore();
+  const { 
+    datosCompletos, 
+    loading: dashboardLoading, 
+    error, 
+    obtenerDashboardCompleto,
+    fromCache 
+  } = useDashboardStore();
   
   const [periodo, setPeriodo] = useState('hoy');
   const [cargandoSecciones, setCargandoSecciones] = useState({
@@ -45,136 +43,97 @@ export default function Dashboard() {
     reportes: false
   });
 
-  // ✅ CORREGIDO: Incluir superadmin en los roles
+  // ✅ ROLES optimizados
   const { esCliente, esTecnico, esAdmin, esSuperAdmin, puedeVerDashboard } = useMemo(() => ({
     esCliente: user?.rol === 'cliente',
     esTecnico: user?.rol === 'tecnico',
     esAdmin: user?.rol === 'admin',
-    esSuperAdmin: user?.rol === 'superadmin', // ✅ AGREGADO
-    puedeVerDashboard: ['superadmin', 'admin', 'tecnico'].includes(user?.rol) // ✅ CORREGIDO
+    esSuperAdmin: user?.rol === 'superadmin',
+    puedeVerDashboard: ['superadmin', 'admin', 'tecnico'].includes(user?.rol)
   }), [user?.rol]);
 
-  // ✅ Cálculo de métricas optimizado
-  const calcularMetricasPlanta = useCallback((plantaId) => {
-    const incidenciasPlanta = incidencias.filter(i => i.plantId === plantaId);
-    const mantenimientosPlanta = mantenimientos.filter(m => m.plantId === plantaId);
-    const reportesPlanta = reportes?.filter(r => r.plantId === plantaId) || [];
-
-    const incidenciasResueltas = incidenciasPlanta.filter(i => i.estado === 'resuelto').length;
-    const mantenimientosPreventivos = mantenimientosPlanta.filter(m => m.tipo === 'preventivo').length;
-    const mantenimientosCompletados = mantenimientosPlanta.filter(m => m.estado === 'completado').length;
-    
-    // Cálculos optimizados
-    const totalIncidencias = incidenciasPlanta.length;
-    const totalMantenimientos = mantenimientosPlanta.length;
-    
-    const tasaResolucion = totalIncidencias > 0 
-      ? Math.round((incidenciasResueltas / totalIncidencias) * 100)
-      : 100;
-
-    const ratioMantenimientoPreventivo = totalMantenimientos > 0
-      ? Math.round((mantenimientosPreventivos / totalMantenimientos) * 100)
-      : 0;
-
-    const tasaCumplimientoMantenimiento = totalMantenimientos > 0
-      ? Math.round((mantenimientosCompletados / totalMantenimientos) * 100)
-      : 100;
-
-    // Estado general optimizado
-    const incidenciasPendientes = incidenciasPlanta.filter(i => i.estado !== 'resuelto').length;
-    const mantenimientosAtrasados = mantenimientosPlanta.filter(m => 
-      m.estado !== 'completado' && new Date(m.fechaProgramada) < new Date()
-    ).length;
-
-    let estadoGeneral = 'optimal';
-    if (incidenciasPendientes > 2 || mantenimientosAtrasados > 1) estadoGeneral = 'critical';
-    else if (incidenciasPendientes > 0 || mantenimientosAtrasados > 0) estadoGeneral = 'attention';
-
-    return {
-      incidenciasActivas: incidenciasPendientes,
-      totalIncidencias,
-      incidenciasResueltas,
-      tasaResolucion,
-      mantenimientosPendientes: mantenimientosPlanta.filter(m => m.estado !== 'completado').length,
-      totalMantenimientos,
-      mantenimientosPreventivos,
-      mantenimientosCorrectivos: totalMantenimientos - mantenimientosPreventivos,
-      mantenimientosCompletados,
-      ratioMantenimientoPreventivo,
-      ratioMantenimientoCorrectivo: 100 - ratioMantenimientoPreventivo,
-      tasaCumplimientoMantenimiento,
-      reportesGenerados: reportesPlanta.length,
-      estadoGeneral,
-      nivelActividad: Math.min((totalIncidencias + totalMantenimientos + reportesPlanta.length) / 10 * 100, 100)
-    };
-  }, [incidencias, mantenimientos, reportes]);
-
-  // ✅ Datos optimizados con cálculos más eficientes
+  // ✅ DATOS OPTIMIZADOS - Sin cálculos complejos en frontend
   const datosOptimizados = useMemo(() => {
-    const incidenciasPendientes = incidencias.filter(i => i.estado === 'pendiente').length;
-    const incidenciasEnProgreso = incidencias.filter(i => i.estado === 'en_progreso').length;
-    const incidenciasResueltas = incidencias.filter(i => i.estado === 'resuelto').length;
-    const mantenimientosPendientes = mantenimientos.filter(m => m.estado !== 'completado').length;
-    
-    const mantenimientosAtrasados = mantenimientos.filter(m => 
-      m.estado !== 'completado' && new Date(m.fechaProgramada) < new Date()
-    ).length;
+    if (!datosCompletos) {
+      return {
+        metricasRapidas: {
+          incidenciasPendientes: 0,
+          incidenciasEnProgreso: 0,
+          incidenciasResueltas: 0,
+          mantenimientosPendientes: 0,
+          mantenimientosAtrasados: 0,
+          totalReportes: 0,
+          totalPlantas: 0
+        },
+        graficos: {
+          plantas: [],
+          incidencias: { pendientes: 0, enProgreso: 0, resueltas: 0 },
+          metricasReales: null
+        },
+        plantasOptimizadas: [],
+        plantasResumen: []
+      };
+    }
 
-    // Plantas únicas optimizado
-    const plantasUnicas = [...new Map(plantas.map(planta => [planta.id, planta])).values()];
-    const plantasConMetricas = plantasUnicas
-      .slice(0, 5)
-      .map(planta => ({
-        ...planta,
-        ...calcularMetricasPlanta(planta.id)
-      }));
+    // ✅ Datos ya vienen procesados del backend
+    const metricas = datosCompletos.metricas || {};
+    const plantas = datosCompletos.plantas || [];
+    const incidenciasRecientes = datosCompletos.incidenciasRecientes || [];
+    const mantenimientosPendientes = datosCompletos.mantenimientosPendientes || [];
+
+    // ✅ Cálculos simples con datos ya filtrados
+    const incidenciasPendientes = incidenciasRecientes.filter(i => i.estado === 'pendiente').length;
+    const incidenciasEnProgreso = incidenciasRecientes.filter(i => i.estado === 'en_progreso').length;
+    const incidenciasResueltas = incidenciasRecientes.filter(i => i.estado === 'resuelto').length;
+    
+    const mantenimientosAtrasados = mantenimientosPendientes.filter(m => 
+      new Date(m.fechaProgramada) < new Date()
+    ).length;
 
     return {
       metricasRapidas: {
         incidenciasPendientes,
         incidenciasEnProgreso,
         incidenciasResueltas,
-        mantenimientosPendientes,
+        mantenimientosPendientes: metricas.mantenimientosPendientes || 0,
         mantenimientosAtrasados,
-        totalReportes: reportes?.length || 0,
-        totalPlantas: plantasUnicas.length
+        totalReportes: 0, // Agregar si se necesitan reportes
+        totalPlantas: metricas.totalPlantas || 0
       },
       
       graficos: {
-        plantas: plantasConMetricas,
-        incidencias: { pendientes: incidenciasPendientes, enProgreso: incidenciasEnProgreso, resueltas: incidenciasResueltas },
-        metricasReales: metricas?.metricas
+        plantas: plantas,
+        incidencias: { 
+          pendientes: incidenciasPendientes, 
+          enProgreso: incidenciasEnProgreso, 
+          resueltas: incidenciasResueltas 
+        },
+        metricasReales: metricas
       },
       
-      plantasOptimizadas: plantasUnicas.slice(0, 8),
-      plantasResumen: plantasConMetricas
+      plantasOptimizadas: plantas.slice(0, 8),
+      plantasResumen: plantas.slice(0, 5)
     };
-  }, [plantas, incidencias, mantenimientos, reportes, metricas, calcularMetricasPlanta]);
+  }, [datosCompletos]);
 
-  // ✅ Carga de datos optimizada
+  // ✅ CARGA OPTIMIZADA - UNA SOLA LLAMADA
   useEffect(() => {
     if (esCliente) return;
 
-    const cargarDatosCompletos = async () => {
-      setCargandoSecciones(prev => ({ 
-        ...prev, 
-        metricas: true, 
+    const cargarDashboard = async () => {
+      setCargandoSecciones({
+        metricas: true,
         plantas: true,
         incidencias: true,
         mantenimientos: true,
-        reportes: true 
-      }));
+        reportes: true
+      });
       
       try {
-        await Promise.allSettled([
-          obtenerMetricas(),
-          obtenerPlantas(DASHBOARD_CONFIG.limites.plantas),
-          obtenerIncidencias(DASHBOARD_CONFIG.limites.incidencias),
-          obtenerMantenimientos(DASHBOARD_CONFIG.limites.mantenimientos),
-          obtenerReportes(DASHBOARD_CONFIG.limites.reportes, 1, true)
-        ]);
+        // ✅ SOLO UNA LLAMADA AL BACKEND
+        await obtenerDashboardCompleto();
       } catch (err) {
-        console.error('Error cargando datos:', err);
+        console.error('Error cargando dashboard:', err);
       } finally {
         setCargandoSecciones({
           metricas: false,
@@ -186,10 +145,10 @@ export default function Dashboard() {
       }
     };
 
-    cargarDatosCompletos();
-  }, [esCliente, obtenerMetricas, obtenerPlantas, obtenerIncidencias, obtenerMantenimientos, obtenerReportes]);
+    cargarDashboard();
+  }, [esCliente, obtenerDashboardCompleto]);
 
-  // ✅ Estados de loading optimizados
+  // ✅ ESTADOS DE LOADING optimizados
   const loadingPrincipal = useMemo(() => 
     authLoading || cargandoSecciones.metricas || cargandoSecciones.plantas,
     [authLoading, cargandoSecciones.metricas, cargandoSecciones.plantas]
@@ -259,7 +218,7 @@ export default function Dashboard() {
     </div>
   );
 
-  // ✅ Renderizado condicional temprano - CORREGIDO
+  // ✅ Renderizado condicional temprano
   if (esCliente) return <AccesoDenegado />;
   if (!puedeVerDashboard && !authLoading) return <AccesoDenegado />;
   if (loadingPrincipal) return <SkeletonLoading />;
@@ -270,28 +229,28 @@ export default function Dashboard() {
       {
         valor: datosOptimizados.metricasRapidas.incidenciasPendientes,
         titulo: "Incidencias Pendientes",
-        descripcion: "Requieren atención inmediata",
+        descripcion: fromCache ? "Desde cache" : "Requieren atención inmediata",
         color: "bg-error-50 border-error-200 text-error-600",
         icono: "⚠️"
       },
       {
         valor: datosOptimizados.metricasRapidas.mantenimientosPendientes,
         titulo: "Mantenimientos",
-        descripcion: "Programados esta semana",
+        descripcion: fromCache ? "Desde cache" : "Programados esta semana",
         color: "bg-primary-50 border-primary-200 text-primary-600",
         icono: "🔧"
       },
       {
         valor: datosOptimizados.metricasRapidas.mantenimientosAtrasados,
         titulo: "Atrasados",
-        descripcion: "Resolver urgentemente",
+        descripcion: fromCache ? "Desde cache" : "Resolver urgentemente",
         color: "bg-warning-50 border-warning-200 text-warning-600",
         icono: "⏰"
       },
       {
         valor: datosOptimizados.metricasRapidas.totalReportes,
         titulo: "Reportes",
-        descripcion: "Generados este mes",
+        descripcion: fromCache ? "Desde cache" : "Generados este mes",
         color: "bg-success-50 border-success-200 text-success-600",
         icono: "📊"
       }
@@ -323,7 +282,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-light p-4 sm:p-6 space-y-6 sm:space-y-8">
-      {/* ✅ HEADER MEJORADO - CORREGIDO */}
+      {/* ✅ HEADER MEJORADO CON INDICADOR DE CACHE */}
       <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-down">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="space-y-3">
@@ -332,14 +291,17 @@ export default function Dashboard() {
                esAdmin ? 'Centro de Operaciones' : 'Panel Técnico'}
             </h1>
             <p className="text-secondary-600 flex items-center gap-2 text-sm sm:text-base">
-              <span className="w-2 h-2 bg-success-500 rounded-full animate-pulse"></span>
+              <span className={`w-2 h-2 rounded-full animate-pulse ${
+                fromCache ? 'bg-warning-500' : 'bg-success-500'
+              }`}></span>
+              {fromCache ? 'Datos en cache • ' : 'Datos en tiempo real • '}
               {esSuperAdmin ? 'Gestión total del sistema' : 
                esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
               {user?.nombre && ` • ${user.nombre}`}
             </p>
           </div>
           
-          {/* ✅ CORREGIDO: Incluir superadmin en el botón */}
+          {/* ✅ BOTÓN CREAR PLANTA */}
           {(esSuperAdmin || esAdmin) && (
             <Link
               to="/plantas/crear"
@@ -368,7 +330,7 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* ✅ CONTENIDO PRINCIPAL - CORREGIDO */}
+      {/* ✅ CONTENIDO PRINCIPAL OPTIMIZADO */}
       {loadingContenido ? (
         <div className="bg-white rounded-2xl p-8 shadow-soft border border-secondary-100 text-center animate-pulse">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600 mx-auto mb-4"></div>
@@ -382,22 +344,22 @@ export default function Dashboard() {
               <GraficosDashboard 
                 datos={{ plantas: datosOptimizados.graficos.plantas }}
                 plantas={datosOptimizados.graficos.plantas}
-                incidencias={incidencias}
-                metricasReales={metricas?.metricas}
+                incidencias={datosCompletos?.incidenciasRecientes || []}
+                metricasReales={datosOptimizados.graficos.metricasReales}
               />
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
               <ResumenActividad 
-                incidencias={incidencias}
-                mantenimientos={mantenimientos}
+                incidencias={datosCompletos?.incidenciasRecientes || []}
+                mantenimientos={datosCompletos?.mantenimientosPendientes || []}
               />
             </div>
           </div>
 
-          {/* ✅ SIDEBAR MEJORADO - CORREGIDO PARA MÓVIL */}
+          {/* ✅ SIDEBAR OPTIMIZADO */}
           <div className="space-y-6">
-            {/* PLANTAS ACTIVAS - CORREGIDO RESPONSIVE */}
+            {/* PLANTAS ACTIVAS */}
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-soft border border-secondary-100 animate-slide-in-right">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-secondary-800 font-heading truncate">
@@ -412,7 +374,7 @@ export default function Dashboard() {
               </div>
               
               <div className="space-y-3 sm:space-y-4">
-                {datosOptimizados.plantasResumen.slice(0, 4).map((planta, index) => (
+                {datosOptimizados.plantasResumen.map((planta, index) => (
                   <Link 
                     key={planta.id} 
                     to={`/plantas/${planta.id}`}
@@ -429,14 +391,14 @@ export default function Dashboard() {
                       <p className="text-secondary-600 text-xs sm:text-sm truncate">{planta.ubicacion}</p>
                     </div>
                     <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
-                      DASHBOARD_CONFIG.colores[planta.estadoGeneral]
+                      DASHBOARD_CONFIG.colores[planta.estados?.estado || 'optimal']
                     }`}></div>
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* RESUMEN RÁPIDO - CORREGIDO RESPONSIVE */}
+            {/* RESUMEN RÁPIDO */}
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
               <h3 className="text-base sm:text-lg font-semibold text-secondary-800 mb-4 sm:mb-6 font-heading">
                 Resumen Rápido
@@ -445,7 +407,7 @@ export default function Dashboard() {
                 {[
                   { label: 'Plantas totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
                   { label: 'Incidencias resueltas', valor: datosOptimizados.metricasRapidas.incidenciasResueltas, color: 'text-success-600' },
-                  { label: 'Reportes generados', valor: datosOptimizados.metricasRapidas.totalReportes, color: 'text-primary-600' }
+                  { label: 'Eficiencia promedio', valor: `${datosOptimizados.graficos.metricasReales?.eficienciaPromedio || 0}%`, color: 'text-primary-600' }
                 ].map((item, index) => (
                   <div 
                     key={index}
