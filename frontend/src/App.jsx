@@ -16,36 +16,15 @@ import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/Profile'; 
 import Administracion from './pages/Administracion';
 
-// ✅ Cache simple en memoria (CORREGIDO - mismo módulo)
-let authCache = {
-  lastCheck: null,
-  user: null,
-  CACHE_TTL: 10 * 60 * 1000, // 10 minutos
-};
-
-// ✅ FUNCIONES PARA GESTIONAR CACHE DESDE OTROS COMPONENTES (EXPORTADAS)
-export const clearAuthCache = () => {
-  authCache.user = null;
-  authCache.lastCheck = null;
-  console.log('✅ [AUTH CACHE] Cache limpiado');
-};
-
-export const updateAuthCache = (userData) => {
-  authCache.user = userData;
-  authCache.lastCheck = Date.now();
-  console.log('✅ [AUTH CACHE] Cache actualizado');
-};
-
-export const getAuthCache = () => {
-  if (authCache.user && authCache.lastCheck && 
-      (Date.now() - authCache.lastCheck) < authCache.CACHE_TTL) {
-    return authCache.user;
-  }
-  return null;
-};
-
 function App() {
-  const { isAuthenticated, login, setLoading, isLoading } = useAuthStore();
+  const { 
+    isAuthenticated, 
+    login, 
+    setLoading, 
+    isLoading, 
+    syncFromCache 
+  } = useAuthStore();
+  
   const [authChecked, setAuthChecked] = useState(false);
 
   console.log('🔄 [APP] Render - authChecked:', authChecked, 'isAuthenticated:', isAuthenticated, 'isLoading:', isLoading);
@@ -57,34 +36,26 @@ function App() {
       try {
         setLoading(true);
         
-        // ✅ OPTIMIZACIÓN 1: PRIMERO VERIFICAR CACHE (INSTANTÁNEO)
-        const cachedUser = getAuthCache();
-        if (cachedUser) {
-          console.log('✅ [APP] Usuario encontrado en cache, haciendo login...');
-          login(cachedUser);
+        // ✅ PRIMERO: INTENTAR DESDE CACHE (INSTANTÁNEO)
+        const fromCache = syncFromCache();
+        if (fromCache) {
+          console.log('✅ [APP] Autenticación restaurada desde cache');
           setAuthChecked(true);
           return;
         }
 
-        // ✅ OPTIMIZACIÓN 2: SOLO SI NO HAY CACHE, LLAMAR AL BACKEND
-        console.log('🔐 [APP] No hay cache, llamando a checkAuth...');
-        
+        // ✅ SEGUNDO: VERIFICAR CON BACKEND (SOLO SI NO HAY CACHE)
+        console.log('🔐 [APP] Verificando autenticación con backend...');
         const result = await authService.checkAuth();
-        console.log('🔐 [APP] Resultado de checkAuth:', result);
         
         if (result.success && result.usuario) {
-          console.log('✅ [APP] Usuario autenticado, guardando en cache...');
-          
-          // ✅ GUARDAR EN CACHE PARA PRÓXIMAS VECES
-          updateAuthCache(result.usuario);
+          console.log('✅ [APP] Usuario autenticado via backend');
           login(result.usuario);
         } else {
-          console.log('❌ [APP] Usuario NO autenticado, limpiando cache');
-          clearAuthCache();
+          console.log('❌ [APP] Usuario NO autenticado');
         }
       } catch (error) {
-        console.error('❌ [APP] Error crítico en verifyInitialAuth:', error);
-        clearAuthCache();
+        console.error('❌ [APP] Error en verifyInitialAuth:', error);
       } finally {
         setLoading(false);
         setAuthChecked(true);
@@ -92,11 +63,10 @@ function App() {
       }
     };
 
-    // ✅ OPTIMIZACIÓN 3: Solo verificar si no hemos verificado antes
     if (!authChecked) {
       verifyInitialAuth();
     }
-  }, [authChecked, login, setLoading]);
+  }, [authChecked, login, setLoading, syncFromCache]);
 
   // ✅ MEJOR EXPERIENCIA: Loading no bloqueante
   if (!authChecked || isLoading) {

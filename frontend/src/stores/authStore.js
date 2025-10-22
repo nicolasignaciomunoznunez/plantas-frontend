@@ -1,7 +1,35 @@
-// stores/authStore.js - VERSIÓN OPTIMIZADA
+// stores/authStore.js - VERSIÓN CORREGIDA
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { authService, updateAuthCache, clearAuthCache, getAuthCache } from '../services/authService';
+import { authService } from '../services/authService';
+
+// ✅ Cache local dentro del mismo archivo (solución temporal)
+let authCache = {
+  user: null,
+  lastCheck: null,
+  CACHE_TTL: 10 * 60 * 1000, // 10 minutos
+};
+
+// ✅ Funciones de cache locales
+const clearAuthCache = () => {
+  authCache.user = null;
+  authCache.lastCheck = null;
+  console.log('✅ [AUTH STORE] Cache limpiado');
+};
+
+const updateAuthCache = (userData) => {
+  authCache.user = userData;
+  authCache.lastCheck = Date.now();
+  console.log('✅ [AUTH STORE] Cache actualizado');
+};
+
+const getAuthCache = () => {
+  if (authCache.user && authCache.lastCheck && 
+      (Date.now() - authCache.lastCheck) < authCache.CACHE_TTL) {
+    return authCache.user;
+  }
+  return null;
+};
 
 export const useAuthStore = create(
   persist(
@@ -12,7 +40,7 @@ export const useAuthStore = create(
       isLoading: true,
       error: null,
 
-      // ✅ LOGIN OPTIMIZADO - SINCRONIZA CACHE + STORE + PERSISTENCE
+      // ✅ LOGIN OPTIMIZADO - SINCRONIZA CACHE + STORE
       login: (userData, authToken) => {
         console.log('✅ [AUTH STORE] Login ejecutado', { 
           userData, 
@@ -115,81 +143,6 @@ export const useAuthStore = create(
         } catch (error) {
           console.error('❌ [AUTH STORE] Error actualizando perfil:', error);
           const errorMessage = error.response?.data?.message || 'Error de conexión al actualizar perfil';
-          set({ 
-            error: errorMessage, 
-            isLoading: false 
-          });
-          return { 
-            success: false, 
-            message: errorMessage 
-          };
-        }
-      },
-
-      // ✅ CAMBIAR CONTRASEÑA OPTIMIZADO
-      cambiarContraseña: async (datosContraseña) => {
-        set({ isLoading: true, error: null });
-        
-        try {
-          console.log('🔄 [AUTH STORE] Cambiando contraseña...');
-          
-          const response = await authService.cambiarContraseña(datosContraseña);
-          
-          set({ isLoading: false, error: null });
-          return response;
-        } catch (error) {
-          console.error('❌ [AUTH STORE] Error cambiar contraseña:', error);
-          
-          const backendMessage = error.response?.data?.message;
-          const errorMessage = backendMessage || 'Error de conexión al cambiar contraseña';
-          
-          set({ 
-            error: errorMessage, 
-            isLoading: false 
-          });
-          return { 
-            success: false, 
-            message: errorMessage 
-          };
-        }
-      },
-
-      // ✅ OBTENER PERFIL ACTUALIZADO OPTIMIZADO
-      obtenerPerfilActualizado: async () => {
-        set({ isLoading: true, error: null });
-        
-        try {
-          console.log('🔄 [AUTH STORE] Obteniendo perfil actualizado...');
-          
-          const response = await authService.getProfile();
-          
-          if (response.success) {
-            // ✅ SINCRONIZAR CACHE Y STORE
-            updateAuthCache(response.usuario);
-            
-            set({ 
-              user: response.usuario, 
-              isLoading: false,
-              error: null 
-            });
-            
-            return { 
-              success: true, 
-              usuario: response.usuario 
-            };
-          } else {
-            set({ 
-              error: response.message, 
-              isLoading: false 
-            });
-            return { 
-              success: false, 
-              message: response.message 
-            };
-          }
-        } catch (error) {
-          console.error('❌ [AUTH STORE] Error obteniendo perfil:', error);
-          const errorMessage = error.response?.data?.message || 'Error de conexión al obtener perfil';
           set({ 
             error: errorMessage, 
             isLoading: false 
