@@ -1,4 +1,4 @@
-import { HashRouter , Routes, Route, Navigate } from 'react-router-dom';
+import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import { useAuthStore } from './stores/authStore';
 import { authService } from './services/authService';
@@ -16,6 +16,34 @@ import LandingPage from './pages/LandingPage';
 import ProfilePage from './pages/Profile'; 
 import Administracion from './pages/Administracion';
 
+// ✅ Cache simple en memoria (CORREGIDO - mismo módulo)
+let authCache = {
+  lastCheck: null,
+  user: null,
+  CACHE_TTL: 10 * 60 * 1000, // 10 minutos
+};
+
+// ✅ FUNCIONES PARA GESTIONAR CACHE DESDE OTROS COMPONENTES (EXPORTADAS)
+export const clearAuthCache = () => {
+  authCache.user = null;
+  authCache.lastCheck = null;
+  console.log('✅ [AUTH CACHE] Cache limpiado');
+};
+
+export const updateAuthCache = (userData) => {
+  authCache.user = userData;
+  authCache.lastCheck = Date.now();
+  console.log('✅ [AUTH CACHE] Cache actualizado');
+};
+
+export const getAuthCache = () => {
+  if (authCache.user && authCache.lastCheck && 
+      (Date.now() - authCache.lastCheck) < authCache.CACHE_TTL) {
+    return authCache.user;
+  }
+  return null;
+};
+
 function App() {
   const { isAuthenticated, login, setLoading, isLoading } = useAuthStore();
   const [authChecked, setAuthChecked] = useState(false);
@@ -28,19 +56,35 @@ function App() {
     const verifyInitialAuth = async () => {
       try {
         setLoading(true);
-        console.log('🔐 [APP] Llamando a checkAuth...');
+        
+        // ✅ OPTIMIZACIÓN 1: PRIMERO VERIFICAR CACHE (INSTANTÁNEO)
+        const cachedUser = getAuthCache();
+        if (cachedUser) {
+          console.log('✅ [APP] Usuario encontrado en cache, haciendo login...');
+          login(cachedUser);
+          setAuthChecked(true);
+          return;
+        }
+
+        // ✅ OPTIMIZACIÓN 2: SOLO SI NO HAY CACHE, LLAMAR AL BACKEND
+        console.log('🔐 [APP] No hay cache, llamando a checkAuth...');
         
         const result = await authService.checkAuth();
         console.log('🔐 [APP] Resultado de checkAuth:', result);
         
         if (result.success && result.usuario) {
-          console.log('✅ [APP] Usuario autenticado, haciendo login...');
+          console.log('✅ [APP] Usuario autenticado, guardando en cache...');
+          
+          // ✅ GUARDAR EN CACHE PARA PRÓXIMAS VECES
+          updateAuthCache(result.usuario);
           login(result.usuario);
         } else {
-          console.log('❌ [APP] Usuario NO autenticado');
+          console.log('❌ [APP] Usuario NO autenticado, limpiando cache');
+          clearAuthCache();
         }
       } catch (error) {
         console.error('❌ [APP] Error crítico en verifyInitialAuth:', error);
+        clearAuthCache();
       } finally {
         setLoading(false);
         setAuthChecked(true);
@@ -48,11 +92,13 @@ function App() {
       }
     };
 
+    // ✅ OPTIMIZACIÓN 3: Solo verificar si no hemos verificado antes
     if (!authChecked) {
       verifyInitialAuth();
     }
   }, [authChecked, login, setLoading]);
 
+  // ✅ MEJOR EXPERIENCIA: Loading no bloqueante
   if (!authChecked || isLoading) {
     console.log('🔄 [APP] Mostrando loading inicial...');
     return (
@@ -66,7 +112,7 @@ function App() {
   console.log('✅ [APP] Renderizando aplicación - isAuthenticated:', isAuthenticated);
 
   return (
-    <HashRouter >
+    <HashRouter>
       <Routes>
         {/* ✅ RUTA PÚBLICA PRINCIPAL: Landing Page (siempre accesible) */}
         <Route path="/" element={<LandingPage />} />
@@ -123,19 +169,16 @@ function App() {
               <ProfilePage />
             </ProtectedRoute>
           } />
-
-              
         </Route>
-  {/* ✅ RUTA DE ADMINISTRACIÓN (FUERA de /dashboard) */}
-   <Route path="/administracion" element={
-  <ProtectedRoute roles={['superadmin', 'admin']}>
-    <Layout /> {/* ← Sin children, usa Outlet */}
-  </ProtectedRoute>
-}>
-  <Route index element={<Administracion />} /> {/* ← Contenido via Outlet */}
-</Route>
 
-
+        {/* ✅ RUTA DE ADMINISTRACIÓN (FUERA de /dashboard) */}
+        <Route path="/administracion" element={
+          <ProtectedRoute roles={['superadmin', 'admin']}>
+            <Layout />
+          </ProtectedRoute>
+        }>
+          <Route index element={<Administracion />} />
+        </Route>
 
         {/* ✅ REDIRECCIONES PARA RUTAS DIRECTAS */}
         {isAuthenticated && (
@@ -144,7 +187,7 @@ function App() {
             <Route path="/incidencias" element={<Navigate to="/dashboard/incidencias" replace />} />
             <Route path="/mantenimientos" element={<Navigate to="/dashboard/mantenimientos" replace />} />
             <Route path="/reportes" element={<Navigate to="/dashboard/reportes" replace />} />
-            <Route path="/perfil" element={<Navigate to="/dashboard/perfil" replace />} /> {/* ✅ NUEVA REDIRECCIÓN */}
+            <Route path="/perfil" element={<Navigate to="/dashboard/perfil" replace />} />
           </>
         )}
 
@@ -153,7 +196,7 @@ function App() {
           <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
         } />
       </Routes>
-    </HashRouter >
+    </HashRouter>
   );
 }
 

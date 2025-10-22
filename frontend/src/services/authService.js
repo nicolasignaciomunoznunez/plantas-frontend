@@ -1,13 +1,19 @@
+// services/authService.js - VERSIÓN CORREGIDA
 import { api } from './api';
+import { getAuthCache, updateAuthCache, clearAuthCache } from '../App'; // ✅ Importar desde App
 
 export const authService = {
   // Login con debug
   login: async (email, password) => {
-
     const response = await api.post('/api/auth/iniciar-sesion', {
       email,
       password,
     });
+
+    // ✅ ACTUALIZAR CACHE AL LOGIN
+    if (response.data.success && response.data.usuario) {
+      updateAuthCache(response.data.usuario);
+    }
 
     return response.data;
   },
@@ -18,12 +24,27 @@ export const authService = {
     return response.data;
   },
 
-  // Verificar autenticación
-    // Verificar autenticación - VERSIÓN MEJORADA
+  // Verificar autenticación - VERSIÓN MEJORADA CON CACHE
   checkAuth: async () => {
     try {
+      // ✅ PRIMERO VERIFICAR CACHE
+      const cachedUser = getAuthCache();
+      if (cachedUser) {
+        console.log('✅ [AUTH SERVICE] Usando cache para checkAuth');
+        return { 
+          success: true, 
+          usuario: cachedUser,
+          fromCache: true 
+        };
+      }
 
+      console.log('🔐 [AUTH SERVICE] Llamando al backend para checkAuth');
       const response = await api.get('/api/auth/verificar-autenticacion');
+
+      // ✅ GUARDAR EN CACHE SI ES EXITOSO
+      if (response.data.success && response.data.usuario) {
+        updateAuthCache(response.data.usuario);
+      }
 
       return response.data;
     } catch (error) {
@@ -39,6 +60,12 @@ export const authService = {
   // Obtener perfil
   getProfile: async () => {
     const response = await api.get('/api/auth/perfil');
+    
+    // ✅ ACTUALIZAR CACHE CON PERFIL ACTUALIZADO
+    if (response.data) {
+      updateAuthCache(response.data);
+    }
+    
     return response.data;
   },
 
@@ -56,12 +83,6 @@ export const authService = {
     return response.data;
   },
 
-  // Cerrar sesión
-  logout: async () => {
-    const response = await api.post('/api/auth/cerrar-sesion');
-    return response.data;
-  },
-
   // Verificar email
   verifyEmail: async (code) => {
     const response = await api.post('/api/auth/verificar-email', {
@@ -69,32 +90,59 @@ export const authService = {
     });
     return response.data;
   },
+
   // Actualizar perfil
-actualizarPerfil: async (datosPerfil) => {
+  actualizarPerfil: async (datosPerfil) => {
+    const response = await api.put('/api/auth/perfil', datosPerfil);
 
-  const response = await api.put('/api/auth/perfil', datosPerfil);
+    // ✅ ACTUALIZAR CACHE CON NUEVOS DATOS
+    if (response.data) {
+      updateAuthCache(response.data);
+    }
 
-  return response.data;
-},
+    return response.data;
+  },
 
-// Cambiar contraseña
-cambiarContraseña: async (datosContraseña) => {
+  // Cambiar contraseña
+  cambiarContraseña: async (datosContraseña) => {
+    const response = await api.post('/api/auth/cambiar-password', datosContraseña);
+    return response.data;
+  },
 
-  const response = await api.post('/api/auth/cambiar-password', datosContraseña);
+  // Obtener todos los usuarios (para superadmin/admin)
+  obtenerUsuarios: async () => {
+    const response = await api.get('/api/auth/usuarios');
+    return response.data;
+  },
 
-  return response.data;
-},
+  // Actualizar rol de usuario
+  actualizarRolUsuario: async (usuarioId, nuevoRol) => {
+    const response = await api.put(`/api/auth/usuarios/${usuarioId}/rol`, { nuevoRol });
+    return response.data;
+  },
 
-// Obtener todos los usuarios (para superadmin/admin)
-obtenerUsuarios: async () => {
-  const response = await api.get('/api/auth/usuarios');
-  return response.data;
-},
+  // ✅ Cerrar sesión CON LIMPIEZA DE CACHE
+  logout: async () => {
+    try {
+      const response = await api.post('/api/auth/cerrar-sesion');
+      
+      // ✅ LIMPIAR CACHE AL LOGOUT
+      clearAuthCache();
+      
+      console.log('✅ [AUTH SERVICE] Logout exitoso, cache limpiado');
+      return response.data;
+    } catch (error) {
+      console.error('❌ [AUTH SERVICE] Error en logout:', error);
+      
+      // ✅ LIMPIAR CACHE INCLUSO SI HAY ERROR
+      clearAuthCache();
+      
+      throw error;
+    }
+  },
 
-// Actualizar rol de usuario
-actualizarRolUsuario: async (usuarioId, nuevoRol) => {
-  const response = await api.put(`/api/auth/usuarios/${usuarioId}/rol`, { nuevoRol });
-  return response.data;
-},
-
+  // ✅ Funciones de cache para uso externo
+  clearAuthCache,
+  updateAuthCache,
+  getAuthCache
 };
