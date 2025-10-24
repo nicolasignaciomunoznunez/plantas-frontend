@@ -422,14 +422,11 @@ const handleSubmit = async (e) => {
                 await subirFotosIncidencia(incidencia.id, fotosDespues, 'despues');
             }
 
-            // ✅ MANEJAR RESPUESTA EXITOSA
+            // ✅ MANEJAR RESPUESTA EXITOSA - SIN setSuccessMessage
             if (resultado.success) {
-                console.log('✅ Incidencia completada - PDF disponible:', resultado.pdfUrl);
+                console.log('✅ Incidencia completada - PDF disponible');
                 
-                // Mostrar mensaje de éxito con opción de PDF
-                setSuccessMessage('Incidencia completada correctamente');
-                
-                // ✅ OFRECER DESCARGAR PDF
+                // ✅ OFRECER DESCARGAR PDF INMEDIATAMENTE
                 setTimeout(() => {
                     const descargarPDF = window.confirm(
                         '✅ Incidencia completada exitosamente!\n\n' +
@@ -445,8 +442,7 @@ const handleSubmit = async (e) => {
                         // Generar y descargar PDF
                         generarReportePDF(incidencia.id);
                     }
-                }, 1000);
-                
+                }, 500);
             }
 
         } else if (incidencia) {
@@ -457,7 +453,7 @@ const handleSubmit = async (e) => {
                 plantId: formData.plantId,
                 estado: formData.estado
             });
-            setSuccessMessage('Incidencia actualizada correctamente');
+            console.log('✅ Incidencia actualizada correctamente');
             
         } else {
             // Nueva incidencia
@@ -467,14 +463,14 @@ const handleSubmit = async (e) => {
             if (fotosAntes.length > 0 && resultado?.incidencia?.id) {
                 await subirFotosIncidencia(resultado.incidencia.id, fotosAntes, 'antes');
             }
-            setSuccessMessage('Incidencia creada correctamente');
+            console.log('✅ Incidencia creada correctamente');
         }
         
-        // Cerrar modal y refrescar
+        // ✅ CERRAR MODAL AUTOMÁTICAMENTE después de éxito
         if (onIncidenciaGuardada) {
             onIncidenciaGuardada();
         }
-        handleCerrarModal();
+        handleClose(); // ✅ Esto cierra el modal
         
     } catch (error) {
         console.error('❌ Error al guardar incidencia:', error);
