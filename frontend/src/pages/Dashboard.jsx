@@ -31,7 +31,8 @@ export default function Dashboard() {
     loading: dashboardLoading, 
     error, 
     obtenerDashboardCompleto,
-    fromCache 
+    fromCache,
+    invalidarCache
   } = useDashboardStore();
   
   const [periodo, setPeriodo] = useState('hoy');
@@ -52,7 +53,7 @@ export default function Dashboard() {
     puedeVerDashboard: ['superadmin', 'admin', 'tecnico'].includes(user?.rol)
   }), [user?.rol]);
 
-  // ✅ DATOS OPTIMIZADOS - Sin cálculos complejos en frontend
+  // ✅ DATOS OPTIMIZADOS - CORREGIDO: Usar métricas reales del backend
   const datosOptimizados = useMemo(() => {
     if (!datosCompletos) {
       return {
@@ -81,10 +82,10 @@ export default function Dashboard() {
     const incidenciasRecientes = datosCompletos.incidenciasRecientes || [];
     const mantenimientosPendientes = datosCompletos.mantenimientosPendientes || [];
 
-    // ✅ Cálculos simples con datos ya filtrados
-    const incidenciasPendientes = incidenciasRecientes.filter(i => i.estado === 'pendiente').length;
-    const incidenciasEnProgreso = incidenciasRecientes.filter(i => i.estado === 'en_progreso').length;
-    const incidenciasResueltas = incidenciasRecientes.filter(i => i.estado === 'resuelto').length;
+    // ✅ CORRECCIÓN: Usar métricas REALES del backend, no filtrar en frontend
+    const incidenciasPendientes = metricas.incidencias?.pendientes || 0;
+    const incidenciasEnProgreso = metricas.incidencias?.enProgreso || 0;
+    const incidenciasResueltas = metricas.incidencias?.resueltas || 0;
     
     const mantenimientosAtrasados = mantenimientosPendientes.filter(m => 
       new Date(m.fechaProgramada) < new Date()
@@ -92,12 +93,13 @@ export default function Dashboard() {
 
     return {
       metricasRapidas: {
+        // ✅ CORREGIDO: Usar datos del backend, no cálculos en frontend
         incidenciasPendientes,
         incidenciasEnProgreso,
         incidenciasResueltas,
-        mantenimientosPendientes: metricas.mantenimientosPendientes || 0,
+        mantenimientosPendientes: metricas.mantenimientos?.pendientes || 0,
         mantenimientosAtrasados,
-        totalReportes: 0, // Agregar si se necesitan reportes
+        totalReportes: 0,
         totalPlantas: metricas.totalPlantas || 0
       },
       
@@ -158,6 +160,12 @@ export default function Dashboard() {
     cargandoSecciones.incidencias || cargandoSecciones.mantenimientos || cargandoSecciones.reportes,
     [cargandoSecciones.incidencias, cargandoSecciones.mantenimientos, cargandoSecciones.reportes]
   );
+
+  // ✅ Función para refrescar datos
+  const handleRefrescar = () => {
+    invalidarCache();
+    obtenerDashboardCompleto();
+  };
 
   // ✅ Componente de Acceso Denegado
   const AccesoDenegado = () => (
@@ -229,28 +237,28 @@ export default function Dashboard() {
       {
         valor: datosOptimizados.metricasRapidas.incidenciasPendientes,
         titulo: "Incidencias Pendientes",
-        descripcion: fromCache ? "Desde cache" : "Requieren atención inmediata",
+        descripcion: "Requieren atención inmediata",
         color: "bg-error-50 border-error-200 text-error-600",
         icono: "⚠️"
       },
       {
         valor: datosOptimizados.metricasRapidas.mantenimientosPendientes,
         titulo: "Mantenimientos",
-        descripcion: fromCache ? "Desde cache" : "Programados esta semana",
+        descripcion: "Programados esta semana",
         color: "bg-primary-50 border-primary-200 text-primary-600",
         icono: "🔧"
       },
       {
         valor: datosOptimizados.metricasRapidas.mantenimientosAtrasados,
         titulo: "Atrasados",
-        descripcion: fromCache ? "Desde cache" : "Resolver urgentemente",
+        descripcion: "Resolver urgentemente",
         color: "bg-warning-50 border-warning-200 text-warning-600",
         icono: "⏰"
       },
       {
         valor: datosOptimizados.metricasRapidas.totalReportes,
         titulo: "Reportes",
-        descripcion: fromCache ? "Desde cache" : "Generados este mes",
+        descripcion: "Generados este mes",
         color: "bg-success-50 border-success-200 text-success-600",
         icono: "📊"
       }
@@ -282,7 +290,7 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-light p-4 sm:p-6 space-y-6 sm:space-y-8">
-      {/* ✅ HEADER MEJORADO CON INDICADOR DE CACHE */}
+      {/* ✅ HEADER MEJORADO CON BOTÓN REFRESCAR */}
       <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-down">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div className="space-y-3">
@@ -301,16 +309,28 @@ export default function Dashboard() {
             </p>
           </div>
           
-          {/* ✅ BOTÓN CREAR PLANTA */}
-          {(esSuperAdmin || esAdmin) && (
-            <Link
-              to="/plantas/crear"
-              className="bg-gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-large transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg w-full lg:w-auto justify-center"
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            {/* ✅ BOTÓN CREAR PLANTA */}
+            {(esSuperAdmin || esAdmin) && (
+              <Link
+                to="/plantas/crear"
+                className="bg-gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-large transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg justify-center"
+              >
+                <span className="text-lg">+</span>
+                Crear Nueva Planta
+              </Link>
+            )}
+            
+            {/* ✅ BOTÓN REFRESCAR */}
+            <button
+              onClick={handleRefrescar}
+              className="bg-secondary-600 text-white px-6 py-3 rounded-xl hover:bg-secondary-700 transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg"
+              title="Refrescar datos y borrar cache"
             >
-              <span className="text-lg">+</span>
-              Crear Nueva Planta
-            </Link>
-          )}
+              <span className="text-lg">🔄</span>
+              Refrescar
+            </button>
+          </div>
         </div>
       </div>
 
@@ -341,9 +361,7 @@ export default function Dashboard() {
           {/* COLUMNA PRINCIPAL */}
           <div className="xl:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-scale-in">
-             
               <GraficosDashboard datosCompletos={datosCompletos} />
-            
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
@@ -388,7 +406,7 @@ export default function Dashboard() {
                       <p className="text-secondary-600 text-xs sm:text-sm truncate">{planta.ubicacion}</p>
                     </div>
                     <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
-                      DASHBOARD_CONFIG.colores[planta.estados?.estado || 'optimal']
+                      DASHBOARD_CONFIG.colores[planta.estados?.planta || 'optimal']
                     }`}></div>
                   </Link>
                 ))}
@@ -404,7 +422,7 @@ export default function Dashboard() {
                 {[
                   { label: 'Plantas totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
                   { label: 'Incidencias resueltas', valor: datosOptimizados.metricasRapidas.incidenciasResueltas, color: 'text-success-600' },
-                  { label: 'Eficiencia promedio', valor: `${datosOptimizados.graficos.metricasReales?.eficienciaPromedio || 0}%`, color: 'text-primary-600' }
+                  { label: 'Plantas operativas', valor: datosCompletos?.metricas?.plantasOperativas || 0, color: 'text-primary-600' }
                 ].map((item, index) => (
                   <div 
                     key={index}

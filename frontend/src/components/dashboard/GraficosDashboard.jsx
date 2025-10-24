@@ -331,12 +331,12 @@ export default function GraficosDashboard({ datosCompletos }) {
                     <div>
                       <div className={clsx(
                         'text-lg sm:text-xl font-bold font-heading',
-                        GRAFICO_CONFIG.colores[planta.estados?.planta]?.text || 'text-secondary-600'
+                  GRAFICO_CONFIG.colores[planta.estados?.planta]?.text || 'text-secondary-600'
                       )}>
-                        {planta.estados?.incidenciasPendientes || 0}
+                       {planta.estados?.incidenciasPendientes || 0}
                       </div>
                       <div className="text-xs text-secondary-500 mt-1 hidden sm:block">
-                        Activas
+                          Incidencias activas
                       </div>
                     </div>
                   </div>
