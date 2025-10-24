@@ -5,6 +5,7 @@ import TarjetaIncidencia from './TarjetaIncidencia';
 export default function ListaIncidencias({ 
   incidencias, 
   onEditarIncidencia, 
+  onCompletarIncidencia,
   onCambiarEstado,
   loading, 
   puedeGestionar 
@@ -106,13 +107,14 @@ export default function ListaIncidencias({
         </div>
         <div className="space-y-3 sm:space-y-4">
           {incidencias.map((incidencia) => (
-            <TarjetaIncidencia
-              key={incidencia.id}
-              incidencia={incidencia}
-              onEditar={() => onEditarIncidencia(incidencia)}
-              onCambiarEstado={onCambiarEstado || handleCambiarEstado}
-              actualizando={incidenciaActualizando === incidencia.id}
-            />
+        <TarjetaIncidencia
+  key={incidencia.id}
+  incidencia={incidencia}
+  onEditar={() => onEditarIncidencia(incidencia)}
+  onCompletar={onCompletarIncidencia} // ✅ AGREGAR ESTA LÍNEA
+  onCambiarEstado={onCambiarEstado || handleCambiarEstado}
+  actualizando={incidenciaActualizando === incidencia.id}
+/>
           ))}
         </div>
       </div>
@@ -125,13 +127,14 @@ export default function ListaIncidencias({
     return (
       <div className="space-y-3 sm:space-y-4">
         {incidencias.map((incidencia) => (
-          <TarjetaIncidencia
-            key={incidencia.id}
-            incidencia={incidencia}
-            onEditar={() => onEditarIncidencia(incidencia)}
-            onCambiarEstado={onCambiarEstado || handleCambiarEstado}
-            actualizando={incidenciaActualizando === incidencia.id}
-          />
+  <TarjetaIncidencia
+  key={incidencia.id}
+  incidencia={incidencia}
+  onEditar={() => onEditarIncidencia(incidencia)}
+  onCompletar={onCompletarIncidencia} // ✅ AGREGAR ESTA LÍNEA
+  onCambiarEstado={onCambiarEstado || handleCambiarEstado}
+  actualizando={incidenciaActualizando === incidencia.id}
+/>
         ))}
       </div>
     );

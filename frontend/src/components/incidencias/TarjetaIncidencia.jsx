@@ -1,7 +1,13 @@
 import { useState } from 'react';
 import { useAuthStore } from '../../stores/authStore';
 
-export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstado, actualizando = false }) {
+export default function TarjetaIncidencia({ 
+  incidencia, 
+  onEditar, 
+  onCompletar, // ✅ NUEVO PROP para completar incidencia
+  onCambiarEstado, 
+  actualizando = false 
+}) {
   const { user } = useAuthStore();
   const [cambiandoEstado, setCambiandoEstado] = useState(false);
 
@@ -46,6 +52,25 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
 
   const handleCambioEstado = async (nuevoEstado) => {
     if (!onCambiarEstado || nuevoEstado === incidencia.estado) return;
+    
+    // ✅ DETECTAR SI SE ESTÁ CAMBIANDO A "RESUELTO"
+    if (nuevoEstado === 'resuelto' && incidencia.estado !== 'resuelto') {
+      console.log('🎯 Cambiando a resuelto - abriendo modal de completar');
+      
+      // Si existe el prop onCompletar, usarlo para abrir modal de completar
+      if (onCompletar) {
+        onCompletar(incidencia);
+        return; // No cambiar el estado directamente
+      }
+      
+      // Si no existe onCompletar, mostrar confirmación
+      const confirmar = window.confirm(
+        '¿Estás seguro de que quieres marcar esta incidencia como resuelta?\n\n' +
+        'Recomendamos usar la opción "Completar Incidencia" para agregar fotos finales, materiales utilizados y generar el reporte PDF.'
+      );
+      
+      if (!confirmar) return;
+    }
     
     setCambiandoEstado(true);
     try {
@@ -120,6 +145,20 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
         
         {puedeEditar && (
           <div className="flex space-x-1 flex-shrink-0 ml-2">
+            {/* ✅ BOTÓN COMPLETAR para incidencias no resueltas */}
+            {incidencia.estado !== 'resuelto' && onCompletar && (
+              <button
+                onClick={() => onCompletar(incidencia)}
+                className="p-1.5 sm:p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-all duration-200 group/btn"
+                title="Completar incidencia"
+                disabled={actualizando}
+              >
+                <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 group-hover/btn:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </button>
+            )}
+            
             <button
               onClick={() => onEditar(incidencia)}
               className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group/btn"

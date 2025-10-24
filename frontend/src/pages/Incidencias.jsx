@@ -22,6 +22,7 @@ export default function Incidencias() {
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
+  const [modoCompletar, setModoCompletar] = useState(false);
 
   // Carga inicial optimizada
   useEffect(() => {
@@ -58,9 +59,16 @@ export default function Incidencias() {
     setShowModal(true);
   }, []);
 
+  const handleCompletarIncidencia = useCallback((incidencia) => {
+  setIncidenciaEditando(incidencia);
+  setModoCompletar(true); // ✅ Activar modo completar
+  setShowModal(true);
+}, []);
+
   const handleCerrarModal = useCallback(() => {
     setShowModal(false);
     setIncidenciaEditando(null);
+    setModoCompletar(false); // ✅ AGREGAR ESTA LÍNEA
   }, []);
 
   const handleCambiarEstado = useCallback(async (id, nuevoEstado) => {
@@ -461,13 +469,14 @@ export default function Incidencias() {
 
       {/* Lista de Incidencias */}
       <div className="bg-white rounded-xl sm:rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <ListaIncidencias 
-          incidencias={incidenciasFiltradas}
-          onEditarIncidencia={handleEditarIncidencia}
-          onCambiarEstado={handleCambiarEstado}
-          loading={loading && incidencias.length > 0}
-          puedeGestionar={puedeGestionar}
-        />
+       <ListaIncidencias 
+  incidencias={incidenciasFiltradas}
+  onEditarIncidencia={handleEditarIncidencia}
+  onCompletarIncidencia={handleCompletarIncidencia} // ✅ AGREGAR ESTA LÍNEA
+  onCambiarEstado={handleCambiarEstado}
+  loading={loading && incidencias.length > 0}
+  puedeGestionar={puedeGestionar}
+/>
       </div>
 
       {/* Empty State cuando no hay resultados */}
@@ -518,12 +527,13 @@ export default function Incidencias() {
       )}
 
       {/* Modal */}
-      <ModalIncidencia
-        isOpen={showModal}
-        onClose={handleCerrarModal}
-        incidencia={incidenciaEditando}
-        onIncidenciaGuardada={handleIncidenciaGuardada}
-      />
+<ModalIncidencia
+  isOpen={showModal}
+  onClose={handleCerrarModal}
+  incidencia={incidenciaEditando}
+  modoCompletar={modoCompletar} // ✅ AGREGAR ESTA LÍNEA
+  onIncidenciaGuardada={handleIncidenciaGuardada}
+/>
 
       {/* Debug Info - Solo en desarrollo */}
       {process.env.NODE_ENV === 'development' && (
