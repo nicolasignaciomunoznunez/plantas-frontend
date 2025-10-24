@@ -397,60 +397,90 @@ useEffect(() => {
     setMateriales(nuevosMateriales);
   };
 
-  const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      return;
+        return;
     }
 
     try {
-      let resultado;
+        let resultado;
 
-      if (modoCompletar && incidencia) {
-        // ✅ COMPLETAR INCIDENCIA CON FOTOS Y MATERIALES
-        console.log('🔄 Completando incidencia:', incidencia.id);
-        resultado = await completarIncidencia(incidencia.id, {
-          resumenTrabajo,
-          materiales
-        });
+        if (modoCompletar && incidencia) {
+            console.log('🔄 Completando incidencia:', incidencia.id);
+            
+            // ✅ COMPLETAR INCIDENCIA
+            resultado = await completarIncidencia(incidencia.id, {
+                resumenTrabajo,
+                materiales
+            });
 
-        // ✅ SUBIR FOTOS DESPUÉS si existen
-        if (fotosDespues.length > 0) {
-          console.log('📸 Subiendo fotos después:', fotosDespues.length);
-          await subirFotosIncidencia(incidencia.id, fotosDespues, 'despues');
+            // ✅ SUBIR FOTOS DESPUÉS si existen
+            if (fotosDespues.length > 0) {
+                console.log('📸 Subiendo fotos después:', fotosDespues.length);
+                await subirFotosIncidencia(incidencia.id, fotosDespues, 'despues');
+            }
+
+            // ✅ MANEJAR RESPUESTA EXITOSA
+            if (resultado.success) {
+                console.log('✅ Incidencia completada - PDF disponible:', resultado.pdfUrl);
+                
+                // Mostrar mensaje de éxito con opción de PDF
+                setSuccessMessage('Incidencia completada correctamente');
+                
+                // ✅ OFRECER DESCARGAR PDF
+                setTimeout(() => {
+                    const descargarPDF = window.confirm(
+                        '✅ Incidencia completada exitosamente!\n\n' +
+                        '¿Deseas descargar el reporte PDF ahora?\n\n' +
+                        'El PDF incluirá:\n' +
+                        '• Información completa de la incidencia\n' +
+                        '• Fotos antes/después del trabajo\n' +
+                        '• Materiales utilizados\n' +
+                        '• Resumen del trabajo realizado'
+                    );
+                    
+                    if (descargarPDF) {
+                        // Generar y descargar PDF
+                        generarReportePDF(incidencia.id);
+                    }
+                }, 1000);
+                
+            }
+
+        } else if (incidencia) {
+            // Edición normal
+            resultado = await actualizarIncidencia(incidencia.id, {
+                titulo: formData.titulo,
+                descripcion: formData.descripcion,
+                plantId: formData.plantId,
+                estado: formData.estado
+            });
+            setSuccessMessage('Incidencia actualizada correctamente');
+            
+        } else {
+            // Nueva incidencia
+            resultado = await crearIncidencia(formData);
+            
+            // Subir fotos antes si existen
+            if (fotosAntes.length > 0 && resultado?.incidencia?.id) {
+                await subirFotosIncidencia(resultado.incidencia.id, fotosAntes, 'antes');
+            }
+            setSuccessMessage('Incidencia creada correctamente');
         }
-
-      } else if (incidencia) {
-        // Edición normal
-        console.log('✏️ Editando incidencia:', incidencia.id);
-        resultado = await actualizarIncidencia(incidencia.id, {
-          titulo: formData.titulo,
-          descripcion: formData.descripcion,
-          plantId: formData.plantId,
-          estado: formData.estado
-        });
-      } else {
-        // Nueva incidencia
-        console.log('🆕 Creando nueva incidencia');
-        resultado = await crearIncidencia(formData);
         
-        // ✅ SUBIR FOTOS ANTES si existen
-        if (fotosAntes.length > 0 && resultado?.incidencia?.id) {
-          console.log('📸 Subiendo fotos antes:', fotosAntes.length);
-          await subirFotosIncidencia(resultado.incidencia.id, fotosAntes, 'antes');
+        // Cerrar modal y refrescar
+        if (onIncidenciaGuardada) {
+            onIncidenciaGuardada();
         }
-      }
-      
-      console.log('✅ Incidencia guardada exitosamente');
-      if (onIncidenciaGuardada) {
-        onIncidenciaGuardada();
-      }
-      onClose();
+        handleCerrarModal();
+        
     } catch (error) {
-      console.error('❌ Error al guardar incidencia:', error);
+        console.error('❌ Error al guardar incidencia:', error);
+        setErrors({ submit: error.message });
     }
-  };
+};
 
   const handleClose = () => {
     // Limpiar estados al cerrar
