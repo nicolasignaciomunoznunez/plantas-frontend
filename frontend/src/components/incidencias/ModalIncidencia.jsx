@@ -254,39 +254,59 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
   const [errors, setErrors] = useState({});
 
   // ✅ Cargar plantas según el rol del usuario - CORREGIDO
-  useEffect(() => {
-    const cargarPlantasPermitidas = async () => {
-      if (!isOpen || !user) return;
-      
-      setCargandoPlantas(true);
-      try {
-        if (user.rol === 'cliente') {
-          console.log('🔍 Cargando plantas para cliente:', user.id);
-          const plantasCliente = await obtenerPlantasPorCliente(user.id);
-          console.log('📊 Plantas del cliente cargadas:', plantasCliente);
-          setPlantasPermitidas(plantasCliente || []);
-          
-          // Si solo tiene una planta, seleccionarla automáticamente
-          if (plantasCliente && plantasCliente.length === 1 && !plantaPreSeleccionada && !incidencia) {
-            setFormData(prev => ({ ...prev, plantId: plantasCliente[0].id }));
-            console.log('✅ Planta auto-seleccionada:', plantasCliente[0].id);
-          }
-        } else {
-          console.log('🔍 Cargando todas las plantas para:', user.rol);
-          await obtenerPlantas(100); // Aumentar límite para asegurar todas las plantas
-          console.log('📊 Todas las plantas cargadas:', plantas);
-          setPlantasPermitidas(plantas);
+useEffect(() => {
+  const cargarPlantasPermitidas = async () => {
+    if (!isOpen || !user) return;
+    
+    setCargandoPlantas(true);
+    try {
+      if (user.rol === 'cliente') {
+        console.log('🔍 Cargando plantas para cliente:', user.id);
+        const plantasCliente = await obtenerPlantasPorCliente(user.id);
+        console.log('📊 Plantas del cliente cargadas:', plantasCliente);
+        setPlantasPermitidas(plantasCliente || []);
+        
+        if (plantasCliente && plantasCliente.length === 1 && !plantaPreSeleccionada && !incidencia) {
+          setFormData(prev => ({ ...prev, plantId: plantasCliente[0].id }));
         }
-      } catch (error) {
-        console.error('❌ Error cargando plantas:', error);
-        setPlantasPermitidas([]);
-      } finally {
-        setCargandoPlantas(false);
+      } else {
+        // ✅ PARA SUPERADMIN/ADMIN/TECNICO - SOLUCIÓN CORREGIDA
+        console.log('🔍 Cargando todas las plantas para:', user.rol);
+        
+        // Esperar a que las plantas se carguen completamente
+        const resultado = await obtenerPlantas(100);
+        console.log('📊 Resultado de obtenerPlantas:', resultado);
+        
+        // Usar las plantas directamente del resultado o del store
+        if (resultado && resultado.plantas) {
+          setPlantasPermitidas(resultado.plantas);
+          console.log('✅ Plantas cargadas desde resultado:', resultado.plantas.length);
+        } else {
+          // Fallback: usar el store después de un pequeño delay
+          setTimeout(() => {
+            console.log('🔄 Plantas desde store (fallback):', plantas);
+            setPlantasPermitidas(plantas);
+          }, 100);
+        }
       }
-    };
+    } catch (error) {
+      console.error('❌ Error cargando plantas:', error);
+      setPlantasPermitidas([]);
+    } finally {
+      setCargandoPlantas(false);
+    }
+  };
 
-    cargarPlantasPermitidas();
-  }, [isOpen, user, obtenerPlantas, obtenerPlantasPorCliente]);
+  cargarPlantasPermitidas();
+}, [isOpen, user, obtenerPlantas, obtenerPlantasPorCliente]);
+
+// ✅ EFECTO ADICIONAL para sincronizar plantas cuando el store se actualice
+useEffect(() => {
+  if (user?.rol !== 'cliente' && plantas.length > 0 && isOpen) {
+    console.log('🔄 Sincronizando plantas desde store:', plantas.length);
+    setPlantasPermitidas(plantas);
+  }
+}, [plantas, user, isOpen]);
 
   // ✅ Cargar datos de la incidencia existente
   useEffect(() => {
