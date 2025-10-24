@@ -153,7 +153,7 @@ export default function Incidencias() {
     URL.revokeObjectURL(url);
     
     setSuccessMessage(`Exportadas ${incidenciasFiltradas.length} incidencias correctamente`);
-  }, [incidenciasFiltrada]);
+  }, [incidenciasFiltradas]);
 
   // Handler para cuando se guarda una incidencia
   const handleIncidenciaGuardada = useCallback(() => {
