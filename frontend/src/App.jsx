@@ -36,7 +36,6 @@ function App() {
       try {
         setLoading(true);
         
-        // ✅ PRIMERO: INTENTAR DESDE CACHE (INSTANTÁNEO)
         const fromCache = syncFromCache();
         if (fromCache) {
           console.log('✅ [APP] Autenticación restaurada desde cache');
@@ -44,7 +43,6 @@ function App() {
           return;
         }
 
-        // ✅ SEGUNDO: VERIFICAR CON BACKEND (SOLO SI NO HAY CACHE)
         console.log('🔐 [APP] Verificando autenticación con backend...');
         const result = await authService.checkAuth();
         
@@ -68,7 +66,6 @@ function App() {
     }
   }, [authChecked, login, setLoading, syncFromCache]);
 
-  // ✅ MEJOR EXPERIENCIA: Loading no bloqueante
   if (!authChecked || isLoading) {
     console.log('🔄 [APP] Mostrando loading inicial...');
     return (
@@ -84,73 +81,67 @@ function App() {
   return (
     <HashRouter>
       <Routes>
-        {/* ✅ RUTA PÚBLICA PRINCIPAL: Landing Page (siempre accesible) */}
+        {/* ✅ RUTA PÚBLICA PRINCIPAL: Landing Page */}
         <Route path="/" element={<LandingPage />} />
         
         {/* ✅ RUTAS PÚBLICAS: Login y Register */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" replace />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" replace />} />
         
-        {/* ✅ RUTAS PROTEGIDAS CON PROTECTEDROUTE Y CONTROL DE ROLES */}
-        <Route path="/dashboard" element={
+        {/* ✅ RUTAS PROTEGIDAS CON LAYOUT (SIDEBAR) - ESTRUCTURA CORREGIDA */}
+        <Route element={
           <ProtectedRoute>
             <Layout />
           </ProtectedRoute>
         }>
-          <Route index element={<Dashboard />} />
+          {/* ✅ TODAS las rutas del sidebar aquí */}
+          <Route path="/dashboard" element={<Dashboard />} />
           
-          {/* PLANTAS: Admin y Técnico pueden ver */}
-          <Route path="plantas" element={
-            <ProtectedRoute roles={['superadmin']}>
+          <Route path="/plantas" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico']}>
               <Plantas />
             </ProtectedRoute>
           } />
           
-          <Route path="plantas/:id" element={
-            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
+          <Route path="/plantas/:id" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico']}>
               <PlantaDetalle />
             </ProtectedRoute>
           } />
           
-          {/* INCIDENCIAS: Todos los roles pueden ver */}
-          <Route path="incidencias" element={
-            <ProtectedRoute roles={['superadmin','admin', 'tecnico', 'cliente']}>
+          <Route path="/incidencias" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico', 'cliente']}>
               <Incidencias />
             </ProtectedRoute>
           } />
           
-          {/* MANTENIMIENTOS: Admin y Técnico */}
-          <Route path="mantenimientos" element={
-            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
+          <Route path="/mantenimientos" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico']}>
               <Mantenimiento />
             </ProtectedRoute>
           } />
           
-          {/* REPORTES: Admin y Técnico */}
-          <Route path="reportes" element={
-            <ProtectedRoute roles={['superadmin','admin', 'tecnico']}>
+          <Route path="/reportes" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico']}>
               <Reportes />
             </ProtectedRoute>
           } />
           
-          {/* ✅ PERFIL: Todos los usuarios autenticados pueden ver */}
-          <Route path="perfil" element={
-            <ProtectedRoute roles={['superadmin','admin', 'tecnico', 'cliente']}>
+          <Route path="/perfil" element={
+            <ProtectedRoute roles={['superadmin', 'admin', 'tecnico', 'cliente']}>
               <ProfilePage />
+            </ProtectedRoute>
+          } />
+
+          {/* ✅ RUTA DE ADMINISTRACIÓN TAMBIÉN DENTRO DEL LAYOUT */}
+          <Route path="/administracion" element={
+            <ProtectedRoute roles={['superadmin', 'admin']}>
+              <Administracion />
             </ProtectedRoute>
           } />
         </Route>
 
-        {/* ✅ RUTA DE ADMINISTRACIÓN (FUERA de /dashboard) */}
-        <Route path="/administracion" element={
-          <ProtectedRoute roles={['superadmin', 'admin']}>
-            <Layout />
-          </ProtectedRoute>
-        }>
-          <Route index element={<Administracion />} />
-        </Route>
-
-        {/* ✅ REDIRECCIÓN GLOBAL - ELIMINADAS RUTAS DUPLICADAS */}
+        {/* ✅ REDIRECCIÓN GLOBAL */}
         <Route path="*" element={
           <Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />
         } />
