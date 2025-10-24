@@ -14,16 +14,13 @@ const obtenerToken = () => {
     const authStorage = localStorage.getItem('auth-storage');
     
     if (!authStorage) {
-    
       return null;
     }
 
     const authState = JSON.parse(authStorage);
-   
     
     // ✅ CORRECCIÓN: Zustand guarda el estado en authState.state
     const token = authState?.state?.token;
-  
     
     return token || null;
   } catch (error) {
@@ -39,7 +36,13 @@ api.interceptors.request.use(
     
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      
+    }
+    
+    // ✅ NUEVO: Manejo especial para FormData (subida de archivos)
+    // Si es FormData, NO establecer Content-Type (dejar que el navegador lo haga)
+    if (config.data instanceof FormData) {
+      // Eliminar Content-Type para que el navegador establezca el boundary automáticamente
+      delete config.headers['Content-Type'];
     }
     
     return config;
@@ -67,3 +70,15 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// ✅ NUEVO: Función helper para subida de archivos con progreso
+export const uploadWithProgress = (url, formData, onProgress) => {
+  return api.post(url, formData, {
+    onUploadProgress: (progressEvent) => {
+      if (onProgress && progressEvent.total) {
+        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+        onProgress(percentCompleted);
+      }
+    },
+  });
+};

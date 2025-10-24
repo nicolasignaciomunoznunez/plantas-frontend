@@ -38,7 +38,20 @@ export const useIncidenciasStore = create((set, get) => ({
     }
   },
 
-  // Crear incidencia - CORREGIDO
+  // ✅ NUEVO: Obtener incidencia COMPLETA con fotos y materiales
+  obtenerIncidenciaCompleta: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await incidenciasService.obtenerIncidenciaCompleta(id);
+      set({ incidenciaSeleccionada: response.incidencia, loading: false });
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al obtener incidencia completa', loading: false });
+      throw error;
+    }
+  },
+
+  // Crear incidencia
   crearIncidencia: async (incidenciaData) => {
     set({ loading: true, error: null });
     try {
@@ -56,12 +69,11 @@ export const useIncidenciasStore = create((set, get) => ({
     }
   },
 
-  // Cambiar estado de incidencia - CORREGIDO
+  // Cambiar estado de incidencia
   cambiarEstadoIncidencia: async (id, estado) => {
     set({ loading: true, error: null });
     try {
       const response = await incidenciasService.cambiarEstadoIncidencia(id, estado);
-      // ✅ SOLUCIÓN: Actualizar localmente SIN nueva llamada API
       set(state => ({
         incidencias: state.incidencias.map(inc => 
           inc.id === id ? { ...inc, estado } : inc
@@ -75,13 +87,12 @@ export const useIncidenciasStore = create((set, get) => ({
     }
   },
   
-  // ✅ AGREGADO: Actualizar incidencia (título, descripción, etc.)
+  // Actualizar incidencia (título, descripción, etc.)
   actualizarIncidencia: async (id, datosActualizacion) => {
     set({ loading: true, error: null });
     try {
       const response = await incidenciasService.actualizarIncidencia(id, datosActualizacion);
       
-      // Actualizar en el estado local
       set(state => ({
         incidencias: state.incidencias.map(inc => 
           inc.id === id ? { ...inc, ...datosActualizacion } : inc
@@ -95,6 +106,154 @@ export const useIncidenciasStore = create((set, get) => ({
       return response;
     } catch (error) {
       set({ error: error.response?.data?.message || 'Error al actualizar incidencia', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Completar incidencia con resumen, fotos y materiales
+  completarIncidencia: async (id, datosCompletar) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await incidenciasService.completarIncidencia(id, datosCompletar);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        incidencias: state.incidencias.map(inc => 
+          inc.id === id ? { 
+            ...inc, 
+            estado: 'resuelto',
+            fechaResolucion: new Date().toISOString(),
+            ...response.incidencia 
+          } : inc
+        ),
+        incidenciaSeleccionada: state.incidenciaSeleccionada?.id === id 
+          ? { ...state.incidenciaSeleccionada, ...response.incidencia }
+          : state.incidenciaSeleccionada,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al completar incidencia', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Subir fotos a incidencia
+  subirFotosIncidencia: async (id, fotos, tipo) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await incidenciasService.subirFotos(id, fotos, tipo);
+      
+      // Si tenemos la incidencia seleccionada, actualizar sus fotos
+      set(state => ({
+        incidenciaSeleccionada: state.incidenciaSeleccionada?.id === id 
+          ? { 
+              ...state.incidenciaSeleccionada, 
+              fotos: [...(state.incidenciaSeleccionada.fotos || []), ...response.fotos]
+            }
+          : state.incidenciaSeleccionada,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al subir fotos', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Agregar materiales a incidencia
+  agregarMaterialesIncidencia: async (id, materiales) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await incidenciasService.agregarMateriales(id, materiales);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        incidenciaSeleccionada: state.incidenciaSeleccionada?.id === id 
+          ? { 
+              ...state.incidenciaSeleccionada, 
+              materiales: [...(state.incidenciaSeleccionada.materiales || []), ...response.materiales]
+            }
+          : state.incidenciaSeleccionada,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al agregar materiales', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Generar reporte PDF
+  generarReportePDF: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await incidenciasService.generarReportePDF(id);
+      
+      // Crear enlace de descarga
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reporte-incidencia-${id}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      set({ loading: false });
+      return { success: true, message: 'Reporte descargado correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al generar reporte PDF', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Eliminar foto
+  eliminarFoto: async (id, fotoId) => {
+    set({ loading: true, error: null });
+    try {
+      await incidenciasService.eliminarFoto(id, fotoId);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        incidenciaSeleccionada: state.incidenciaSeleccionada?.id === id 
+          ? { 
+              ...state.incidenciaSeleccionada, 
+              fotos: state.incidenciaSeleccionada.fotos?.filter(foto => foto.id !== fotoId) || []
+            }
+          : state.incidenciaSeleccionada,
+        loading: false
+      }));
+      
+      return { success: true, message: 'Foto eliminada correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al eliminar foto', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Eliminar material
+  eliminarMaterial: async (id, materialId) => {
+    set({ loading: true, error: null });
+    try {
+      await incidenciasService.eliminarMaterial(id, materialId);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        incidenciaSeleccionada: state.incidenciaSeleccionada?.id === id 
+          ? { 
+              ...state.incidenciaSeleccionada, 
+              materiales: state.incidenciaSeleccionada.materiales?.filter(mat => mat.id !== materialId) || []
+            }
+          : state.incidenciaSeleccionada,
+        loading: false
+      }));
+      
+      return { success: true, message: 'Material eliminado correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al eliminar material', loading: false });
       throw error;
     }
   },
@@ -114,4 +273,16 @@ export const useIncidenciasStore = create((set, get) => ({
 
   // Limpiar incidencia seleccionada
   limpiarIncidenciaSeleccionada: () => set({ incidenciaSeleccionada: null }),
+
+  // ✅ NUEVO: Limpiar errores
+  limpiarError: () => set({ error: null }),
+
+  // ✅ NUEVO: Actualizar incidencia en lista
+  actualizarIncidenciaEnLista: (id, datosActualizados) => {
+    set(state => ({
+      incidencias: state.incidencias.map(inc => 
+        inc.id === id ? { ...inc, ...datosActualizados } : inc
+      )
+    }));
+  }
 }));

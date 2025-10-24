@@ -10,7 +10,8 @@ export default function Incidencias() {
     loading, 
     error, 
     obtenerIncidencias, 
-    cambiarEstadoIncidencia
+    cambiarEstadoIncidencia,
+    limpiarError
   } = useIncidenciasStore();
   
   const { user } = useAuthStore();
@@ -20,6 +21,7 @@ export default function Incidencias() {
   const [filtroEstado, setFiltroEstado] = useState('todos');
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [successMessage, setSuccessMessage] = useState('');
 
   // Carga inicial optimizada
   useEffect(() => {
@@ -33,6 +35,17 @@ export default function Incidencias() {
     
     cargarDatos();
   }, [obtenerIncidencias]);
+
+  // Limpiar mensajes después de un tiempo
+  useEffect(() => {
+    if (error || successMessage) {
+      const timer = setTimeout(() => {
+        if (error) limpiarError();
+        if (successMessage) setSuccessMessage('');
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, successMessage, limpiarError]);
 
   // Handlers optimizados con useCallback
   const handleNuevaIncidencia = useCallback(() => {
@@ -53,6 +66,7 @@ export default function Incidencias() {
   const handleCambiarEstado = useCallback(async (id, nuevoEstado) => {
     try {
       await cambiarEstadoIncidencia(id, nuevoEstado);
+      setSuccessMessage(`Estado cambiado a ${nuevoEstado} correctamente`);
     } catch (error) {
       console.error('Error al cambiar estado:', error);
     }
@@ -63,6 +77,7 @@ export default function Incidencias() {
     setRefreshing(true);
     try {
       await obtenerIncidencias(50);
+      setSuccessMessage('Datos actualizados correctamente');
     } catch (error) {
       console.error('Error refrescando incidencias:', error);
     } finally {
@@ -101,11 +116,13 @@ export default function Incidencias() {
     setFiltroBusqueda('');
   }, []);
 
-  const puedeGestionar = user?.rol === 'superadmin' ||user?.rol === 'admin' || user?.rol === 'tecnico';
+  const puedeGestionar = user?.rol === 'superadmin' || user?.rol === 'admin' || user?.rol === 'tecnico';
   const hayFiltrosActivos = filtroEstado !== 'todos' || filtroBusqueda !== '';
 
   // Función para exportar incidencias
   const handleExportarIncidencias = useCallback(() => {
+    if (incidenciasFiltradas.length === 0) return;
+
     const datosExportar = incidenciasFiltradas.map(incidencia => ({
       'ID': incidencia.id,
       'Título': incidencia.titulo,
@@ -120,10 +137,12 @@ export default function Incidencias() {
 
     const csv = [
       Object.keys(datosExportar[0]).join(','),
-      ...datosExportar.map(row => Object.values(row).join(','))
+      ...datosExportar.map(row => Object.values(row).map(value => 
+        `"${String(value).replace(/"/g, '""')}"`
+      ).join(','))
     ].join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv' });
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -132,7 +151,16 @@ export default function Incidencias() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }, [incidenciasFiltradas]);
+    
+    setSuccessMessage(`Exportadas ${incidenciasFiltradas.length} incidencias correctamente`);
+  }, [incidenciasFiltrada]);
+
+  // Handler para cuando se guarda una incidencia
+  const handleIncidenciaGuardada = useCallback(() => {
+    handleCerrarModal();
+    obtenerIncidencias(50);
+    setSuccessMessage(incidenciaEditando ? 'Incidencia actualizada correctamente' : 'Incidencia creada correctamente');
+  }, [handleCerrarModal, obtenerIncidencias, incidenciaEditando]);
 
   if (loading && incidencias.length === 0) {
     return (
@@ -247,10 +275,31 @@ export default function Incidencias() {
             <p className="text-xs sm:text-sm text-red-600 truncate">{error}</p>
           </div>
           <button
-            onClick={handleRefresh}
+            onClick={() => limpiarError()}
             className="text-red-700 hover:text-red-800 font-medium text-xs sm:text-sm flex-shrink-0"
           >
-            Reintentar
+            Cerrar
+          </button>
+        </div>
+      )}
+
+      {/* Mensaje de Éxito */}
+      {successMessage && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 sm:px-6 py-3 sm:py-4 rounded-xl sm:rounded-2xl flex items-center gap-2 sm:gap-3 shadow-sm">
+          <div className="w-5 h-5 sm:w-6 sm:h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <svg className="w-3 h-3 sm:w-4 sm:h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-medium text-sm sm:text-base">¡Éxito!</p>
+            <p className="text-xs sm:text-sm text-green-600 truncate">{successMessage}</p>
+          </div>
+          <button
+            onClick={() => setSuccessMessage('')}
+            className="text-green-700 hover:text-green-800 font-medium text-xs sm:text-sm flex-shrink-0"
+          >
+            Cerrar
           </button>
         </div>
       )}
@@ -416,7 +465,7 @@ export default function Incidencias() {
           incidencias={incidenciasFiltradas}
           onEditarIncidencia={handleEditarIncidencia}
           onCambiarEstado={handleCambiarEstado}
-          loading={loading}
+          loading={loading && incidencias.length > 0}
           puedeGestionar={puedeGestionar}
         />
       </div>
@@ -473,10 +522,7 @@ export default function Incidencias() {
         isOpen={showModal}
         onClose={handleCerrarModal}
         incidencia={incidenciaEditando}
-        onIncidenciaGuardada={() => {
-          handleCerrarModal();
-          obtenerIncidencias(50);
-        }}
+        onIncidenciaGuardada={handleIncidenciaGuardada}
       />
 
       {/* Debug Info - Solo en desarrollo */}
@@ -487,6 +533,7 @@ export default function Incidencias() {
             <p>Incidencias: {incidenciasFiltradas.length} filtradas de {incidencias.length} totales</p>
             <p>Usuario: {user?.nombre} ({user?.rol})</p>
             <p>Filtros: estado="{filtroEstado}", búsqueda="{filtroBusqueda}"</p>
+            <p>Puede gestionar: {puedeGestionar ? 'Sí' : 'No'}</p>
           </div>
         </div>
       )}

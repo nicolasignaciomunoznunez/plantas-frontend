@@ -45,7 +45,7 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
   const estadoActual = estados[incidencia.estado] || estados.pendiente;
 
   const handleCambioEstado = async (nuevoEstado) => {
-    if (!onCambiarEstado) return;
+    if (!onCambiarEstado || nuevoEstado === incidencia.estado) return;
     
     setCambiandoEstado(true);
     try {
@@ -61,11 +61,31 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
 
   const getRolBadgeColor = () => {
     switch (user?.rol) {
+      case 'superadmin': return 'bg-purple-100 text-purple-700 border-purple-200';
       case 'admin': return 'bg-red-100 text-red-700 border-red-200';
       case 'tecnico': return 'bg-blue-100 text-blue-700 border-blue-200';
       case 'cliente': return 'bg-green-100 text-green-700 border-green-200';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
     }
+  };
+
+  const getPrioridadColor = () => {
+    switch (incidencia.prioridad) {
+      case 'critica': return 'bg-red-100 text-red-700 border-red-200';
+      case 'alta': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'media': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'baja': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-gray-100 text-gray-700 border-gray-200';
+    }
+  };
+
+  const formatFecha = (fecha) => {
+    if (!fecha) return 'N/A';
+    return new Date(fecha).toLocaleDateString('es-ES', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   };
 
   return (
@@ -74,7 +94,7 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
     }`}>
       {/* Header con información de estado y acciones - RESPONSIVE */}
       <div className="flex justify-between items-start mb-3 sm:mb-4">
-        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0 flex-wrap">
           <span className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border ${estadoActual.color} flex-shrink-0`}>
             {estadoActual.icon}
             <span className="hidden xs:inline">{estadoActual.label}</span>
@@ -83,6 +103,16 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
                estadoActual.label === 'En Progreso' ? 'En Prog.' : 'Resuelto'}
             </span>
           </span>
+          
+          {incidencia.prioridad && (
+            <span className={`inline-flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium border ${getPrioridadColor()} flex-shrink-0`}>
+              <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="capitalize">{incidencia.prioridad}</span>
+            </span>
+          )}
+          
           <span className="text-xs text-gray-500 font-mono bg-gray-50 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded hidden sm:block">
             #{incidencia.id}
           </span>
@@ -91,7 +121,7 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
         {puedeEditar && (
           <div className="flex space-x-1 flex-shrink-0 ml-2">
             <button
-              onClick={onEditar}
+              onClick={() => onEditar(incidencia)}
               className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 group/btn"
               title="Editar incidencia"
               disabled={actualizando}
@@ -127,7 +157,7 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
           <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <span className="truncate">Reportada: {new Date(incidencia.fechaReporte).toLocaleDateString()}</span>
+          <span className="truncate">{formatFecha(incidencia.fechaReporte)}</span>
         </div>
 
         {incidencia.fechaResolucion && (
@@ -135,10 +165,32 @@ export default function TarjetaIncidencia({ incidencia, onEditar, onCambiarEstad
             <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span className="truncate">Resuelta: {new Date(incidencia.fechaResolucion).toLocaleDateString()}</span>
+            <span className="truncate">{formatFecha(incidencia.fechaResolucion)}</span>
           </div>
         )}
       </div>
+
+      {/* Información adicional si está disponible */}
+      {(incidencia.reportadoPor || incidencia.resueltoPor) && (
+        <div className="flex flex-wrap gap-2 sm:gap-3 text-xs text-gray-500 mb-3 sm:mb-4">
+          {incidencia.reportadoPor && (
+            <div className="flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <span>Reportado por: {incidencia.reportadoPor}</span>
+            </div>
+          )}
+          {incidencia.resueltoPor && (
+            <div className="flex items-center gap-1.5">
+              <svg className="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              <span>Resuelto por: {incidencia.resueltoPor}</span>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Footer con información de usuario y controles - RESPONSIVE */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 pt-3 sm:pt-4 border-t border-gray-100">
