@@ -10,7 +10,7 @@ export default function TarjetaIncidencia({
   actualizando = false 
 }) {
   const { user } = useAuthStore();
-  const { generarReportePDFDirecto } = useIncidenciasStore(); // ✅ NUEVO STORE
+ const { generarReportePDF } = useIncidenciasStore();
   const [cambiandoEstado, setCambiandoEstado] = useState(false);
   const [descargandoPDF, setDescargandoPDF] = useState(false); // ✅ NUEVO ESTADO
 
@@ -54,18 +54,18 @@ export default function TarjetaIncidencia({
   const estadoActual = estados[incidencia.estado] || estados.pendiente;
 
   // ✅ NUEVA FUNCIÓN: Descargar PDF
-  const handleDescargarPDF = async () => {
+const handleDescargarPDF = async () => {
     if (descargandoPDF) return;
     
     setDescargandoPDF(true);
     try {
-      await generarReportePDFDirecto(incidencia.id);
+        await generarReportePDF(incidencia.id); // ✅ Usa la función correcta
     } catch (error) {
-      console.error('Error al descargar PDF:', error);
+        console.error('Error al descargar PDF:', error);
     } finally {
-      setDescargandoPDF(false);
+        setDescargandoPDF(false);
     }
-  };
+};
 
   const handleCambioEstado = async (nuevoEstado) => {
     if (!onCambiarEstado || nuevoEstado === incidencia.estado) return;

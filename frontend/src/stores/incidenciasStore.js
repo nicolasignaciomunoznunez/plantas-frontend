@@ -211,44 +211,7 @@ export const useIncidenciasStore = create((set, get) => ({
   },
 
   // ✅ NUEVO: Generar reporte PDF (método directo con fetch)
-  generarReportePDFDirecto: async (incidenciaId) => {
-    set({ loading: true, error: null });
-    try {
-      console.log('📄 Generando PDF para incidencia:', incidenciaId);
-      
-      // Hacer request para generar PDF
-      const response = await fetch(`/api/incidencias/${incidenciaId}/reporte-pdf`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`,
-        },
-      });
 
-      if (!response.ok) {
-        throw new Error('Error al generar el PDF');
-      }
-
-      // Crear blob y descargar
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `reporte-incidencia-${incidenciaId}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      window.URL.revokeObjectURL(url);
-      
-      set({ loading: false });
-      console.log('✅ PDF descargado exitosamente');
-      return { success: true, message: 'PDF descargado correctamente' };
-      
-    } catch (error) {
-      console.error('❌ Error al descargar PDF:', error);
-      set({ error: error.message || 'Error al descargar el PDF', loading: false });
-      throw error;
-    }
-  },
 
   // ✅ NUEVO: Eliminar foto
   eliminarFoto: async (id, fotoId) => {
