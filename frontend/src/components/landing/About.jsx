@@ -33,7 +33,6 @@ const About = () => {
   ];
 
   
-
   return (
     <section id="nosotros" className="py-16 lg:py-24 bg-gradient-light relative overflow-hidden">
       {/* Elementos decorativos de fondo mejorados */}

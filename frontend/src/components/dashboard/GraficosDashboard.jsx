@@ -46,15 +46,15 @@ const GRAFICO_CONFIG = {
   }
 };
 
-// 🎯 Hook personalizado para datos de gráficos - CORREGIDO CON ESTRUCTURA REAL
-const useDatosGraficos = ({ datos, incidencias }) => {
-  // ✅ Datos de rendimiento memoizados
+// 🎯 Hook personalizado para datos de gráficos - CORREGIDO
+const useDatosGraficos = ({ metricas, plantas, incidencias }) => {
+  // ✅ Datos de rendimiento memoizados - CORREGIDO: usar plantas directo
   const datosRendimientoReales = useMemo(() => 
-    datos?.plantas || [], 
-    [datos?.plantas]
+    plantas || [], 
+    [plantas]
   );
 
-  // ✅ Datos de incidencias por día - CORREGIDO CON ESTRUCTURA REAL
+  // ✅ Datos de incidencias por día - CORREGIDO
   const datosIncidenciasReales = useMemo(() => {
     const dias = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
     
@@ -75,33 +75,28 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     
     console.log('🔍 DEBUG - Procesando incidencias:', incidencias);
     
-    // Procesar cada incidencia - CORREGIDO: usar estructura real de BD
+    // Procesar cada incidencia
     incidencias.forEach(incidencia => {
       try {
-        // ✅ CORRECCIÓN: Usar fechaReporte que sí existe en tu BD
         let fechaIncidencia;
         if (incidencia.fechaReporte) {
           fechaIncidencia = new Date(incidencia.fechaReporte);
         } else {
-          // Si no hay fechaReporte, usar fecha actual como fallback
           fechaIncidencia = new Date();
         }
         
-        // Validar fecha
         if (isNaN(fechaIncidencia.getTime())) {
           console.warn('Fecha inválida para incidencia:', incidencia.id, incidencia.fechaReporte);
-          fechaIncidencia = new Date(); // Fallback a fecha actual
+          fechaIncidencia = new Date();
         }
         
-        // Solo incluir incidencias de la última semana
         const unaSemanaAtras = new Date();
         unaSemanaAtras.setDate(unaSemanaAtras.getDate() - 7);
         
         if (fechaIncidencia >= unaSemanaAtras) {
-          const diaSemana = fechaIncidencia.getDay(); // 0=Domingo, 1=Lunes...
-          const index = diaSemana === 0 ? 6 : diaSemana - 1; // Ajustar para Lunes=0
+          const diaSemana = fechaIncidencia.getDay();
+          const index = diaSemana === 0 ? 6 : diaSemana - 1;
           
-          // ✅ CORRECCIÓN: Usar el campo 'estado' que sí existe en tu BD
           switch(incidencia.estado) {
             case 'pendiente':
               pendientesPorDia[index]++;
@@ -114,7 +109,6 @@ const useDatosGraficos = ({ datos, incidencias }) => {
               break;
             default:
               console.warn('Estado no reconocido:', incidencia.estado, 'en incidencia:', incidencia.id);
-              // Contar como pendiente por defecto
               pendientesPorDia[index]++;
           }
         }
@@ -152,7 +146,6 @@ const useDatosGraficos = ({ datos, incidencias }) => {
     
     const maxValor = Math.max(...todosLosValores);
     
-    // Escala adaptativa
     if (maxValor <= 2) return 2;
     if (maxValor <= 5) return 5;
     
@@ -199,7 +192,7 @@ const BarraProgreso = ({
   );
 };
 
-// 🎯 Componente de Tarjeta de Métrica - CORREGIDO PARA MÓVIL
+// 🎯 Componente de Tarjeta de Métrica
 const TarjetaMetrica = ({ titulo, valor, subtitulo, color = 'primary', icono }) => (
   <div className={clsx(
     'rounded-xl p-3 sm:p-4 text-center transition-all duration-200 hover:shadow-medium min-w-0',
@@ -219,58 +212,62 @@ const TarjetaMetrica = ({ titulo, valor, subtitulo, color = 'primary', icono }) 
   </div>
 );
 
-export default function GraficosDashboard({ datos, plantas, incidencias, metricasReales }) {
+// ✅ COMPONENTE PRINCIPAL CORREGIDO
+export default function GraficosDashboard({ datosCompletos }) {
   const [tipoGrafico, setTipoGrafico] = useState('rendimiento');
   
+  // ✅ EXTRAER DATOS de datosCompletos (CORRECCIÓN CRÍTICA)
+  const metricas = datosCompletos?.metricas;
+  const plantas = datosCompletos?.plantas;
+  const incidencias = datosCompletos?.incidenciasRecientes;
+
   // ✅ DEBUG: Ver datos que llegan
-  console.log('🔍 DEBUG - Datos recibidos en GraficosDashboard:', {
+  console.log('🔍 DEBUG - DatosCompletos recibidos:', {
+    tieneMetricas: !!metricas,
+    tienePlantas: !!plantas,
+    tieneIncidencias: !!incidencias,
+    metricasEstructura: metricas ? Object.keys(metricas) : 'No hay métricas',
+    plantasCount: plantas?.length,
     incidenciasCount: incidencias?.length,
-    primeraIncidencia: incidencias?.[0],
-    datos,
-    plantasCount: plantas?.length
+    metricasValores: metricas ? {
+      totalPlantas: metricas.totalPlantas,
+      plantasConIncidencias: metricas.plantasConIncidencias,
+      plantasOperativas: metricas.plantasOperativas
+    } : 'No hay métricas'
   });
 
-  // ✅ Usar hook personalizado para datos
+  // ✅ Usar hook CORREGIDO
   const { 
     datosRendimientoReales, 
     datosIncidenciasReales, 
     maxIncidencias 
-  } = useDatosGraficos({ datos, incidencias });
+  } = useDatosGraficos({ metricas, plantas, incidencias });
 
-  // ✅ DEBUG: Ver datos procesados
-  console.log('🔍 DEBUG - Datos procesados:', {
-    datosIncidenciasReales,
-    maxIncidencias,
-    datosRendimientoReales
-  });
-
-  // ✅ Handlers optimizados con useCallback
+  // ✅ Handlers optimizados
   const handleCambiarGrafico = useCallback((tipo) => {
     setTipoGrafico(tipo);
   }, []);
 
-  // ✅ Calcular métricas resumen
+  // ✅ Calcular métricas resumen CORREGIDO
   const metricasResumen = useMemo(() => ({
-    pendientes: incidencias?.filter(i => i.estado === 'pendiente').length || 0,
-    enProgreso: incidencias?.filter(i => i.estado === 'en_progreso').length || 0,
-    resueltas: incidencias?.filter(i => i.estado === 'resuelto').length || 0,
-    totalPlantas: datosRendimientoReales.length
-  }), [incidencias, datosRendimientoReales]);
+    pendientes: metricas?.incidencias?.pendientes || 0,
+    enProgreso: metricas?.incidencias?.enProgreso || 0,
+    resueltas: metricas?.incidencias?.resueltas || 0,
+    totalPlantas: metricas?.totalPlantas || 0
+  }), [metricas]);
 
-  // ✅ FUNCIÓN CORREGIDA: Calcular altura de barras - GARANTIZADA VISIBLE
+  // ✅ FUNCIÓN CORREGIDA: Calcular altura de barras
   const calcularAlturaBarra = (valor) => {
     if (valor === 0) return '8px';
     
-    // Para valores 1-2, usar alturas fijas y visibles
     if (maxIncidencias <= 2) {
       const alturas = {
-        1: '60%',   // 1 incidencia = 60% de altura
-        2: '90%'    // 2 incidencias = 90% de altura
+        1: '60%',
+        2: '90%'
       };
       return alturas[valor] || '70%';
     }
     
-    // Para más valores, escala normal
     const porcentaje = (valor / maxIncidencias) * 80 + 20;
     return `${Math.min(porcentaje, 100)}%`;
   };
@@ -282,11 +279,9 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
       <div>
         <h4 className="text-sm font-medium text-secondary-700 mb-4 font-sans">
           Tasa de Resolución de Incidencias
-          {metricasReales && (
-            <span className="text-xs text-secondary-500 ml-2 hidden sm:inline">
-              (Promedio del sistema)
-            </span>
-          )}
+          <span className="text-xs text-secondary-500 ml-2 hidden sm:inline">
+            (Promedio del sistema)
+          </span>
         </h4>
         <div className="space-y-4">
           {datosRendimientoReales.length > 0 ? (
@@ -330,15 +325,15 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
               <div key={planta.id || index} className="text-center group">
                 <div className={clsx(
                   'relative h-20 sm:h-24 rounded-xl border-2 transition-all duration-300 group-hover:scale-105',
-                  GRAFICO_CONFIG.colores[planta.estadoGeneral]?.bg || 'bg-secondary-50 border-secondary-200'
+                  GRAFICO_CONFIG.colores[planta.estados?.planta]?.bg || 'bg-secondary-50 border-secondary-200'
                 )}>
                   <div className="absolute inset-0 flex items-center justify-center p-2">
                     <div>
                       <div className={clsx(
                         'text-lg sm:text-xl font-bold font-heading',
-                        GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
+                        GRAFICO_CONFIG.colores[planta.estados?.planta]?.text || 'text-secondary-600'
                       )}>
-                        {planta.incidenciasActivas || 0}
+                        {planta.estados?.incidenciasPendientes || 0}
                       </div>
                       <div className="text-xs text-secondary-500 mt-1 hidden sm:block">
                         Activas
@@ -347,16 +342,16 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                   </div>
                 </div>
                 <div className="mt-2 space-y-1">
-                 <div className="text-xs text-secondary-600 truncate px-1" title={planta.nombre || 'Planta'}>
-  {planta.nombre || 'Planta'}
-</div>
+                  <div className="text-xs text-secondary-600 truncate px-1" title={planta.nombre || 'Planta'}>
+                    {planta.nombre || 'Planta'}
+                  </div>
                   <div className={clsx(
                     'text-xs font-semibold',
-                    GRAFICO_CONFIG.colores[planta.estadoGeneral]?.text || 'text-secondary-600'
+                    GRAFICO_CONFIG.colores[planta.estados?.planta]?.text || 'text-secondary-600'
                   )}>
-                    {planta.estadoGeneral === 'optimal' ? 'Óptimo' :
-                     planta.estadoGeneral === 'attention' ? 'Atención' :
-                     planta.estadoGeneral === 'critical' ? 'Crítico' : 'Estable'}
+                    {planta.estados?.planta === 'optimal' ? 'Óptimo' :
+                     planta.estados?.planta === 'attention' ? 'Atención' :
+                     planta.estados?.planta === 'critical' ? 'Crítico' : 'Estable'}
                   </div>
                 </div>
               </div>
@@ -393,10 +388,7 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
           </div>
         ) : (
           <>
-       
-       
-
-            {/* Contenedor del gráfico con scroll horizontal en móvil */}
+            {/* Contenedor del gráfico */}
             <div className="overflow-x-auto pb-4 -mx-2 px-2">
               <div className="min-w-max flex items-end justify-between h-40 sm:h-48 px-2 sm:px-4 border-b border-l border-secondary-200 mb-2 relative">
                 {/* Líneas de guía horizontales */}
@@ -424,27 +416,26 @@ export default function GraficosDashboard({ datos, plantas, incidencias, metrica
                         const altura = calcularAlturaBarra(valor);
                         
                         return (
-                       <div
-  key={tipo}
-  className="w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative border border-gray-300 shadow-md"
-  style={{
-    height: calcularAlturaBarra(valor),
-    minHeight: '20px', // ✅ Más alto para mejor visibilidad
-    opacity: valor > 0 ? 1 : 0,
-    // ✅ COLORES SÓLIDOS GARANTIZADOS
-    backgroundColor: 
-      tipo === 'pendientes' ? '#ef4444' : // Rojo
-      tipo === 'enProgreso' ? '#3b82f6' : // Azul  
-      '#10b981' // Verde
-  }}
-  title={`${valor} ${label}`}
->
-  {valor > 0 && (
-    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-100 whitespace-nowrap pointer-events-none z-20 font-bold">
-      {valor}
-    </div>
-  )}
-</div>
+                          <div
+                            key={tipo}
+                            className="w-3 sm:w-4 rounded-t transition-all duration-500 hover:opacity-80 cursor-help relative border border-gray-300 shadow-md"
+                            style={{
+                              height: calcularAlturaBarra(valor),
+                              minHeight: '20px',
+                              opacity: valor > 0 ? 1 : 0,
+                              backgroundColor: 
+                                tipo === 'pendientes' ? '#ef4444' :
+                                tipo === 'enProgreso' ? '#3b82f6' :  
+                                '#10b981'
+                            }}
+                            title={`${valor} ${label}`}
+                          >
+                            {valor > 0 && (
+                              <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-black text-white text-xs px-2 py-1 rounded opacity-100 whitespace-nowrap pointer-events-none z-20 font-bold">
+                                {valor}
+                              </div>
+                            )}
+                          </div>
                         );
                       })}
                     </div>

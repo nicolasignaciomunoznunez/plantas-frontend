@@ -341,12 +341,9 @@ export default function Dashboard() {
           {/* COLUMNA PRINCIPAL */}
           <div className="xl:col-span-2 space-y-6">
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-scale-in">
-              <GraficosDashboard 
-                datos={{ plantas: datosOptimizados.graficos.plantas }}
-                plantas={datosOptimizados.graficos.plantas}
-                incidencias={datosCompletos?.incidenciasRecientes || []}
-                metricasReales={datosOptimizados.graficos.metricasReales}
-              />
+             
+              <GraficosDashboard datosCompletos={datosCompletos} />
+            
             </div>
             
             <div className="bg-white rounded-2xl p-6 shadow-soft border border-secondary-100 animate-fade-in-up">
