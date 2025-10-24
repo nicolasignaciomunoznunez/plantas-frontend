@@ -223,8 +223,8 @@ const FormularioMateriales = ({ onMaterialesChange, materialesIniciales = [] }) 
   );
 };
 
-// 🎯 MODAL PRINCIPAL
-export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPreSeleccionada, modoCompletar = false }) {
+// 🎯 MODAL PRINCIPAL CORREGIDO
+export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPreSeleccionada, modoCompletar = false, onIncidenciaGuardada }) {
   const { 
     crearIncidencia, 
     actualizarIncidencia,
@@ -253,7 +253,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
   });
   const [errors, setErrors] = useState({});
 
-  // ✅ Cargar plantas según el rol del usuario
+  // ✅ Cargar plantas según el rol del usuario - CORREGIDO
   useEffect(() => {
     const cargarPlantasPermitidas = async () => {
       if (!isOpen || !user) return;
@@ -261,60 +261,51 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
       setCargandoPlantas(true);
       try {
         if (user.rol === 'cliente') {
-          // Para cliente: obtener solo sus plantas asignadas
           console.log('🔍 Cargando plantas para cliente:', user.id);
           const plantasCliente = await obtenerPlantasPorCliente(user.id);
-          setPlantasPermitidas(plantasCliente);
-          console.log('📊 Plantas del cliente:', plantasCliente);
+          console.log('📊 Plantas del cliente cargadas:', plantasCliente);
+          setPlantasPermitidas(plantasCliente || []);
           
           // Si solo tiene una planta, seleccionarla automáticamente
-          if (plantasCliente.length === 1 && !plantaPreSeleccionada) {
+          if (plantasCliente && plantasCliente.length === 1 && !plantaPreSeleccionada && !incidencia) {
             setFormData(prev => ({ ...prev, plantId: plantasCliente[0].id }));
+            console.log('✅ Planta auto-seleccionada:', plantasCliente[0].id);
           }
         } else {
-          // Para admin/superadmin/tecnico: cargar todas las plantas
           console.log('🔍 Cargando todas las plantas para:', user.rol);
-          await obtenerPlantas(50);
+          await obtenerPlantas(100); // Aumentar límite para asegurar todas las plantas
+          console.log('📊 Todas las plantas cargadas:', plantas);
           setPlantasPermitidas(plantas);
         }
       } catch (error) {
         console.error('❌ Error cargando plantas:', error);
-        // Fallback: usar plantas ya cargadas
-        setPlantasPermitidas(plantas);
+        setPlantasPermitidas([]);
       } finally {
         setCargandoPlantas(false);
       }
     };
 
     cargarPlantasPermitidas();
-  }, [isOpen, user]);
+  }, [isOpen, user, obtenerPlantas, obtenerPlantasPorCliente]);
 
-  // ✅ Actualizar plantasPermitidas cuando cambian las plantas (para roles no-cliente)
-  useEffect(() => {
-    if (user?.rol !== 'cliente' && plantas.length > 0) {
-      setPlantasPermitidas(plantas);
-    }
-  }, [plantas, user]);
-
-  // ✅ Cargar datos existentes si estamos en modo completar
-  useEffect(() => {
-    if (modoCompletar && incidencia) {
-      // Cargar fotos y materiales existentes de la incidencia
-      setResumenTrabajo(incidencia.resumenTrabajo || '');
-      setMateriales(incidencia.materiales || []);
-      // Las fotos se cargarían desde la API
-    }
-  }, [modoCompletar, incidencia]);
-
+  // ✅ Cargar datos de la incidencia existente
   useEffect(() => {
     if (incidencia) {
+      console.log('📝 Cargando datos de incidencia existente:', incidencia);
       setFormData({
         plantId: incidencia.plantId || '',
         titulo: incidencia.titulo || '',
         descripcion: incidencia.descripcion || '',
         estado: incidencia.estado || 'pendiente'
       });
+
+      // Cargar datos adicionales si estamos en modo completar
+      if (modoCompletar) {
+        setResumenTrabajo(incidencia.resumenTrabajo || '');
+        setMateriales(incidencia.materiales || []);
+      }
     } else {
+      // Nueva incidencia
       setFormData({
         plantId: plantaPreSeleccionada || '',
         titulo: '',
@@ -323,7 +314,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
       });
     }
     setErrors({});
-  }, [incidencia, plantaPreSeleccionada, isOpen]);
+  }, [incidencia, plantaPreSeleccionada, modoCompletar]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -394,21 +385,26 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
     }
 
     try {
+      let resultado;
+
       if (modoCompletar && incidencia) {
         // ✅ COMPLETAR INCIDENCIA CON FOTOS Y MATERIALES
-        await completarIncidencia(incidencia.id, {
+        console.log('🔄 Completando incidencia:', incidencia.id);
+        resultado = await completarIncidencia(incidencia.id, {
           resumenTrabajo,
           materiales
         });
 
         // ✅ SUBIR FOTOS DESPUÉS si existen
         if (fotosDespues.length > 0) {
+          console.log('📸 Subiendo fotos después:', fotosDespues.length);
           await subirFotosIncidencia(incidencia.id, fotosDespues, 'despues');
         }
 
       } else if (incidencia) {
         // Edición normal
-        await actualizarIncidencia(incidencia.id, {
+        console.log('✏️ Editando incidencia:', incidencia.id);
+        resultado = await actualizarIncidencia(incidencia.id, {
           titulo: formData.titulo,
           descripcion: formData.descripcion,
           plantId: formData.plantId,
@@ -416,21 +412,33 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
         });
       } else {
         // Nueva incidencia
-        const nuevaIncidencia = await crearIncidencia(formData);
+        console.log('🆕 Creando nueva incidencia');
+        resultado = await crearIncidencia(formData);
         
         // ✅ SUBIR FOTOS ANTES si existen
-        if (fotosAntes.length > 0) {
-          await subirFotosIncidencia(nuevaIncidencia.id, fotosAntes, 'antes');
+        if (fotosAntes.length > 0 && resultado?.incidencia?.id) {
+          console.log('📸 Subiendo fotos antes:', fotosAntes.length);
+          await subirFotosIncidencia(resultado.incidencia.id, fotosAntes, 'antes');
         }
       }
       
+      console.log('✅ Incidencia guardada exitosamente');
+      if (onIncidenciaGuardada) {
+        onIncidenciaGuardada();
+      }
       onClose();
     } catch (error) {
-      console.error('Error al guardar incidencia:', error);
+      console.error('❌ Error al guardar incidencia:', error);
     }
   };
 
   const handleClose = () => {
+    // Limpiar estados al cerrar
+    setFotosAntes([]);
+    setFotosDespues([]);
+    setMateriales([]);
+    setResumenTrabajo('');
+    setErrors({});
     onClose();
   };
 
@@ -444,6 +452,9 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
     en_progreso: { label: 'En Progreso', color: 'text-blue-600 bg-blue-50 border-blue-200' },
     resuelto: { label: 'Resuelto', color: 'text-green-600 bg-green-50 border-green-200' }
   };
+
+  // Obtener nombre de la planta seleccionada para mostrar
+  const plantaSeleccionada = plantasPermitidas.find(p => p.id === formData.plantId);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-2 sm:p-4 z-50 backdrop-blur-sm">
@@ -500,7 +511,7 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
             </div>
           )}
 
-          {/* Campo Planta */}
+          {/* Campo Planta - MEJORADO */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
               Planta *
@@ -508,7 +519,13 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
             
             {cargandoPlantas ? (
               <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 rounded-lg sm:rounded-xl text-gray-500 text-sm sm:text-base text-center">
-                Cargando plantas...
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Cargando plantas...
+                </div>
               </div>
             ) : user?.rol === 'cliente' && plantasPermitidas.length === 0 ? (
               <div className="px-3 sm:px-4 py-2 sm:py-3 bg-yellow-50 border border-yellow-200 rounded-lg sm:rounded-xl text-yellow-700 text-sm sm:text-base">
@@ -516,8 +533,9 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
               </div>
             ) : user?.rol === 'cliente' && plantasPermitidas.length === 1 ? (
               <div>
-                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-gray-100 rounded-lg sm:rounded-xl text-gray-700 text-sm sm:text-base">
-                  {plantasPermitidas[0]?.nombre} - {plantasPermitidas[0]?.ubicacion}
+                <div className="px-3 sm:px-4 py-2 sm:py-3 bg-blue-50 border border-blue-200 rounded-lg sm:rounded-xl text-blue-700 text-sm sm:text-base">
+                  <div className="font-medium">{plantasPermitidas[0]?.nombre}</div>
+                  <div className="text-xs text-blue-600">{plantasPermitidas[0]?.ubicacion}</div>
                 </div>
                 <input 
                   type="hidden" 
@@ -525,6 +543,9 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
                   value={plantasPermitidas[0]?.id} 
                   onChange={handleChange}
                 />
+                <p className="text-xs text-blue-600 mt-1">
+                  Esta es tu única planta asignada
+                </p>
               </div>
             ) : (
               <select
@@ -559,8 +580,23 @@ export default function ModalIncidencia({ isOpen, onClose, incidencia, plantaPre
                 {errors.plantId}
               </p>
             )}
+
+            {/* Mostrar información de la planta seleccionada */}
+            {plantaSeleccionada && (
+              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mt-2">
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>
+                    <strong>{plantaSeleccionada.nombre}</strong> - {plantaSeleccionada.ubicacion}
+                  </span>
+                </div>
+              </div>
+            )}
           </div>
 
+          {/* Resto del formulario (mantener igual) */}
           {/* Campo Título */}
           <div className="space-y-2">
             <label htmlFor="titulo" className="block text-sm font-medium text-gray-700">
