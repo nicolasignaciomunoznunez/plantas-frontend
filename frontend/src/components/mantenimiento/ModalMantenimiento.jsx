@@ -448,7 +448,7 @@ export default function ModalMantenimiento({
       
       // ✅ CERRAR MODAL AUTOMÁTICAMENTE después de éxito
       if (onMantenimientoGuardado) {
-        onMantenimientoGuardada();
+        onMantenimientoGuardado();
       }
       handleClose();
       
