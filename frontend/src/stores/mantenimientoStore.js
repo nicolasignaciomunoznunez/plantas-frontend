@@ -137,7 +137,7 @@ completarMantenimiento: async (id, datosCompletar) => {
 subirFotosMantenimiento: async (id, fotos, tipo) => {
     set({ loading: true, error: null });
     try {
-        const response = await mantenimientoService.subirFotos(id, fotos, tipo);
+        const response = await mantenimientoService.subirFotosMantenimiento(id, fotos, tipo);
         
         // Actualizar fotos en el mantenimiento seleccionado
         set(state => ({
