@@ -10,25 +10,29 @@ const SubidaFotos = ({ tipo, onFotosChange, fotosExistentes = [] }) => {
   const [fotos, setFotos] = useState(fotosExistentes);
   const fileInputRef = useRef();
 
-  const handleFileSelect = (event) => {
-    const files = Array.from(event.target.files);
-    const nuevasFotos = files.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      nombre: file.name,
-      tamaño: (file.size / 1024 / 1024).toFixed(2) + ' MB'
-    }));
-    
-    const todasFotos = [...fotos, ...nuevasFotos];
-    setFotos(todasFotos);
-    onFotosChange(todasFotos.map(f => f.file));
-  };
+// En tu componente SubidaFotos - ACTUALIZA la función handleFileSelect
+const handleFileSelect = (event) => {
+  const files = Array.from(event.target.files);
+  const nuevasFotos = files.map(file => ({
+    file, // ✅ Esto es lo importante - mantener la propiedad 'file'
+    preview: URL.createObjectURL(file),
+    nombre: file.name,
+    tamaño: (file.size / 1024 / 1024).toFixed(2) + ' MB'
+  }));
+  
+  const todasFotos = [...fotos, ...nuevasFotos];
+  setFotos(todasFotos);
+  
+  // ✅ Enviar los objetos completos, no solo los files
+  onFotosChange(todasFotos);
+};
 
-  const eliminarFoto = (index) => {
-    const nuevasFotos = fotos.filter((_, i) => i !== index);
-    setFotos(nuevasFotos);
-    onFotosChange(nuevasFotos.map(f => f.file));
-  };
+const eliminarFoto = (index) => {
+  const nuevasFotos = fotos.filter((_, i) => i !== index);
+  setFotos(nuevasFotos);
+  // ✅ Enviar los objetos completos
+  onFotosChange(nuevasFotos);
+};
 
   return (
     <div className="space-y-4">

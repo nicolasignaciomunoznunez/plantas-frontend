@@ -69,13 +69,31 @@ completarMantenimiento: async (id, datosCompletar) => {
     return response.data;
 },
   // ✅ NUEVO: Subir fotos a mantenimiento
-subirFotosMantenimiento: async (id, fotos, tipo) => {
+  subirFotosMantenimiento: async (id, fotos, tipo) => {
     const formData = new FormData();
     formData.append('tipo', tipo);
     
-    fotos.forEach((foto) => {
-        formData.append('fotos', foto.file);
+    console.log('📸 Archivos recibidos para subir:', fotos);
+    
+    // ✅ Manejar diferentes formatos de entrada
+    fotos.forEach((foto, index) => {
+        if (foto instanceof File) {
+            // Si es directamente un File object
+            formData.append('fotos', foto);
+        } else if (foto.file && foto.file instanceof File) {
+            // Si es un objeto con propiedad 'file'
+            formData.append('fotos', foto.file);
+        } else {
+            console.warn('❌ Formato de archivo no válido:', foto);
+        }
     });
+
+    // ✅ Verificar que hay archivos antes de enviar
+    if (formData.getAll('fotos').length === 0) {
+        throw new Error('No hay archivos válidos para subir');
+    }
+
+    console.log('📤 Enviando archivos al servidor:', formData.getAll('fotos').length);
 
     const response = await api.post(`/api/mantenimientos/${id}/fotos`, formData, {
         headers: {
@@ -84,6 +102,10 @@ subirFotosMantenimiento: async (id, fotos, tipo) => {
     });
     return response.data;
 },
+
+
+
+
   // ✅ NUEVO: Agregar materiales a mantenimiento
   agregarMateriales: async (id, materiales) => {
     const response = await api.post(`/api/mantenimientos/${id}/materiales`, { materiales });
