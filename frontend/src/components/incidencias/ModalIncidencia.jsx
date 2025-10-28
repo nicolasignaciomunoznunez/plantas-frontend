@@ -3,7 +3,7 @@ import { useIncidenciasStore } from '../../stores/incidenciasStore';
 import { usePlantasStore } from '../../stores/plantasStore';
 import { useAuthStore } from '../../stores/authStore';
 import { clsx } from 'clsx';
-import { useIncidenciasStore } from '../../stores/incidenciasStore';
+
 
 // 🎨 Componente de Subida de Fotos
 const SubidaFotos = ({ tipo, onFotosChange, fotosExistentes = [] }) => {
