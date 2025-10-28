@@ -19,15 +19,19 @@ export const mantenimientoService = {
     return response.data;
   },
 
- crearMantenimiento: async (formData) => {
-    const response = await api.post('/api/mantenimientos', formData, {
+crearMantenimiento: async (data) => {
+    // Determinar si es FormData o objeto normal
+    const isFormData = data instanceof FormData;
+    
+    const config = isFormData ? {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
-    });
+    } : {};
+
+    const response = await api.post('/api/mantenimientos', data, config);
     return response.data;
 },
-
   actualizarMantenimiento: async (id, mantenimientoData) => {
     const response = await api.put(`/api/mantenimientos/${id}`, mantenimientoData);
     return response.data;

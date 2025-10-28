@@ -374,7 +374,7 @@ export default function ModalMantenimiento({
   };
 
   // ✅ MANEJADOR DE SUBMIT ACTUALIZADO
- const handleSubmit = async (e) => {
+const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
@@ -429,7 +429,6 @@ export default function ModalMantenimiento({
         } else if (mantenimiento && formData.estado === 'en_progreso') {
             // ✅ INICIAR MANTENIMIENTO
             const iniciarFormData = new FormData();
-            iniciarFormData.append('fotosAntes', JSON.stringify([])); // Placeholder
             
             // Agregar fotos antes si existen
             fotosAntes.forEach((foto, index) => {
@@ -438,32 +437,62 @@ export default function ModalMantenimiento({
                 }
             });
 
+            // Si no hay fotos, enviar array vacío
+            if (fotosAntes.length === 0) {
+                iniciarFormData.append('fotosAntes', JSON.stringify([]));
+            }
+
             resultado = await iniciarMantenimiento(mantenimiento.id, iniciarFormData);
             console.log('✅ Mantenimiento iniciado correctamente');
 
         } else if (mantenimiento) {
-            // Edición normal
-            resultado = await actualizarMantenimiento(mantenimiento.id, formData);
+            // ✅ EDICIÓN NORMAL - NO usar FormData, usar JSON normal
+            resultado = await actualizarMantenimiento(mantenimiento.id, {
+                plantId: formData.plantId,
+                tipo: formData.tipo,
+                descripcion: formData.descripcion,
+                fechaProgramada: formData.fechaProgramada,
+                estado: formData.estado
+            });
             console.log('✅ Mantenimiento actualizado correctamente');
             
         } else {
-            // Nuevo mantenimiento
-            const nuevoFormData = new FormData();
-            nuevoFormData.append('plantId', formData.plantId);
-            nuevoFormData.append('tipo', formData.tipo);
-            nuevoFormData.append('descripcion', formData.descripcion);
-            nuevoFormData.append('fechaProgramada', formData.fechaProgramada);
-            nuevoFormData.append('estado', formData.estado);
-            nuevoFormData.append('userId', user?.id);
+            // ✅ NUEVO MANTENIMIENTO - Usar FormData solo si hay fotos
+            const datosMantenimiento = {
+                plantId: formData.plantId,
+                tipo: formData.tipo,
+                descripcion: formData.descripcion,
+                fechaProgramada: formData.fechaProgramada,
+                estado: formData.estado,
+                userId: user?.id
+            };
 
-            // Agregar fotos antes si existen
-            fotosAntes.forEach((foto, index) => {
-                if (foto.file) {
-                    nuevoFormData.append('fotos', foto.file);
-                }
-            });
+            console.log('📤 Creando nuevo mantenimiento con:', datosMantenimiento);
 
-            resultado = await crearMantenimiento(nuevoFormData);
+            // Si hay fotos, usar FormData, sino usar JSON normal
+            if (fotosAntes.length > 0) {
+                const nuevoFormData = new FormData();
+                
+                // ✅ AGREGAR CAMPOS REQUERIDOS COMO STRINGS
+                nuevoFormData.append('plantId', formData.plantId);
+                nuevoFormData.append('tipo', formData.tipo);
+                nuevoFormData.append('descripcion', formData.descripcion);
+                nuevoFormData.append('fechaProgramada', formData.fechaProgramada);
+                nuevoFormData.append('estado', formData.estado);
+                nuevoFormData.append('userId', user?.id);
+
+                // Agregar fotos antes si existen
+                fotosAntes.forEach((foto, index) => {
+                    if (foto.file) {
+                        nuevoFormData.append('fotos', foto.file);
+                    }
+                });
+
+                resultado = await crearMantenimiento(nuevoFormData);
+            } else {
+                // Sin fotos, usar JSON normal
+                resultado = await crearMantenimiento(datosMantenimiento);
+            }
             
             console.log('✅ Mantenimiento creado correctamente');
         }
