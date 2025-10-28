@@ -62,75 +62,76 @@ export const useMantenimientoStore = create((set, get) => ({
     }
   },
 
-  // Crear mantenimiento
-  crearMantenimiento: async (mantenimientoData) => {
-    set({ loading: true, error: null });
-    try {
-      const response = await mantenimientoService.crearMantenimiento(mantenimientoData);
-      const nuevoMantenimiento = response.mantenimiento;
-      set(state => ({
-        mantenimientos: [nuevoMantenimiento, ...state.mantenimientos],
-        loading: false
-      }));
-      return response;
-    } catch (error) {
-      set({ error: error.response?.data?.message || 'Error al crear mantenimiento', loading: false });
-      throw error;
-    }
-  },
+ 
+ 
 
-  // ✅ NUEVO: Iniciar mantenimiento (subir fotos "antes")
-  iniciarMantenimiento: async (id, fotosAntes = []) => {
+  crearMantenimiento: async (formData) => {
     set({ loading: true, error: null });
     try {
-      const response = await mantenimientoService.iniciarMantenimiento(id, fotosAntes);
-      
-      // Actualizar estado del mantenimiento
-      set(state => ({
-        mantenimientos: state.mantenimientos.map(mant => 
-          mant.id === id ? { ...mant, estado: 'en_progreso' } : mant
-        ),
-        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
-          ? { ...state.mantenimientoSeleccionado, estado: 'en_progreso' }
-          : state.mantenimientoSeleccionado,
-        loading: false
-      }));
-      
-      return response;
+        const response = await mantenimientoService.crearMantenimiento(formData);
+        const nuevoMantenimiento = response.mantenimiento;
+        set(state => ({
+            mantenimientos: [nuevoMantenimiento, ...state.mantenimientos],
+            loading: false
+        }));
+        return response;
     } catch (error) {
-      set({ error: error.response?.data?.message || 'Error al iniciar mantenimiento', loading: false });
-      throw error;
+        set({ error: error.response?.data?.message || 'Error al crear mantenimiento', loading: false });
+        throw error;
     }
-  },
+},
 
-  // ✅ NUEVO: Completar mantenimiento con fotos, materiales y checklist
-  completarMantenimiento: async (id, datosCompletar) => {
+iniciarMantenimiento: async (id, formData) => {
     set({ loading: true, error: null });
     try {
-      const response = await mantenimientoService.completarMantenimiento(id, datosCompletar);
-      
-      // Actualizar en el estado local
-      set(state => ({
-        mantenimientos: state.mantenimientos.map(mant => 
-          mant.id === id ? { 
-            ...mant, 
-            estado: 'completado',
-            fechaRealizada: new Date().toISOString(),
-            ...response.mantenimiento 
-          } : mant
-        ),
-        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
-          ? { ...state.mantenimientoSeleccionado, ...response.mantenimiento }
-          : state.mantenimientoSeleccionado,
-        loading: false
-      }));
-      
-      return response;
+        const response = await mantenimientoService.iniciarMantenimiento(id, formData);
+        
+        // Actualizar estado del mantenimiento
+        set(state => ({
+            mantenimientos: state.mantenimientos.map(mant => 
+                mant.id === id ? { ...mant, estado: 'en_progreso' } : mant
+            ),
+            mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+                ? { ...state.mantenimientoSeleccionado, estado: 'en_progreso' }
+                : state.mantenimientoSeleccionado,
+            loading: false
+        }));
+        
+        return response;
     } catch (error) {
-      set({ error: error.response?.data?.message || 'Error al completar mantenimiento', loading: false });
-      throw error;
+        set({ error: error.response?.data?.message || 'Error al iniciar mantenimiento', loading: false });
+        throw error;
     }
-  },
+},
+
+completarMantenimiento: async (id, formData) => {
+    set({ loading: true, error: null });
+    try {
+        const response = await mantenimientoService.completarMantenimiento(id, formData);
+        
+        // Actualizar en el estado local
+        set(state => ({
+            mantenimientos: state.mantenimientos.map(mant => 
+                mant.id === id ? { 
+                    ...mant, 
+                    estado: 'completado',
+                    fechaRealizada: new Date().toISOString(),
+                    ...response.mantenimiento 
+                } : mant
+            ),
+            mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+                ? { ...state.mantenimientoSeleccionado, ...response.mantenimiento }
+                : state.mantenimientoSeleccionado,
+            loading: false
+        }));
+        
+        return response;
+    } catch (error) {
+        set({ error: error.response?.data?.message || 'Error al completar mantenimiento', loading: false });
+        throw error;
+    }
+},
+
 
   // ✅ NUEVO: Subir fotos a mantenimiento
   subirFotosMantenimiento: async (id, fotos, tipo) => {

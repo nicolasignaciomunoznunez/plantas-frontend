@@ -374,92 +374,114 @@ export default function ModalMantenimiento({
   };
 
   // ✅ MANEJADOR DE SUBMIT ACTUALIZADO
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!validateForm()) {
-      return;
+        return;
     }
 
     try {
-      let resultado;
+        let resultado;
 
-      if (modoCompletar && mantenimiento) {
-        console.log('🔄 Completando mantenimiento:', mantenimiento.id);
-        
-        // ✅ COMPLETAR MANTENIMIENTO
-        resultado = await completarMantenimiento(mantenimiento.id, {
-          resumenTrabajo,
-          materiales,
-          fotos: fotosDespues.map(foto => ({
-            tipo: 'despues',
-            datos_imagen: foto,
-            ruta_archivo: foto.name,
-            descripcion: `Foto después - ${foto.name}`
-          }))
-        });
+        if (modoCompletar && mantenimiento) {
+            console.log('🔄 Completando mantenimiento:', mantenimiento.id);
+            
+            // ✅ CREAR FORMDATA PARA ENVIAR FOTOS COMO ARCHIVOS
+            const formData = new FormData();
+            formData.append('resumenTrabajo', resumenTrabajo);
+            formData.append('materiales', JSON.stringify(materiales));
+            formData.append('checklistCompletado', JSON.stringify(checklistCompletado || []));
+            
+            // ✅ AGREGAR FOTOS AL FORMDATA
+            fotosDespues.forEach((foto, index) => {
+                if (foto.file) {
+                    formData.append('fotos', foto.file);
+                }
+            });
 
-        // ✅ OFRECER DESCARGAR PDF INMEDIATAMENTE
-        setTimeout(() => {
-          const descargarPDF = window.confirm(
-            '✅ Mantenimiento completado exitosamente!\n\n' +
-            '¿Deseas descargar el reporte PDF ahora?\n\n' +
-            'El PDF incluirá:\n' +
-            '• Información completa del mantenimiento\n' +
-            '• Fotos antes/después del trabajo\n' +
-            '• Materiales utilizados\n' +
-            '• Resumen del trabajo realizado'
-          );
-          
-          if (descargarPDF) {
-            generarReportePDF(mantenimiento.id);
-          }
-        }, 500);
+            console.log('📤 Enviando FormData con:', {
+                fotosCount: fotosDespues.length,
+                materialesCount: materiales.length,
+                tieneResumen: !!resumenTrabajo
+            });
 
-      } else if (mantenimiento && formData.estado === 'en_progreso') {
-        // ✅ INICIAR MANTENIMIENTO
-        resultado = await iniciarMantenimiento(mantenimiento.id, fotosAntes.map(foto => ({
-          tipo: 'antes',
-          datos_imagen: foto,
-          ruta_archivo: foto.name,
-          descripcion: `Foto antes - ${foto.name}`
-        })));
+            // ✅ COMPLETAR MANTENIMIENTO CON FORMDATA
+            resultado = await completarMantenimiento(mantenimiento.id, formData);
 
-        console.log('✅ Mantenimiento iniciado correctamente');
+            // ✅ OFRECER DESCARGAR PDF INMEDIATAMENTE
+            setTimeout(() => {
+                const descargarPDF = window.confirm(
+                    '✅ Mantenimiento completado exitosamente!\n\n' +
+                    '¿Deseas descargar el reporte PDF ahora?\n\n' +
+                    'El PDF incluirá:\n' +
+                    '• Información completa del mantenimiento\n' +
+                    '• Fotos antes/después del trabajo\n' +
+                    '• Materiales utilizados\n' +
+                    '• Resumen del trabajo realizado'
+                );
+                
+                if (descargarPDF) {
+                    generarReportePDF(mantenimiento.id);
+                }
+            }, 500);
 
-      } else if (mantenimiento) {
-        // Edición normal
-        resultado = await actualizarMantenimiento(mantenimiento.id, formData);
-        console.log('✅ Mantenimiento actualizado correctamente');
-        
-      } else {
-        // Nuevo mantenimiento
-        resultado = await crearMantenimiento({
-          ...formData,
-          userId: user?.id
-        });
-        
-        // Subir fotos antes si existen
-        if (fotosAntes.length > 0 && resultado?.mantenimiento?.id) {
-          await subirFotosMantenimiento(resultado.mantenimiento.id, fotosAntes, 'antes');
+        } else if (mantenimiento && formData.estado === 'en_progreso') {
+            // ✅ INICIAR MANTENIMIENTO
+            const iniciarFormData = new FormData();
+            iniciarFormData.append('fotosAntes', JSON.stringify([])); // Placeholder
+            
+            // Agregar fotos antes si existen
+            fotosAntes.forEach((foto, index) => {
+                if (foto.file) {
+                    iniciarFormData.append('fotos', foto.file);
+                }
+            });
+
+            resultado = await iniciarMantenimiento(mantenimiento.id, iniciarFormData);
+            console.log('✅ Mantenimiento iniciado correctamente');
+
+        } else if (mantenimiento) {
+            // Edición normal
+            resultado = await actualizarMantenimiento(mantenimiento.id, formData);
+            console.log('✅ Mantenimiento actualizado correctamente');
+            
+        } else {
+            // Nuevo mantenimiento
+            const nuevoFormData = new FormData();
+            nuevoFormData.append('plantId', formData.plantId);
+            nuevoFormData.append('tipo', formData.tipo);
+            nuevoFormData.append('descripcion', formData.descripcion);
+            nuevoFormData.append('fechaProgramada', formData.fechaProgramada);
+            nuevoFormData.append('estado', formData.estado);
+            nuevoFormData.append('userId', user?.id);
+
+            // Agregar fotos antes si existen
+            fotosAntes.forEach((foto, index) => {
+                if (foto.file) {
+                    nuevoFormData.append('fotos', foto.file);
+                }
+            });
+
+            resultado = await crearMantenimiento(nuevoFormData);
+            
+            console.log('✅ Mantenimiento creado correctamente');
         }
-        console.log('✅ Mantenimiento creado correctamente');
-      }
-      
-      // ✅ CERRAR MODAL AUTOMÁTICAMENTE después de éxito
-      if (onMantenimientoGuardado) {
-        onMantenimientoGuardado();
-      }
-      handleClose();
-      
+        
+        // ✅ CERRAR MODAL AUTOMÁTICAMENTE después de éxito
+        if (onMantenimientoGuardado) {
+            onMantenimientoGuardado();
+        }
+        handleClose();
+        
     } catch (error) {
-      console.error('Error al guardar mantenimiento:', error);
-      setErrors(prev => ({
-        ...prev,
-        submit: error.response?.data?.message || 'Error al guardar el mantenimiento. Intenta nuevamente.'
-      }));
+        console.error('Error al guardar mantenimiento:', error);
+        setErrors(prev => ({
+            ...prev,
+            submit: error.response?.data?.message || 'Error al guardar el mantenimiento. Intenta nuevamente.'
+        }));
     }
-  };
+};
 
   // ✅ MEJORA: Cerrar modal con ESC
   useEffect(() => {

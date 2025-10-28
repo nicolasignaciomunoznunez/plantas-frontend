@@ -19,10 +19,14 @@ export const mantenimientoService = {
     return response.data;
   },
 
-  crearMantenimiento: async (mantenimientoData) => {
-    const response = await api.post('/api/mantenimientos', mantenimientoData);
+ crearMantenimiento: async (formData) => {
+    const response = await api.post('/api/mantenimientos', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
-  },
+},
 
   actualizarMantenimiento: async (id, mantenimientoData) => {
     const response = await api.put(`/api/mantenimientos/${id}`, mantenimientoData);
@@ -50,18 +54,24 @@ export const mantenimientoService = {
     return response.data;
   },
 
-  // ✅ NUEVO: Iniciar mantenimiento
-  iniciarMantenimiento: async (id, fotosAntes = []) => {
-    const response = await api.post(`/api/mantenimientos/${id}/iniciar`, { fotosAntes });
+iniciarMantenimiento: async (id, formData) => {
+    const response = await api.post(`/api/mantenimientos/${id}/iniciar`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
-  },
+},
 
   // ✅ NUEVO: Completar mantenimiento con fotos, materiales y checklist
-  completarMantenimiento: async (id, datosCompletar) => {
-    const response = await api.post(`/api/mantenimientos/${id}/completar`, datosCompletar);
+completarMantenimiento: async (id, formData) => {
+    const response = await api.post(`/api/mantenimientos/${id}/completar`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     return response.data;
-  },
-
+},
   // ✅ NUEVO: Subir fotos a mantenimiento
   subirFotos: async (id, fotos, tipo) => {
     const formData = new FormData();
