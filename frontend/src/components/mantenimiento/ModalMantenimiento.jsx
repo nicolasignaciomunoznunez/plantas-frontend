@@ -387,66 +387,53 @@ const handleSubmit = async (e) => {
         if (modoCompletar && mantenimiento) {
             console.log('🔄 Completando mantenimiento:', mantenimiento.id);
             
-            // ✅ CREAR FORMDATA PARA ENVIAR FOTOS COMO ARCHIVOS
-            const formData = new FormData();
-            formData.append('resumenTrabajo', resumenTrabajo);
-            formData.append('materiales', JSON.stringify(materiales));
-            formData.append('checklistCompletado', JSON.stringify(checklistCompletado || []));
-            
-            // ✅ AGREGAR FOTOS AL FORMDATA
-            fotosDespues.forEach((foto, index) => {
-                if (foto.file) {
-                    formData.append('fotos', foto.file);
-                }
+            // ✅ COMPLETAR MANTENIMIENTO (igual que incidencias)
+            resultado = await completarMantenimiento(mantenimiento.id, {
+                resumenTrabajo,
+                materiales
             });
 
-            console.log('📤 Enviando FormData con:', {
-                fotosCount: fotosDespues.length,
-                materialesCount: materiales.length,
-                tieneResumen: !!resumenTrabajo
-            });
-
-            // ✅ COMPLETAR MANTENIMIENTO CON FORMDATA
-            resultado = await completarMantenimiento(mantenimiento.id, formData);
+            // ✅ SUBIR FOTOS DESPUÉS si existen (igual que incidencias)
+            if (fotosDespues.length > 0) {
+                console.log('📸 Subiendo fotos después:', fotosDespues.length);
+                await subirFotosMantenimiento(mantenimiento.id, fotosDespues, 'despues');
+            }
 
             // ✅ OFRECER DESCARGAR PDF INMEDIATAMENTE
-            setTimeout(() => {
-                const descargarPDF = window.confirm(
-                    '✅ Mantenimiento completado exitosamente!\n\n' +
-                    '¿Deseas descargar el reporte PDF ahora?\n\n' +
-                    'El PDF incluirá:\n' +
-                    '• Información completa del mantenimiento\n' +
-                    '• Fotos antes/después del trabajo\n' +
-                    '• Materiales utilizados\n' +
-                    '• Resumen del trabajo realizado'
-                );
+            if (resultado.success) {
+                console.log('✅ Mantenimiento completado - PDF disponible');
                 
-                if (descargarPDF) {
-                    generarReportePDF(mantenimiento.id);
-                }
-            }, 500);
+                setTimeout(() => {
+                    const descargarPDF = window.confirm(
+                        '✅ Mantenimiento completado exitosamente!\n\n' +
+                        '¿Deseas descargar el reporte PDF ahora?\n\n' +
+                        'El PDF incluirá:\n' +
+                        '• Información completa del mantenimiento\n' +
+                        '• Fotos antes/después del trabajo\n' +
+                        '• Materiales utilizados\n' +
+                        '• Resumen del trabajo realizado'
+                    );
+                    
+                    if (descargarPDF) {
+                        generarReportePDF(mantenimiento.id);
+                    }
+                }, 500);
+            }
 
         } else if (mantenimiento && formData.estado === 'en_progreso') {
             // ✅ INICIAR MANTENIMIENTO
-            const iniciarFormData = new FormData();
+            resultado = await iniciarMantenimiento(mantenimiento.id);
             
-            // Agregar fotos antes si existen
-            fotosAntes.forEach((foto, index) => {
-                if (foto.file) {
-                    iniciarFormData.append('fotos', foto.file);
-                }
-            });
-
-            // Si no hay fotos, enviar array vacío
-            if (fotosAntes.length === 0) {
-                iniciarFormData.append('fotosAntes', JSON.stringify([]));
+            // ✅ SUBIR FOTOS ANTES si existen
+            if (fotosAntes.length > 0) {
+                console.log('📸 Subiendo fotos antes:', fotosAntes.length);
+                await subirFotosMantenimiento(mantenimiento.id, fotosAntes, 'antes');
             }
-
-            resultado = await iniciarMantenimiento(mantenimiento.id, iniciarFormData);
+            
             console.log('✅ Mantenimiento iniciado correctamente');
 
         } else if (mantenimiento) {
-            // ✅ EDICIÓN NORMAL - NO usar FormData, usar JSON normal
+            // Edición normal
             resultado = await actualizarMantenimiento(mantenimiento.id, {
                 plantId: formData.plantId,
                 tipo: formData.tipo,
@@ -457,43 +444,20 @@ const handleSubmit = async (e) => {
             console.log('✅ Mantenimiento actualizado correctamente');
             
         } else {
-            // ✅ NUEVO MANTENIMIENTO - Usar FormData solo si hay fotos
-            const datosMantenimiento = {
+            // Nueva mantenimiento
+            resultado = await crearMantenimiento({
                 plantId: formData.plantId,
                 tipo: formData.tipo,
                 descripcion: formData.descripcion,
                 fechaProgramada: formData.fechaProgramada,
                 estado: formData.estado,
                 userId: user?.id
-            };
-
-            console.log('📤 Creando nuevo mantenimiento con:', datosMantenimiento);
-
-            // Si hay fotos, usar FormData, sino usar JSON normal
-            if (fotosAntes.length > 0) {
-                const nuevoFormData = new FormData();
-                
-                // ✅ AGREGAR CAMPOS REQUERIDOS COMO STRINGS
-                nuevoFormData.append('plantId', formData.plantId);
-                nuevoFormData.append('tipo', formData.tipo);
-                nuevoFormData.append('descripcion', formData.descripcion);
-                nuevoFormData.append('fechaProgramada', formData.fechaProgramada);
-                nuevoFormData.append('estado', formData.estado);
-                nuevoFormData.append('userId', user?.id);
-
-                // Agregar fotos antes si existen
-                fotosAntes.forEach((foto, index) => {
-                    if (foto.file) {
-                        nuevoFormData.append('fotos', foto.file);
-                    }
-                });
-
-                resultado = await crearMantenimiento(nuevoFormData);
-            } else {
-                // Sin fotos, usar JSON normal
-                resultado = await crearMantenimiento(datosMantenimiento);
-            }
+            });
             
+            // Subir fotos antes si existen
+            if (fotosAntes.length > 0 && resultado?.mantenimiento?.id) {
+                await subirFotosMantenimiento(resultado.mantenimiento.id, fotosAntes, 'antes');
+            }
             console.log('✅ Mantenimiento creado correctamente');
         }
         

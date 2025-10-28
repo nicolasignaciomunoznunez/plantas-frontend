@@ -65,10 +65,10 @@ export const useMantenimientoStore = create((set, get) => ({
  
  
 
-  crearMantenimiento: async (formData) => {
+  crearMantenimiento: async (mantenimientoData) => {
     set({ loading: true, error: null });
     try {
-        const response = await mantenimientoService.crearMantenimiento(formData);
+        const response = await mantenimientoService.crearMantenimiento(mantenimientoData);
         const nuevoMantenimiento = response.mantenimiento;
         set(state => ({
             mantenimientos: [nuevoMantenimiento, ...state.mantenimientos],
@@ -81,10 +81,10 @@ export const useMantenimientoStore = create((set, get) => ({
     }
 },
 
-iniciarMantenimiento: async (id, formData) => {
+iniciarMantenimiento: async (id) => {
     set({ loading: true, error: null });
     try {
-        const response = await mantenimientoService.iniciarMantenimiento(id, formData);
+        const response = await mantenimientoService.iniciarMantenimiento(id);
         
         // Actualizar estado del mantenimiento
         set(state => ({
@@ -104,10 +104,10 @@ iniciarMantenimiento: async (id, formData) => {
     }
 },
 
-completarMantenimiento: async (id, formData) => {
+completarMantenimiento: async (id, datosCompletar) => {
     set({ loading: true, error: null });
     try {
-        const response = await mantenimientoService.completarMantenimiento(id, formData);
+        const response = await mantenimientoService.completarMantenimiento(id, datosCompletar);
         
         // Actualizar en el estado local
         set(state => ({
@@ -134,29 +134,28 @@ completarMantenimiento: async (id, formData) => {
 
 
   // ✅ NUEVO: Subir fotos a mantenimiento
-  subirFotosMantenimiento: async (id, fotos, tipo) => {
+subirFotosMantenimiento: async (id, fotos, tipo) => {
     set({ loading: true, error: null });
     try {
-      const response = await mantenimientoService.subirFotos(id, fotos, tipo);
-      
-      // Actualizar fotos en el mantenimiento seleccionado
-      set(state => ({
-        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
-          ? { 
-              ...state.mantenimientoSeleccionado, 
-              fotos: [...(state.mantenimientoSeleccionado.fotos || []), ...response.fotos]
-            }
-          : state.mantenimientoSeleccionado,
-        loading: false
-      }));
-      
-      return response;
+        const response = await mantenimientoService.subirFotos(id, fotos, tipo);
+        
+        // Actualizar fotos en el mantenimiento seleccionado
+        set(state => ({
+            mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+                ? { 
+                    ...state.mantenimientoSeleccionado, 
+                    fotos: [...(state.mantenimientoSeleccionado.fotos || []), ...response.fotos]
+                }
+                : state.mantenimientoSeleccionado,
+            loading: false
+        }));
+        
+        return response;
     } catch (error) {
-      set({ error: error.response?.data?.message || 'Error al subir fotos', loading: false });
-      throw error;
+        set({ error: error.response?.data?.message || 'Error al subir fotos', loading: false });
+        throw error;
     }
-  },
-
+},
   // ✅ NUEVO: Agregar materiales a mantenimiento
   agregarMaterialesMantenimiento: async (id, materiales) => {
     set({ loading: true, error: null });
