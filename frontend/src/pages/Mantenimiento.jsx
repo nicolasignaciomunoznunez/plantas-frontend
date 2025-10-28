@@ -11,7 +11,10 @@ export default function Mantenimiento() {
     mantenimientos, 
     loading: mantenimientosLoading, 
     error, 
-    obtenerMantenimientos
+    obtenerMantenimientos,
+      iniciarMantenimiento,
+  completarMantenimiento,
+  generarReportePDF
   } = useMantenimientoStore();
   
   const { plantas, loading: plantasLoading, obtenerPlantas } = usePlantasStore();
@@ -152,6 +155,31 @@ export default function Mantenimiento() {
     setModalAbierto(false);
     setMantenimientoEditando(null);
   }, []);
+
+  // ✅ NUEVO: Handler para iniciar mantenimiento
+const handleIniciarMantenimiento = useCallback(async (mantenimiento) => {
+  try {
+    await iniciarMantenimiento(mantenimiento.id);
+    await obtenerMantenimientos(); // Refrescar lista
+  } catch (error) {
+    console.error('Error al iniciar mantenimiento:', error);
+  }
+}, [iniciarMantenimiento, obtenerMantenimientos]);
+
+// ✅ NUEVO: Handler para completar mantenimiento
+const handleCompletarMantenimiento = useCallback((mantenimiento) => {
+  setMantenimientoEditando(mantenimiento);
+  setModalAbierto(true);
+}, []);
+
+// ✅ NUEVO: Handler para generar PDF
+const handleGenerarPDF = useCallback(async (mantenimientoId) => {
+  try {
+    await generarReportePDF(mantenimientoId);
+  } catch (error) {
+    console.error('Error al generar PDF:', error);
+  }
+}, [generarReportePDF]);
 
   const handleFiltroChange = useCallback((e) => {
     const { name, value } = e.target;
@@ -486,6 +514,9 @@ export default function Mantenimiento() {
           <ListaMantenimientosPrincipal 
             mantenimientos={mantenimientosEnriquecidos}
             onEditarMantenimiento={handleAbrirModalEditar}
+             onIniciarMantenimiento={handleIniciarMantenimiento}
+              onCompletarMantenimiento={handleCompletarMantenimiento}
+              onGenerarPDF={handleGenerarPDF}
             loading={loading}
             puedeGestionar={puedeGestionar}
           />
@@ -533,6 +564,7 @@ export default function Mantenimiento() {
         isOpen={modalAbierto}
         onClose={handleCerrarModal}
         mantenimiento={mantenimientoEditando}
+         modoCompletar={mantenimientoEditando?.estado === 'en_progreso'}
         onMantenimientoGuardado={() => {
           handleCerrarModal();
           obtenerMantenimientos(); // Refrescar la lista

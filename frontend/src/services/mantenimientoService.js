@@ -13,6 +13,12 @@ export const mantenimientoService = {
     return response.data;
   },
 
+  // ✅ NUEVO: Obtener mantenimiento COMPLETO con fotos y materiales
+  obtenerMantenimientoCompleto: async (id) => {
+    const response = await api.get(`/api/mantenimientos/${id}/completo`);
+    return response.data;
+  },
+
   crearMantenimiento: async (mantenimientoData) => {
     const response = await api.post('/api/mantenimientos', mantenimientoData);
     return response.data;
@@ -20,6 +26,11 @@ export const mantenimientoService = {
 
   actualizarMantenimiento: async (id, mantenimientoData) => {
     const response = await api.put(`/api/mantenimientos/${id}`, mantenimientoData);
+    return response.data;
+  },
+
+  cambiarEstadoMantenimiento: async (id, estado) => {
+    const response = await api.patch(`/api/mantenimientos/${id}/estado`, { estado });
     return response.data;
   },
 
@@ -33,19 +44,80 @@ export const mantenimientoService = {
     return response.data;
   },
 
+  // ✅ NUEVO: Obtener resumen para dashboard
+  obtenerResumenDashboard: async () => {
+    const response = await api.get('/api/mantenimientos/resumen/dashboard');
+    return response.data;
+  },
+
+  // ✅ NUEVO: Iniciar mantenimiento
+  iniciarMantenimiento: async (id, fotosAntes = []) => {
+    const response = await api.post(`/api/mantenimientos/${id}/iniciar`, { fotosAntes });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Completar mantenimiento con fotos, materiales y checklist
+  completarMantenimiento: async (id, datosCompletar) => {
+    const response = await api.post(`/api/mantenimientos/${id}/completar`, datosCompletar);
+    return response.data;
+  },
+
+  // ✅ NUEVO: Subir fotos a mantenimiento
+  subirFotos: async (id, fotos, tipo) => {
+    const formData = new FormData();
+    formData.append('tipo', tipo);
+    
+    fotos.forEach((foto) => {
+      formData.append('fotos', foto);
+    });
+
+    const response = await api.post(`/api/mantenimientos/${id}/fotos`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Agregar materiales a mantenimiento
+  agregarMateriales: async (id, materiales) => {
+    const response = await api.post(`/api/mantenimientos/${id}/materiales`, { materiales });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Generar reporte PDF
+  generarReportePDF: async (id) => {
+    const response = await api.get(`/api/mantenimientos/${id}/reporte-pdf`, {
+      responseType: 'blob',
+    });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Eliminar foto
+  eliminarFoto: async (id, fotoId) => {
+    const response = await api.delete(`/api/mantenimientos/${id}/fotos/${fotoId}`);
+    return response.data;
+  },
+
+  // ✅ NUEVO: Eliminar material
+  eliminarMaterial: async (id, materialId) => {
+    const response = await api.delete(`/api/mantenimientos/${id}/materiales/${materialId}`);
+    return response.data;
+  },
+
   // Checklist
   obtenerChecklistMantenimiento: async (mantenimientoId) => {
     const response = await api.get(`/api/mantenimientos/${mantenimientoId}/checklist`);
     return response.data;
   },
 
-  crearChecklist: async (mantenimientoId, checklistData) => {
-    const response = await api.post(`/api/mantenimientos/${mantenimientoId}/checklist`, checklistData);
+  agregarItemChecklist: async (mantenimientoId, item) => {
+    const response = await api.post(`/api/mantenimientos/${mantenimientoId}/checklist`, { item });
     return response.data;
   },
 
-  actualizarItemChecklist: async (mantenimientoId, checklistId, itemData) => {
-    const response = await api.put(`/api/mantenimientos/${mantenimientoId}/checklist/${checklistId}`, itemData);
+  actualizarItemChecklist: async (itemId, itemData) => {
+    const response = await api.put(`/api/mantenimientos/checklist/${itemId}`, itemData);
     return response.data;
   },
 
@@ -54,7 +126,7 @@ export const mantenimientoService = {
     return response.data;
   },
 
-  // Reportes
+  // Reportes (mantener existentes)
   obtenerReportes: async (limite = 50, pagina = 1) => {
     const response = await api.get(`/api/reportes?limite=${limite}&pagina=${pagina}`);
     return response.data;
@@ -80,7 +152,6 @@ export const mantenimientoService = {
     return response.data;
   },
 
-  // Descargar reporte
   descargarReporte: async (rutaArchivo) => {
     const response = await api.get(`/api/reportes/descargar/${encodeURIComponent(rutaArchivo)}`, {
       responseType: 'blob'

@@ -49,6 +49,19 @@ export const useMantenimientoStore = create((set, get) => ({
     }
   },
 
+  // ✅ NUEVO: Obtener mantenimiento COMPLETO con fotos y materiales
+  obtenerMantenimientoCompleto: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.obtenerMantenimientoCompleto(id);
+      set({ mantenimientoSeleccionado: response.mantenimiento, loading: false });
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al obtener mantenimiento completo', loading: false });
+      throw error;
+    }
+  },
+
   // Crear mantenimiento
   crearMantenimiento: async (mantenimientoData) => {
     set({ loading: true, error: null });
@@ -62,6 +75,178 @@ export const useMantenimientoStore = create((set, get) => ({
       return response;
     } catch (error) {
       set({ error: error.response?.data?.message || 'Error al crear mantenimiento', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Iniciar mantenimiento (subir fotos "antes")
+  iniciarMantenimiento: async (id, fotosAntes = []) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.iniciarMantenimiento(id, fotosAntes);
+      
+      // Actualizar estado del mantenimiento
+      set(state => ({
+        mantenimientos: state.mantenimientos.map(mant => 
+          mant.id === id ? { ...mant, estado: 'en_progreso' } : mant
+        ),
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { ...state.mantenimientoSeleccionado, estado: 'en_progreso' }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al iniciar mantenimiento', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Completar mantenimiento con fotos, materiales y checklist
+  completarMantenimiento: async (id, datosCompletar) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.completarMantenimiento(id, datosCompletar);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        mantenimientos: state.mantenimientos.map(mant => 
+          mant.id === id ? { 
+            ...mant, 
+            estado: 'completado',
+            fechaRealizada: new Date().toISOString(),
+            ...response.mantenimiento 
+          } : mant
+        ),
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { ...state.mantenimientoSeleccionado, ...response.mantenimiento }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al completar mantenimiento', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Subir fotos a mantenimiento
+  subirFotosMantenimiento: async (id, fotos, tipo) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.subirFotos(id, fotos, tipo);
+      
+      // Actualizar fotos en el mantenimiento seleccionado
+      set(state => ({
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { 
+              ...state.mantenimientoSeleccionado, 
+              fotos: [...(state.mantenimientoSeleccionado.fotos || []), ...response.fotos]
+            }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al subir fotos', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Agregar materiales a mantenimiento
+  agregarMaterialesMantenimiento: async (id, materiales) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.agregarMateriales(id, materiales);
+      
+      // Actualizar materiales en el mantenimiento seleccionado
+      set(state => ({
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { 
+              ...state.mantenimientoSeleccionado, 
+              materiales: [...(state.mantenimientoSeleccionado.materiales || []), ...response.materiales]
+            }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al agregar materiales', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Generar reporte PDF
+  generarReportePDF: async (id) => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.generarReportePDF(id);
+      
+      // Crear enlace de descarga
+      const blob = new Blob([response], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `reporte-mantenimiento-${id}.pdf`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      
+      set({ loading: false });
+      return { success: true, message: 'Reporte descargado correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al generar reporte PDF', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Eliminar foto
+  eliminarFoto: async (id, fotoId) => {
+    set({ loading: true, error: null });
+    try {
+      await mantenimientoService.eliminarFoto(id, fotoId);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { 
+              ...state.mantenimientoSeleccionado, 
+              fotos: state.mantenimientoSeleccionado.fotos?.filter(foto => foto.id !== fotoId) || []
+            }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return { success: true, message: 'Foto eliminada correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al eliminar foto', loading: false });
+      throw error;
+    }
+  },
+
+  // ✅ NUEVO: Eliminar material
+  eliminarMaterial: async (id, materialId) => {
+    set({ loading: true, error: null });
+    try {
+      await mantenimientoService.eliminarMaterial(id, materialId);
+      
+      // Actualizar en el estado local
+      set(state => ({
+        mantenimientoSeleccionado: state.mantenimientoSeleccionado?.id === id 
+          ? { 
+              ...state.mantenimientoSeleccionado, 
+              materiales: state.mantenimientoSeleccionado.materiales?.filter(mat => mat.id !== materialId) || []
+            }
+          : state.mantenimientoSeleccionado,
+        loading: false
+      }));
+      
+      return { success: true, message: 'Material eliminado correctamente' };
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al eliminar material', loading: false });
       throw error;
     }
   },
@@ -135,7 +320,21 @@ export const useMantenimientoStore = create((set, get) => ({
     }
   },
 
+  // ✅ NUEVO: Obtener resumen para dashboard
+  obtenerResumenDashboard: async () => {
+    set({ loading: true, error: null });
+    try {
+      const response = await mantenimientoService.obtenerResumenDashboard();
+      set({ loading: false });
+      return response;
+    } catch (error) {
+      set({ error: error.response?.data?.message || 'Error al obtener resumen', loading: false });
+      throw error;
+    }
+  },
+
   // Resetear estado
   resetearMantenimientosCargados: () => set({ mantenimientosCargados: false }),
   limpiarMantenimientoSeleccionado: () => set({ mantenimientoSeleccionado: null }),
+  limpiarError: () => set({ error: null }),
 }));
