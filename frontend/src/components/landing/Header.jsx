@@ -62,7 +62,7 @@ const Header = () => {
               {/* Logo para desktop */}
               <img 
                 src="/images/finalogo.jpeg" 
-                alt="RYV SPA - Soluciones integrales para plantas de agua potable" 
+                alt="RYV SPA - Gestión integral de infraestructura: agua, electricidad, climatización y gas" 
                 className={`transition-all duration-500 ${
                   isScrolled ? 'h-14' : 'h-18'
                 } w-auto hidden md:block group-hover:scale-105`}
@@ -70,7 +70,7 @@ const Header = () => {
               {/* Logo para móvil */}
               <img 
                 src="/images/finalogotr.png" 
-                alt="RYV SPA" 
+                alt="RYV SPA - Soluciones integrales" 
                 className="h-12 w-auto md:hidden transition-transform duration-300 group-hover:scale-105"
               />
             </Link>
@@ -101,13 +101,13 @@ const Header = () => {
                 to="/login"
                 className="px-6 py-3 rounded-xl font-medium border border-secondary-300 text-secondary-700 hover:bg-secondary-50 hover:border-secondary-400 transition-all duration-300 hover:shadow-soft"
               >
-                Iniciar Sesión
+                Acceso Clientes
               </Link>
               <button 
                 onClick={() => scrollToSection('contacto')}
                 className="px-6 py-3 rounded-xl font-medium bg-gradient-primary text-white hover:shadow-large transform hover:scale-105 transition-all duration-300 relative overflow-hidden group"
               >
-                <span className="relative z-10">Contactar</span>
+                <span className="relative z-10">Cotizar Proyecto</span>
                 <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </button>
             </div>
@@ -132,7 +132,7 @@ const Header = () => {
               onClick={() => scrollToSection('contacto')}
               className="px-4 py-2 rounded-lg font-medium text-sm bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300 ml-2"
             >
-              Contacto
+              Cotizar
             </button>
           </nav>
 
@@ -184,13 +184,13 @@ const Header = () => {
                   className="px-4 py-4 rounded-xl font-medium text-center border border-secondary-300 text-secondary-700 hover:bg-secondary-50 transition-all duration-300"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  Iniciar Sesión
+                  Acceso Clientes
                 </Link>
                 <button 
                   onClick={() => scrollToSection('contacto')}
                   className="px-4 py-4 rounded-xl font-medium text-center bg-gradient-primary text-white hover:shadow-large transition-all duration-300"
                 >
-                  Contactar
+                  Cotizar Proyecto
                 </button>
               </div>
             </div>

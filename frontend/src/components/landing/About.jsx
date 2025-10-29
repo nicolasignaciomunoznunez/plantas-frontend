@@ -5,21 +5,21 @@ const About = () => {
     {
       icon: "🎯",
       title: "Misión",
-      description: "Garantizar el funcionamiento óptimo de plantas industriales mediante soluciones tecnológicas innovadoras y mantenimiento especializado en múltiples sectores.",
+      description: "Garantizar el funcionamiento óptimo de infraestructuras críticas, desde plantas industriales hasta edificios residenciales, mediante soluciones tecnológicas integrales y mantenimiento especializado.",
       gradient: "from-primary-500 to-primary-600",
       delay: "100"
     },
     {
       icon: "👁️",
       title: "Visión", 
-      description: "Ser referentes en ingeniería aplicada al sector industrial, expandiendo nuestro expertise a diversos tipos de plantas y procesos productivos.",
+      description: "Ser el partner líder en gestión integral de infraestructura, expandiendo nuestro expertise desde plantas de agua hacia soluciones multisectoriales de electricidad, climatización y gas.",
       gradient: "from-primary-600 to-primary-700",
       delay: "200"
     },
     {
       icon: "⭐",
       title: "Valores",
-      description: "Compromiso, innovación, calidad y adaptabilidad para enfrentar los desafíos únicos de cada proyecto industrial.",
+      description: "Compromiso, innovación, calidad y adaptabilidad para enfrentar los desafíos únicos de cada proyecto, ya sea industrial, comercial o residencial.",
       gradient: "from-primary-400 to-primary-500",
       delay: "300"
     }
@@ -27,12 +27,11 @@ const About = () => {
 
   const stats = [
     { number: "5+", label: "Años de experiencia", suffix: "" },
-    { number: "50+", label: "Clientes industriales", suffix: "" },
+    { number: "50+", label: "Clientes satisfechos", suffix: "" },
     { number: "60+", label: "Proyectos completados", suffix: "" },
-    { number: "15+", label: "Sectores atendidos", suffix: "" }
+    { number: "8+", label: "Especialidades técnicas", suffix: "" }
   ];
 
-  
   return (
     <section id="nosotros" className="py-16 lg:py-24 bg-gradient-light relative overflow-hidden">
       {/* Elementos decorativos de fondo mejorados */}
@@ -44,23 +43,22 @@ const About = () => {
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary-50/30 to-transparent"></div>
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Header Mejorado con Enfoque Industrial Amplio */}
+        {/* Header Actualizado - Enfoque Integral */}
         <div className="text-center max-w-5xl mx-auto mb-16 lg:mb-20 animate-fade-in-up">
           <span className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4 shadow-soft">
-            Expertos en Soluciones Industriales
+            De Expertos en Agua a Especialistas Integrales
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 leading-tight font-heading">
-            Especialistas en <span className="text-primary-600 bg-gradient-primary bg-clip-text text-transparent">Plantas Industriales</span> de Todo Tipo
+            Gestión Integral de <span className="text-primary-600 bg-gradient-primary bg-clip-text text-transparent">Infraestructura</span>
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed max-w-4xl mx-auto">
-            Con más de <strong className="text-primary-600">5 años de experiencia</strong> en múltiples sectores industriales, 
-            integramos <strong className="text-primary-600">tecnológica de vanguardia y sólido</strong> con <strong className="text-primary-600">expertise para maximizar </strong> 
-            la eficiencia operativa en plantas de agua y energía, entre otras..
+            Con más de <strong className="text-primary-600">5 años de expertise en plantas de agua</strong>, 
+            expandimos nuestro conocimiento hacia <strong className="text-primary-600">gestión completa de edificios e infraestructura</strong>. 
+            Combinamos tecnología de vanguardia con experiencia práctica para optimizar desde plantas industriales hasta condominios residenciales.
           </p>
         </div>
 
-   
-        {/* Grid de Valores Mejorado */}
+        {/* Grid de Valores Actualizado */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 mb-16 lg:mb-20">
           {values.map((value, index) => (
             <div 
@@ -86,14 +84,14 @@ const About = () => {
           ))}
         </div>
 
-        {/* Estadísticas Destacadas - Enfoque Industrial */}
+        {/* Estadísticas Actualizadas - Enfoque Multisector */}
         <div className="bg-white rounded-2xl shadow-medium p-8 lg:p-12 border border-secondary-100 animate-scale-in mb-16 lg:mb-20">
           <div className="text-center mb-12">
             <h3 className="text-2xl lg:text-3xl font-bold text-secondary-800 mb-4 font-heading">
-              Nuestro Impacto Industrial
+              Nuestro Impacto Multisector
             </h3>
             <p className="text-secondary-600 text-lg max-w-2xl mx-auto">
-              Resultados tangibles que respaldan nuestra versatilidad y compromiso con la excelencia industrial
+              Resultados que respaldan nuestra evolución de especialistas en agua a gestores integrales de infraestructura
             </p>
           </div>
           
@@ -117,7 +115,7 @@ const About = () => {
           </div>
         </div>
 
-        {/* CTA Section Mejorado - Enfoque Industrial Amplio */}
+        {/* CTA Section Actualizado - Enfoque Integral */}
         <div className="text-center animate-fade-in-up">
           <div className="bg-gradient-primary rounded-2xl p-8 lg:p-12 text-white shadow-large max-w-4xl mx-auto relative overflow-hidden">
             {/* Elementos decorativos del CTA */}
@@ -125,26 +123,31 @@ const About = () => {
             <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
             
             <h3 className="text-2xl lg:text-3xl font-bold mb-4 relative z-10 font-heading">
-              ¿Proyecto Industrial en Mente?
+              ¿Necesitas un Partner Integral?
             </h3>
             <p className="text-primary-100 text-lg lg:text-xl mb-6 max-w-2xl mx-auto relative z-10">
-              Desde plantas de agua hasta energía solar, tenemos la experiencia y tecnología para tu sector.
+              Desde plantas industriales hasta gestión de edificios, tenemos la experiencia y tecnología para tu proyecto.
             </p>
             
-            {/* Especialidades destacadas */}
+            {/* Especialidades destacadas - Actualizadas */}
             <div className="flex flex-wrap justify-center gap-3 mb-6 relative z-10">
               <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">💧 Plantas de Agua</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">☀️ Energía Solar</span>
-              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">⚡ Automatización</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">⚡ Electricidad</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">❄️ Climatización</span>
+              <span className="bg-white/20 px-3 py-1 rounded-full text-sm font-medium">🏢 Edificios</span>
             </div>
             
-       
+            <button
+              onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg relative z-10"
+            >
+              Consultar Servicios
+            </button>
           </div>
         </div>
       </div>
     </section>
   );
 };
-
 
 export default About;

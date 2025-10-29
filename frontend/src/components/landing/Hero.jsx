@@ -5,24 +5,24 @@ const Hero = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const slides = [
-    {
-      image: "/images/portada4.webp",
-      title: "Ingeniería para un",
-      highlighted: "futuro sostenible", 
-      subtitle: "Soluciones innovadoras para plantas de agua potable rural",
-      ctaText: "Ver Servicios",
-      ctaLink: "servicios" // ✅ CORREGIDO: sin #
-    },
-    {
-      image: "/images/portada1.jpg",
-      title: "Expertos en",
-      highlighted: "mantenimiento industrial",
-      subtitle: "Calidad y eficiencia en cada proyecto que emprendemos", 
-      ctaText: "Contáctanos",
-      ctaLink: "contacto" // ✅ CORREGIDO: sin #
-    }
-  ];
+const slides = [
+  {
+    image: "/images/portada4.webp",
+    title: "Soluciones integrales para",
+    highlighted: "tu infraestructura", 
+    subtitle: "De plantas de agua potable a gestión completa de edificios industriales y residenciales",
+    ctaText: "Descubrir Servicios",
+    ctaLink: "servicios"
+  },
+  {
+    image: "/images/portada1.jpg",
+    title: "Expertos en mantenimiento",
+    highlighted: "multidisciplinario",
+    subtitle: "Agua, electricidad, climatización y gas - Un solo proveedor confiable", 
+    ctaText: "Solicitar Diagnóstico",
+    ctaLink: "contacto"
+  }
+];
 
   // Preload images
   useEffect(() => {

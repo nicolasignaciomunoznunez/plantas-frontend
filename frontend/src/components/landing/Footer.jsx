@@ -16,6 +16,40 @@ const Footer = () => {
     window.open('https://maps.google.com/?q=Quinta+Normal+4830', '_blank');
   };
 
+  // ✅ NUEVA BOTONERA DE REDES SOCIALES
+  const socialMedia = [
+    {
+      name: "LinkedIn",
+      icon: "💼",
+      url: "https://linkedin.com/company/ryv-spa",
+      color: "hover:bg-blue-500 hover:border-blue-500"
+    },
+    {
+      name: "Instagram", 
+      icon: "📷",
+      url: "https://instagram.com/ryvspa",
+      color: "hover:bg-pink-500 hover:border-pink-500"
+    },
+    {
+      name: "Facebook",
+      icon: "👥",
+      url: "https://facebook.com/ryvspa",
+      color: "hover:bg-blue-600 hover:border-blue-600"
+    },
+    {
+      name: "WhatsApp",
+      icon: "💬",
+      url: "https://wa.me/56937492604",
+      color: "hover:bg-green-500 hover:border-green-500"
+    },
+    {
+      name: "YouTube",
+      icon: "🎥",
+      url: "https://youtube.com/@ryvspa",
+      color: "hover:bg-red-500 hover:border-red-500"
+    }
+  ];
+
   const contactInfo = [
     {
       icon: "📍",
@@ -44,6 +78,10 @@ const Footer = () => {
     { days: "Sábados - Domingos", hours: "10:00 - 14:00" }
   ];
 
+  const handleSocialClick = (url) => {
+    window.open(url, '_blank');
+  };
+
   return (
     <footer className="bg-secondary-900 text-white">
       {/* Main Footer */}
@@ -53,22 +91,40 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <img 
               src="/images/finalogotr.png" 
-              alt="RYV SPA - Soluciones integrales para plantas de agua potable" 
+              alt="RYV SPA - Gestión integral de infraestructura: agua, electricidad, climatización y gas" 
               className="h-28 lg:h-32 w-auto mx-auto md:mx-0 mb-6 transition-transform duration-300 hover:scale-105"
               onError={(e) => {
                 e.target.src = '/images/finalogo.jpeg';
               }}
             />
             <p className="text-secondary-300 text-lg leading-relaxed mb-6">
-              Soluciones integrales para plantas de agua potable con más de 5 años de experiencia en el sector industrial.
+              Especialistas en gestión integral de infraestructura: desde plantas de agua hasta edificios inteligentes. Más de 5 años de experiencia multisector.
             </p>
             
+            {/* ✅ NUEVA BOTONERA DE REDES SOCIALES */}
+            <div className="mb-6">
+              <h4 className="text-white font-semibold mb-4 text-lg">Síguenos en Redes</h4>
+              <div className="flex justify-center md:justify-start space-x-3">
+                {socialMedia.map((social, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handleSocialClick(social.url)}
+                    className={`w-12 h-12 rounded-xl bg-secondary-800 border border-secondary-700 text-white text-lg flex items-center justify-center transition-all duration-300 transform hover:scale-110 hover:shadow-lg ${social.color}`}
+                    aria-label={`Síguenos en ${social.name}`}
+                    title={social.name}
+                  >
+                    {social.icon}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Botón de Contacto */}
             <button
               onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
               className="bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 w-full md:w-auto text-center shadow-lg hover:shadow-xl"
             >
-              Contactar Ahora
+              Solicitar Cotización
             </button>
           </div>
 
@@ -146,6 +202,24 @@ const Footer = () => {
                   {link.label}
                 </button>
               ))}
+            </div>
+
+            {/* ✅ ESPECIALIDADES DESTACADAS */}
+            <div className="mt-8 p-4 bg-secondary-800 rounded-xl border border-secondary-700">
+              <h4 className="text-white font-semibold mb-3 text-lg">Especialidades</h4>
+              <div className="flex flex-wrap gap-2">
+                {[
+                  "💧 Agua", "⚡ Electricidad", "❄️ Climatización", 
+                  "🔥 Gas", "🏢 Edificios", "☀️ Solar"
+                ].map((specialty, index) => (
+                  <span 
+                    key={index}
+                    className="text-xs bg-primary-900/30 text-primary-300 px-2 py-1 rounded-lg border border-primary-700/30"
+                  >
+                    {specialty}
+                  </span>
+                ))}
+              </div>
             </div>
           </div>
         </div>

@@ -4,59 +4,66 @@ import React from 'react';
 const Projects = () => {
   const projects = [
     {
-      title: "Fusión HDPE",
+      title: "Gestión de Plantas de Agua",
       image: "/images/fusionppr.jpg",
-      category: "Sistema de unión",
-      description: "Tecnología de fusión para tuberías de polietileno de alta densidad",
-      gradient: "from-blue-500 to-blue-600"
+      category: "Infraestructura Hídrica",
+      description: "Sistemas completos de agua potable rural e industrial con tecnología de fusión HDPE y PPR",
+      gradient: "from-blue-500 to-cyan-600"
     },
     {
-      title: "Fusión PPR", 
+      title: "Sistemas Eléctricos Integrales", 
       image: "/images/hdpe.jpg",
-      category: "Sistema de tuberías",
-      description: "Unión térmica para sistemas de polipropileno random",
-      gradient: "from-green-500 to-green-600"
+      category: "Energía y Electricidad",
+      description: "Instalación y mantenimiento eléctrico para plantas industriales y edificios comerciales",
+      gradient: "from-amber-500 to-orange-500"
     },
     {
-      title: "Termografías",
+      title: "Climatización y HVAC",
       image: "/images/calor.jpg",
-      category: "Análisis térmico",
-      description: "Diagnóstico por infrarrojos para mantenimiento predictivo",
-      gradient: "from-orange-500 to-orange-600"
+      category: "Confort Térmico",
+      description: "Sistemas de aire acondicionado y calefacción con análisis termográfico predictivo",
+      gradient: "from-cyan-500 to-blue-500"
     },
     {
-      title: "Automatización de procesos",
+      title: "Automatización de Edificios", 
       image: "/images/automatizacion.webp", 
-      category: "Control industrial",
-      description: "Sistemas SCADA y PLC para optimización operacional",
-      gradient: "from-purple-500 to-purple-600"
+      category: "Control Inteligente",
+      description: "Sistemas SCADA y PLC para automatización residencial, comercial e industrial",
+      gradient: "from-purple-500 to-pink-500"
     },
     {
-      title: "Planes de mitigación y contingencia",
+      title: "Seguridad en Sistemas de Gas",
       image: "/images/mitigacion.jpg",
-      category: "Gestión de riesgos", 
-      description: "Estrategias preventivas para continuidad operativa",
-      gradient: "from-red-500 to-red-600"
+      category: "Infraestructura Crítica", 
+      description: "Instalación y certificación de redes de gas con planes de contingencia avanzados",
+      gradient: "from-red-500 to-orange-500"
+    },
+    {
+      title: "Gestión de Edificios",
+      image: "/images/placeholder-project.jpg", // Puedes cambiar esta imagen
+      category: "Infraestructura Comercial",
+      description: "Mantenimiento integral de condominios y edificios corporativos multiservicio",
+      gradient: "from-gray-600 to-gray-700"
     }
   ];
 
   return (
     <section id="proyectos" className="py-16 lg:py-24 bg-gradient-to-br from-secondary-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header Mejorado */}
+        {/* Header Actualizado */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20 animate-fade-in-up">
           <span className="inline-block px-4 py-2 bg-primary-100 text-primary-600 rounded-full text-sm font-semibold mb-4 shadow-soft">
-            Nuestros Proyectos
+            Proyectos Destacados
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 font-heading">
-            Tecnología Aplicada a <span className="text-primary-600">Soluciones Reales</span>
+            De Plantas Industriales a <span className="text-primary-600">Edificios Inteligentes</span>
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed">
-            Descubre cómo implementamos soluciones innovadoras que optimizan el funcionamiento de plantas de agua potable
+            Implementamos soluciones integrales que optimizan infraestructuras críticas: desde plantas de agua hasta sistemas completos de edificios
           </p>
         </div>
 
-        {/* Grid de Proyectos Mejorado */}
+        {/* Grid de Proyectos Actualizado */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {projects.map((project, index) => (
             <div 
@@ -104,15 +111,49 @@ const Projects = () => {
                   {project.description}
                 </p>
                 
-            
-
-                
+                {/* Etiqueta de especialidad */}
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {project.category === "Infraestructura Hídrica" && (
+                    <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-lg">💧 Agua</span>
+                  )}
+                  {project.category === "Energía y Electricidad" && (
+                    <span className="text-xs bg-amber-100 text-amber-600 px-2 py-1 rounded-lg">⚡ Electricidad</span>
+                  )}
+                  {project.category === "Confort Térmico" && (
+                    <span className="text-xs bg-cyan-100 text-cyan-600 px-2 py-1 rounded-lg">❄️ Climatización</span>
+                  )}
+                  {project.category === "Control Inteligente" && (
+                    <span className="text-xs bg-purple-100 text-purple-600 px-2 py-1 rounded-lg">🏠 Automatización</span>
+                  )}
+                  {project.category === "Infraestructura Crítica" && (
+                    <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded-lg">🔥 Gas</span>
+                  )}
+                  {project.category === "Infraestructura Comercial" && (
+                    <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-lg">🏢 Edificios</span>
+                  )}
+                </div>
               </div>
             </div>
           ))}
         </div>
 
-   
+        {/* CTA Section Actualizado */}
+        <div className="text-center mt-16 lg:mt-20 animate-fade-in-up">
+          <div className="bg-gradient-primary rounded-2xl p-8 lg:p-12 text-white shadow-large max-w-4xl mx-auto">
+            <h3 className="text-2xl lg:text-3xl font-bold mb-4 font-heading">
+              ¿Tienes un Proyecto en Mente?
+            </h3>
+            <p className="text-primary-100 text-lg lg:text-xl mb-6 max-w-2xl mx-auto">
+              Desde plantas industriales hasta gestión de edificios, tenemos la experiencia y tecnología para hacerlo realidad.
+            </p>
+            <button
+              onClick={() => document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' })}
+              className="bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 transform hover:scale-105 shadow-lg"
+            >
+              Consultar Proyecto
+            </button>
+          </div>
+        </div>
       </div>
     </section>
   );
