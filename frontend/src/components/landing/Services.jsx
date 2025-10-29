@@ -84,7 +84,7 @@ const Services = () => {
             Servicios Integrales
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 leading-tight font-heading">
-            De Plantas Industriales a <span className="text-primary-600">Edificios Inteligentes</span>
+            De Plantas Industriales a <span className="text-primary-600">Edificios Residenciales</span>
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed">
             Combinamos tu expertise en plantas de agua con gestión integral de infraestructura: electricidad, climatización, gas y automatización para todos los sectores.
