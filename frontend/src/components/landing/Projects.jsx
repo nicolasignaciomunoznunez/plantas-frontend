@@ -12,35 +12,35 @@ const Projects = () => {
     },
     {
       title: "Sistemas Eléctricos Integrales", 
-      image: "/images/hdpe.jpg",
+      image: "/images/electricidad.jpg",
       category: "Energía y Electricidad",
       description: "Instalación y mantenimiento eléctrico para plantas industriales y edificios comerciales",
       gradient: "from-amber-500 to-orange-500"
     },
     {
       title: "Climatización y HVAC",
-      image: "/images/calor.jpg",
+      image: "/images/aireacon.jpg",
       category: "Confort Térmico",
       description: "Sistemas de aire acondicionado y calefacción con análisis termográfico predictivo",
       gradient: "from-cyan-500 to-blue-500"
     },
     {
       title: "Automatización de Edificios", 
-      image: "/images/automatizacion.webp", 
+      image: "/images/automati.png", 
       category: "Control Inteligente",
       description: "Sistemas SCADA y PLC para automatización residencial, comercial e industrial",
       gradient: "from-purple-500 to-pink-500"
     },
     {
       title: "Seguridad en Sistemas de Gas",
-      image: "/images/mitigacion.jpg",
+      image: "/images/gas.jpg",
       category: "Infraestructura Crítica", 
       description: "Instalación y certificación de redes de gas con planes de contingencia avanzados",
       gradient: "from-red-500 to-orange-500"
     },
     {
       title: "Gestión de Edificios",
-      image: "/images/placeholder-project.jpg", // Puedes cambiar esta imagen
+      image: "/images/mitigacion.jpg", // Puedes cambiar esta imagen
       category: "Infraestructura Comercial",
       description: "Mantenimiento integral de condominios y edificios corporativos multiservicio",
       gradient: "from-gray-600 to-gray-700"
