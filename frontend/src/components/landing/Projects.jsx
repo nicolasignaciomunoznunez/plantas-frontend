@@ -56,7 +56,7 @@ const Projects = () => {
             Proyectos Destacados
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-secondary-800 mb-6 font-heading">
-            De Plantas Industriales a <span className="text-primary-600">Edificios Inteligentes</span>
+            De Plantas Industriales a <span className="text-primary-600">Edificios Residenciales</span>
           </h2>
           <p className="text-lg sm:text-xl text-secondary-600 leading-relaxed">
             Implementamos soluciones integrales que optimizan infraestructuras críticas: desde plantas de agua hasta sistemas completos de edificios

@@ -33,7 +33,7 @@ const Services = () => {
     // ✅ NUEVOS SERVICIOS - GESTIÓN DE EDIFICIOS
     {
       title: "Mantenimiento de Edificios",
-      description: "Gestión completa de infraestructura: áreas comunes, ascensores, sistemas hidráulicos y eléctricos de edificios.",
+      description: "Gestión completa de infraestructura: áreas comunes, sistemas hidráulicos y eléctricos de edificios.",
       icon: "🏢",
       gradient: "from-gray-600 to-gray-700",
       category: "edificios"
