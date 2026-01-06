@@ -111,11 +111,11 @@ const Footer = () => {
           {/* Logo y Descripción */}
           <div className="text-center md:text-left">
             <img 
-              src="/images/finalogotr.png" 
+              src="/images/infraexpertlogo.png" 
               alt="RYV SPA - Gestión integral de infraestructura: agua, electricidad, climatización y gas" 
               className="h-28 lg:h-32 w-auto mx-auto md:mx-0 mb-6 transition-transform duration-300 hover:scale-105"
               onError={(e) => {
-                e.target.src = '/images/finalogo.jpeg';
+                e.target.src = '/images/infraexpertlogo.png';
               }}
             />
             <p className="text-secondary-300 text-lg leading-relaxed mb-6">

@@ -61,7 +61,7 @@ const Header = () => {
             >
               {/* Logo para desktop */}
               <img 
-                src="/images/finalogo.jpeg" 
+                src="/images/infraexpertlogotr.png" 
                 alt="RYV SPA - Gestión integral de infraestructura: agua, electricidad, climatización y gas" 
                 className={`transition-all duration-500 ${
                   isScrolled ? 'h-14' : 'h-18'
@@ -69,7 +69,7 @@ const Header = () => {
               />
               {/* Logo para móvil */}
               <img 
-                src="/images/finalogotr.png" 
+                src="/images/infraexpertlogotr.png" 
                 alt="RYV SPA - Soluciones integrales" 
                 className="h-12 w-auto md:hidden transition-transform duration-300 group-hover:scale-105"
               />
