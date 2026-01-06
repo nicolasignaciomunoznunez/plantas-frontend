@@ -100,7 +100,7 @@ const slides = [
                   {/* Badge */}
                   <div className="mb-4 lg:mb-6">
                     <span className="inline-block px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-semibold text-white border border-white/30">
-                      R&V SPA
+                      InfraExpert
                     </span>
                   </div>
                   

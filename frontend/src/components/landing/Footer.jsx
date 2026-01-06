@@ -235,7 +235,7 @@ const Footer = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-secondary-400 text-lg text-center md:text-left">
-              &copy; {currentYear} R&V SPA. Todos los derechos reservados.
+              &copy; {currentYear} InfraExpert. Todos los derechos reservados.
             </p>
             
             {/* Enlaces legales */}
