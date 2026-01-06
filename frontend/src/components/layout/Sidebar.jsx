@@ -230,7 +230,7 @@ export default function Sidebar({ isCollapsed, onToggleCollapse, className = '' 
               {(!isCollapsed || isMobileOpen) && (
                 <div className="min-w-0 flex-1">
                   <h1 className="text-lg font-bold bg-gradient-to-r from-secondary-800 to-primary-600 bg-clip-text text-transparent truncate font-heading">
-                    RYV SPA
+                    InfraExpert
                   </h1>
                   <p className="text-xs text-secondary-500 truncate">
                     {getPanelText}

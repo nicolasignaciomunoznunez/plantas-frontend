@@ -67,11 +67,10 @@ export default function Header({ onToggleSidebar, sidebarCollapsed, className = 
     </svg>
   </button>
 
-          {/* Logo y Branding - CORREGIDO (sin cuadro azul feo) */}
           <div className="flex items-center gap-3">
-            {/* Logo sin fondo azul - SOLO la imagen */}
+       
             <img 
-              src="/images/finalogo.jpeg" 
+              src="/images/infraexpertlogotr.png" 
               alt="RYV SPA" 
               className="h-8 w-8 object-contain flex-shrink-0" // ✅ Sin fondo azul
             />

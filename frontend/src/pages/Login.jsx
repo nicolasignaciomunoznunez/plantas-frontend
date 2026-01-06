@@ -39,17 +39,17 @@ export default function Login() {
       {/* Sidebar con branding mejorado */}
       <div className="hidden lg:flex lg:flex-1 lg:flex-col lg:justify-center lg:items-center lg:bg-gradient-primary lg:text-white lg:p-12">
         <div className="max-w-md text-center">
-          {/* Logo RYV SPA */}
+          {/* Logo InfraExpert */}
           <div className="mb-8">
             <img 
-              src="/images/finalogotr.png" 
-              alt="RYV SPA" 
+              src="/images/infraexpertlogotr.png" 
+              alt="InfraExpert" 
               className="h-24 w-auto mx-auto mb-6"
               onError={(e) => {
-                e.target.src = '/images/finalogo.jpeg';
+                e.target.src = '/images/infraexpertlogotr.png';
               }}
             />
-            <h1 className="text-3xl font-bold mb-4 font-heading">RYV SPA</h1>
+            <h1 className="text-3xl font-bold mb-4 font-heading">InfraExpert</h1>
             <p className="text-primary-100 text-lg opacity-90">
               Sistema de Gestión de Mantenimiento Industrial
             </p>
@@ -83,14 +83,14 @@ export default function Login() {
           {/* Logo móvil */}
           <div className="lg:hidden text-center mb-8">
             <img 
-              src="/images/finalogotr.png" 
-              alt="RYV SPA" 
+              src="/images/infraexpertlogotr.png" 
+              alt="InfraExpert" 
               className="h-16 w-auto mx-auto mb-4"
               onError={(e) => {
-                e.target.src = '/images/finalogo.jpeg';
+                e.target.src = '/images/infraexpertlogotr.png';
               }}
             />
-            <h1 className="text-2xl font-bold text-secondary-900 font-heading">RYV SPA</h1>
+            <h1 className="text-2xl font-bold text-secondary-900 font-heading">InfraExpert</h1>
             <p className="text-secondary-600 text-sm mt-2">Sistema de Gestión</p>
           </div>
 
@@ -230,7 +230,7 @@ export default function Login() {
           {/* Footer */}
           <div className="mt-8 text-center animate-fade-in-up" style={{ animationDelay: '200ms' }}>
             <p className="text-xs text-secondary-500">
-              © 2025 RYV SPA. Sistema de Gestión de Mantenimiento Industrial para Plantas de Agua Potable.
+              © 2025 InfraExpert. Sistema de Gestión de Mantenimiento Industrial para Plantas de Agua Potable.
             </p>
           </div>
         </div>
