@@ -65,11 +65,11 @@ export default function VerifyEmail() {
         <div className="max-w-md text-center">
           <div className="mb-8">
             <img 
-              src="/images/finalogotr.png" 
+              src="/images/infraexpertlogotr.png" 
               alt="RYV SPA" 
               className="h-20 w-auto mx-auto mb-6"
               onError={(e) => {
-                e.target.src = '/images/finalogo.jpeg';
+                e.target.src = '/images/infraexpertlogotr.png';
               }}
             />
             <h1 className="text-3xl font-bold mb-4 font-heading">RYV SPA</h1>
@@ -101,11 +101,11 @@ export default function VerifyEmail() {
           {/* Logo móvil */}
           <div className="lg:hidden text-center mb-8">
             <img 
-              src="/images/finalogotr.png" 
+              src="/images/infraexpertlogotr.png" 
               alt="RYV SPA" 
               className="h-16 w-auto mx-auto mb-4"
               onError={(e) => {
-                e.target.src = '/images/finalogo.jpeg';
+                e.target.src = '/images/infraexpertlogotr.png';
               }}
             />
             <h1 className="text-2xl font-bold text-secondary-900 font-heading">RYV SPA</h1>

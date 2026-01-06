@@ -71,14 +71,14 @@ export default function Header({ onToggleSidebar, sidebarCollapsed, className = 
        
             <img 
               src="/images/infraexpertlogotr.png" 
-              alt="RYV SPA" 
+              alt="InfraExpert" 
               className="h-8 w-8 object-contain flex-shrink-0" // ✅ Sin fondo azul
             />
             
             {/* Texto que se adapta al espacio */}
             <div className="hidden sm:block">
               <h1 className="text-lg font-bold text-secondary-800 font-heading"> {/* ✅ Sin gradient */}
-                RYV SPA
+                InfraExpert
               </h1>
               <p className="text-xs text-secondary-500 font-medium">
                 Gestión Integral
