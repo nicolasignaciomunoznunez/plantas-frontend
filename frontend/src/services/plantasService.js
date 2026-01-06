@@ -3,7 +3,7 @@ import { api } from './api';
 export const plantasService = {
   // Obtener todas las plantas
   obtenerPlantas: async (limite = 10, pagina = 1) => {
-    const response = await api.get(`/api/plantas?limite=${limite}&pagina=${pagina}`);
+    const response = await api.get(`/plantas?limite=${limite}&pagina=${pagina}`);
     return response.data;
   },
 
@@ -15,7 +15,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.get(`/api/plantas/${id}`);
+      const response = await api.get(`/plantas/${id}`);
       return response.data;
     } catch (error) {
       console.error('❌ [PLANTAS SERVICE] Error al obtener planta:', error);
@@ -30,7 +30,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.get(`/api/plantas/${plantaId}/completa`);
+      const response = await api.get(`/plantas/${plantaId}/completa`);
       return response.data;
     } catch (error) {
       console.error('❌ [PLANTAS SERVICE] Error al obtener planta completa:', error);
@@ -40,7 +40,7 @@ export const plantasService = {
 
   // Crear nueva planta
   crearPlanta: async (plantaData) => {
-    const response = await api.post('/api/plantas', plantaData);
+    const response = await api.post('/plantas', plantaData);
     return response.data;
   },
 
@@ -50,7 +50,7 @@ export const plantasService = {
       throw new Error('ID de planta no proporcionado');
     }
     
-    const response = await api.put(`/api/plantas/${id}`, plantaData);
+    const response = await api.put(`/plantas/${id}`, plantaData);
     return response.data;
   },
 
@@ -60,7 +60,7 @@ export const plantasService = {
       throw new Error('ID de planta no proporcionado');
     }
     
-    const response = await api.delete(`/api/plantas/${id}`);
+    const response = await api.delete(`/plantas/${id}`);
     return response.data;
   },
 
@@ -70,13 +70,13 @@ export const plantasService = {
       throw new Error('ID de cliente no proporcionado');
     }
     
-    const response = await api.get(`/api/plantas/cliente/${clienteId}`);
+    const response = await api.get(`/plantas/cliente/${clienteId}`);
     return response.data;
   },
   
   // Asignar/desasignar planta a usuario (1-a-1)
   asignarPlantaUsuario: async (datos) => {
-    const response = await api.post('/api/plantas/asignar', datos);
+    const response = await api.post('/plantas/asignar', datos);
     return response.data;
   },
 
@@ -87,7 +87,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.post(`/api/plantas/${plantaId}/asignar-tecnicos`, {
+      const response = await api.post(`/plantas/${plantaId}/asignar-tecnicos`, {
         tecnicosIds
       });
       return response.data;
@@ -104,7 +104,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.post(`/api/plantas/${plantaId}/asignar-clientes`, {
+      const response = await api.post(`/plantas/${plantaId}/asignar-clientes`, {
         clientesIds
       });
       return response.data;
@@ -121,7 +121,7 @@ export const plantasService = {
     }
     
     try {
-      const response = await api.get(`/api/plantas/usuario/${usuarioId}`);
+      const response = await api.get(`/plantas/usuario/${usuarioId}`);
       return response.data;
     } catch (error) {
       console.error('❌ [PLANTAS SERVICE] Error obteniendo plantas del usuario:', error);
@@ -132,7 +132,7 @@ export const plantasService = {
   // ✅ OBTENER TODAS LAS PLANTAS COMPLETAS (para administración)
   obtenerPlantasCompletas: async (limite = 50, pagina = 1) => {
     try {
-      const response = await api.get(`/api/plantas/completas?limite=${limite}&pagina=${pagina}`);
+      const response = await api.get(`/plantas/completas?limite=${limite}&pagina=${pagina}`);
       return response.data;
     } catch (error) {
       console.error('❌ [PLANTAS SERVICE] Error obteniendo plantas completas:', error);

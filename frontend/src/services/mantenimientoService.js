@@ -4,18 +4,18 @@ import { api } from './api';
 export const mantenimientoService = {
   // Mantenimientos
   obtenerMantenimientos: async (limite = 50, pagina = 1) => {
-    const response = await api.get(`/api/mantenimientos?limite=${limite}&pagina=${pagina}`);
+    const response = await api.get(`/mantenimientos?limite=${limite}&pagina=${pagina}`);
     return response.data;
   },
 
   obtenerMantenimiento: async (id) => {
-    const response = await api.get(`/api/mantenimientos/${id}`);
+    const response = await api.get(`/mantenimientos/${id}`);
     return response.data;
   },
 
   // ✅ NUEVO: Obtener mantenimiento COMPLETO con fotos y materiales
   obtenerMantenimientoCompleto: async (id) => {
-    const response = await api.get(`/api/mantenimientos/${id}/completo`);
+    const response = await api.get(`/mantenimientos/${id}/completo`);
     return response.data;
   },
 
@@ -29,43 +29,43 @@ crearMantenimiento: async (data) => {
         },
     } : {};
 
-    const response = await api.post('/api/mantenimientos', data, config);
+    const response = await api.post('/mantenimientos', data, config);
     return response.data;
 },
   actualizarMantenimiento: async (id, mantenimientoData) => {
-    const response = await api.put(`/api/mantenimientos/${id}`, mantenimientoData);
+    const response = await api.put(`/mantenimientos/${id}`, mantenimientoData);
     return response.data;
   },
 
   cambiarEstadoMantenimiento: async (id, estado) => {
-    const response = await api.patch(`/api/mantenimientos/${id}/estado`, { estado });
+    const response = await api.patch(`/mantenimientos/${id}/estado`, { estado });
     return response.data;
   },
 
   eliminarMantenimiento: async (id) => {
-    const response = await api.delete(`/api/mantenimientos/${id}`);
+    const response = await api.delete(`/mantenimientos/${id}`);
     return response.data;
   },
 
   obtenerMantenimientosPlanta: async (plantId) => {
-    const response = await api.get(`/api/mantenimientos/planta/${plantId}`);
+    const response = await api.get(`/mantenimientos/planta/${plantId}`);
     return response.data;
   },
 
   // ✅ NUEVO: Obtener resumen para dashboard
   obtenerResumenDashboard: async () => {
-    const response = await api.get('/api/mantenimientos/resumen/dashboard');
+    const response = await api.get('/mantenimientos/resumen/dashboard');
     return response.data;
   },
 
 iniciarMantenimiento: async (id) => {
-    const response = await api.post(`/api/mantenimientos/${id}/iniciar`);
+    const response = await api.post(`/mantenimientos/${id}/iniciar`);
     return response.data;
 },
 
   // ✅ NUEVO: Completar mantenimiento con fotos, materiales y checklist
 completarMantenimiento: async (id, datosCompletar) => {
-    const response = await api.post(`/api/mantenimientos/${id}/completar`, datosCompletar);
+    const response = await api.post(`/mantenimientos/${id}/completar`, datosCompletar);
     return response.data;
 },
   // ✅ NUEVO: Subir fotos a mantenimiento
@@ -95,7 +95,7 @@ completarMantenimiento: async (id, datosCompletar) => {
 
     console.log('📤 Enviando archivos al servidor:', formData.getAll('fotos').length);
 
-    const response = await api.post(`/api/mantenimientos/${id}/fotos`, formData, {
+    const response = await api.post(`/mantenimientos/${id}/fotos`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },
@@ -108,13 +108,13 @@ completarMantenimiento: async (id, datosCompletar) => {
 
   // ✅ NUEVO: Agregar materiales a mantenimiento
   agregarMateriales: async (id, materiales) => {
-    const response = await api.post(`/api/mantenimientos/${id}/materiales`, { materiales });
+    const response = await api.post(`/mantenimientos/${id}/materiales`, { materiales });
     return response.data;
   },
 
   // ✅ NUEVO: Generar reporte PDF
   generarReportePDF: async (id) => {
-    const response = await api.get(`/api/mantenimientos/${id}/reporte-pdf`, {
+    const response = await api.get(`/mantenimientos/${id}/reporte-pdf`, {
       responseType: 'blob',
     });
     return response.data;
@@ -122,65 +122,65 @@ completarMantenimiento: async (id, datosCompletar) => {
 
   // ✅ NUEVO: Eliminar foto
   eliminarFoto: async (id, fotoId) => {
-    const response = await api.delete(`/api/mantenimientos/${id}/fotos/${fotoId}`);
+    const response = await api.delete(`/mantenimientos/${id}/fotos/${fotoId}`);
     return response.data;
   },
 
   // ✅ NUEVO: Eliminar material
   eliminarMaterial: async (id, materialId) => {
-    const response = await api.delete(`/api/mantenimientos/${id}/materiales/${materialId}`);
+    const response = await api.delete(`/mantenimientos/${id}/materiales/${materialId}`);
     return response.data;
   },
 
   // Checklist
   obtenerChecklistMantenimiento: async (mantenimientoId) => {
-    const response = await api.get(`/api/mantenimientos/${mantenimientoId}/checklist`);
+    const response = await api.get(`/mantenimientos/${mantenimientoId}/checklist`);
     return response.data;
   },
 
   agregarItemChecklist: async (mantenimientoId, item) => {
-    const response = await api.post(`/api/mantenimientos/${mantenimientoId}/checklist`, { item });
+    const response = await api.post(`/mantenimientos/${mantenimientoId}/checklist`, { item });
     return response.data;
   },
 
   actualizarItemChecklist: async (itemId, itemData) => {
-    const response = await api.put(`/api/mantenimientos/checklist/${itemId}`, itemData);
+    const response = await api.put(`/mantenimientos/checklist/${itemId}`, itemData);
     return response.data;
   },
 
   eliminarChecklist: async (mantenimientoId, checklistId) => {
-    const response = await api.delete(`/api/mantenimientos/${mantenimientoId}/checklist/${checklistId}`);
+    const response = await api.delete(`/mantenimientos/${mantenimientoId}/checklist/${checklistId}`);
     return response.data;
   },
 
   // Reportes (mantener existentes)
   obtenerReportes: async (limite = 50, pagina = 1) => {
-    const response = await api.get(`/api/reportes?limite=${limite}&pagina=${pagina}`);
+    const response = await api.get(`/reportes?limite=${limite}&pagina=${pagina}`);
     return response.data;
   },
 
   obtenerReporte: async (id) => {
-    const response = await api.get(`/api/reportes/${id}`);
+    const response = await api.get(`/reportes/${id}`);
     return response.data;
   },
 
   crearReporte: async (reporteData) => {
-    const response = await api.post('/api/reportes', reporteData);
+    const response = await api.post('/reportes', reporteData);
     return response.data;
   },
 
   eliminarReporte: async (id) => {
-    const response = await api.delete(`/api/reportes/${id}`);
+    const response = await api.delete(`/reportes/${id}`);
     return response.data;
   },
 
   obtenerReportesPlanta: async (plantId) => {
-    const response = await api.get(`/api/reportes/planta/${plantId}`);
+    const response = await api.get(`/reportes/planta/${plantId}`);
     return response.data;
   },
 
   descargarReporte: async (rutaArchivo) => {
-    const response = await api.get(`/api/reportes/descargar/${encodeURIComponent(rutaArchivo)}`, {
+    const response = await api.get(`/reportes/descargar/${encodeURIComponent(rutaArchivo)}`, {
       responseType: 'blob'
     });
     return response.data;
