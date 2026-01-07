@@ -225,7 +225,7 @@ export default function Incidencias() {
           </div>
           <p className="text-gray-500 flex items-center gap-2 text-sm sm:text-base">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse flex-shrink-0"></span>
-            Monitorea y gestiona los problemas reportados en las plantas
+            Monitorea y gestiona los problemas reportados en las infraestructuras
           </p>
         </div>
         
@@ -515,7 +515,7 @@ export default function Incidencias() {
           </div>
           <h3 className="text-lg font-semibold text-gray-900 mb-2">¡No hay incidencias reportadas!</h3>
           <p className="text-gray-500 max-w-md mx-auto mb-4 sm:mb-6 text-sm sm:text-base">
-            Todas las plantas están funcionando correctamente. Puedes reportar una nueva incidencia cuando sea necesario.
+            Todas las infraestructuras están funcionando correctamente. Puedes reportar una nueva incidencia cuando sea necesario.
           </p>
           <button
             onClick={handleNuevaIncidencia}

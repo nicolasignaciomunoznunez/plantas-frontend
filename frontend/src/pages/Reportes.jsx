@@ -187,7 +187,7 @@ export default function Reportes() {
             </div>
             <p className="text-gray-600 mt-1 flex items-center gap-2 text-sm sm:text-base">
               <span className="w-2 h-2 bg-green-400 rounded-full flex-shrink-0"></span>
-              Genera y descarga reportes de las plantas de agua
+              Genera y descarga reportes de las infraestructuras
             </p>
           </div>
           
@@ -257,7 +257,7 @@ export default function Reportes() {
         <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-600">Plantas Activas</p>
+              <p className="text-sm font-medium text-gray-600">Infraestructuras Activas</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900 mt-1">{metricas.plantasActivas}</p>
             </div>
             <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-100 rounded-lg sm:rounded-xl flex items-center justify-center text-lg sm:text-xl flex-shrink-0 ml-3">
@@ -301,14 +301,14 @@ export default function Reportes() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <div className="space-y-2">
             <label className="block text-sm font-medium text-gray-700">
-              Planta
+              Infraestructura
             </label>
             <select
               value={filtroPlanta}
               onChange={(e) => setFiltroPlanta(e.target.value)}
               className="w-full px-3 sm:px-4 py-2 sm:py-3 border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400 text-sm sm:text-base"
             >
-              <option value="todas">Todas las plantas</option>
+              <option value="todas">Todas las infraestructuras</option>
               {plantas.map((planta) => (
                 <option key={planta.id} value={planta.id}>
                   {planta.nombre}
@@ -390,7 +390,7 @@ export default function Reportes() {
           </h3>
           <div className="text-xs text-blue-700 space-y-1 mt-2">
             <div><strong>Reportes:</strong> {reportesFiltrados.length} filtrados de {reportes.length} totales</div>
-            <div><strong>Plantas:</strong> {plantas.length} cargadas</div>
+            <div><strong>Infraestructuras:</strong> {plantas.length} cargadas</div>
             <div><strong>Usuario:</strong> {user?.nombre} ({user?.rol})</div>
           </div>
         </div>

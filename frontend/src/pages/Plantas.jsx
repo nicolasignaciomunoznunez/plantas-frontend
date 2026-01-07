@@ -91,7 +91,7 @@ export default function Plantas() {
           </h1>
           <p className="text-gray-500 flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            {estadisticas.total} plantas registradas en el sistema
+            {estadisticas.total} infraestructuras registradas en el sistema
           </p>
         </div>
         
@@ -102,7 +102,7 @@ export default function Plantas() {
           <svg className="w-5 h-5 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
           </svg>
-          Nueva Planta
+          Nueva Infraestructura
         </button>
       </div>
 
@@ -113,7 +113,7 @@ export default function Plantas() {
             <span className="text-red-500 text-sm font-bold">!</span>
           </div>
           <div>
-            <p className="font-medium">Error al cargar plantas</p>
+            <p className="font-medium">Error al cargar infraestructuras</p>
             <p className="text-sm text-red-600">{error}</p>
           </div>
         </div>
@@ -130,7 +130,7 @@ export default function Plantas() {
             </div>
             <input
               type="text"
-              placeholder="Buscar plantas por nombre, ubicación o código..."
+              placeholder="Buscar infraestructuras por nombre, ubicación o código..."
               value={filtroBusqueda}
               onChange={(e) => setFiltroBusqueda(e.target.value)}
               className="block w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50/50 transition-colors"
@@ -142,7 +142,7 @@ export default function Plantas() {
             <span className="font-semibold text-gray-700">{plantasFiltradas.length}</span>
             <span>de</span>
             <span className="font-semibold text-gray-700">{plantas.length}</span>
-            <span>plantas</span>
+            <span>infraestructuras</span>
           </div>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function Plantas() {
         <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600">Total Plantas</p>
+              <p className="text-sm font-medium text-gray-600">Total Infraestructuras</p>
               <p className="text-3xl font-bold text-gray-900 mt-2">{estadisticas.total}</p>
             </div>
             <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">

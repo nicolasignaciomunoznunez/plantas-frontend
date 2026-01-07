@@ -304,7 +304,7 @@ export default function Dashboard() {
               }`}></span>
               {fromCache ? 'Datos en cache • ' : 'Datos en tiempo real • '}
               {esSuperAdmin ? 'Gestión total del sistema' : 
-               esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de plantas'}
+               esAdmin ? 'Gestión completa del sistema' : 'Gestión técnica de infraestructuras'}
               {user?.nombre && ` • ${user.nombre}`}
             </p>
           </div>
@@ -317,7 +317,7 @@ export default function Dashboard() {
                 className="bg-gradient-primary text-white px-6 py-3 rounded-xl hover:shadow-large transition-all duration-300 transform hover:scale-105 flex items-center gap-2 font-semibold shadow-lg justify-center"
               >
                 <span className="text-lg">+</span>
-                Crear Nueva Planta
+                Crear Nueva infraestructura
               </Link>
             )}
             
@@ -378,7 +378,7 @@ export default function Dashboard() {
             <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-soft border border-secondary-100 animate-slide-in-right">
               <div className="flex justify-between items-center mb-4 sm:mb-6">
                 <h3 className="text-base sm:text-lg font-semibold text-secondary-800 font-heading truncate">
-                  Plantas Activas
+                  Infraestructuras Activas
                 </h3>
                 <Link
                   to="/plantas"
@@ -420,9 +420,9 @@ export default function Dashboard() {
               </h3>
               <div className="space-y-3 sm:space-y-4">
                 {[
-                  { label: 'Plantas totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
+                  { label: 'Infraestructuras totales', valor: datosOptimizados.metricasRapidas.totalPlantas, color: 'text-secondary-800' },
                   { label: 'Incidencias resueltas', valor: datosOptimizados.metricasRapidas.incidenciasResueltas, color: 'text-success-600' },
-                  { label: 'Plantas operativas', valor: datosCompletos?.metricas?.plantasOperativas || 0, color: 'text-primary-600' }
+                  { label: 'Infraestructuras operativas', valor: datosCompletos?.metricas?.plantasOperativas || 0, color: 'text-primary-600' }
                 ].map((item, index) => (
                   <div 
                     key={index}

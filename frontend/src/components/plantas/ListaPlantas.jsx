@@ -5,11 +5,11 @@ export default function ListaPlantas({ plantas, onEditarPlanta, loading }) {
   const { eliminarPlanta } = usePlantasStore();
 
   const handleEliminar = async (id) => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta planta?')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta infraestructura?')) {
       try {
         await eliminarPlanta(id);
       } catch (error) {
-        console.error('Error eliminando planta:', error);
+        console.error('Error eliminando infraestructura:', error);
       }
     }
   };
@@ -18,8 +18,8 @@ export default function ListaPlantas({ plantas, onEditarPlanta, loading }) {
     return (
       <div className="bg-white rounded-lg shadow-md p-8 text-center">
         <div className="text-gray-400 text-6xl mb-4">🏭</div>
-        <h3 className="text-lg font-medium text-gray-900 mb-2">No hay plantas registradas</h3>
-        <p className="text-gray-500">Comienza agregando tu primera planta al sistema.</p>
+        <h3 className="text-lg font-medium text-gray-900 mb-2">No hay infraestructuras registradas</h3>
+        <p className="text-gray-500">Comienza agregando tu primera infraestructura al sistema.</p>
       </div>
     );
   }

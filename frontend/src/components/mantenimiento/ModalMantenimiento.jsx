@@ -314,7 +314,7 @@ export default function ModalMantenimiento({
     const newErrors = {};
     
     if (!formData.plantId) {
-      newErrors.plantId = 'Selecciona una planta';
+      newErrors.plantId = 'Selecciona una infraestructura';
     }
     
     if (!formData.descripcion.trim()) {
@@ -527,7 +527,7 @@ const handleSubmit = async (e) => {
               </h2>
               <p className="text-sm text-gray-500">
                 {modoCompletar ? 'Documenta el trabajo realizado y materiales usados' : 
-                 esEdicion ? 'Actualiza la información del mantenimiento' : 'Programa un nuevo mantenimiento para la planta'}
+                 esEdicion ? 'Actualiza la información del mantenimiento' : 'Programa un nuevo mantenimiento para la infraestructura'}
               </p>
             </div>
           </div>
@@ -568,7 +568,7 @@ const handleSubmit = async (e) => {
           {/* Campo Planta */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
-              Planta *
+              Infraestructura *
             </label>
             <select
               id="plantId"
@@ -582,7 +582,7 @@ const handleSubmit = async (e) => {
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
-              <option value="">Seleccionar planta...</option>
+              <option value="">Seleccionar infraestructura...</option>
               {plantas.map((planta) => (
                 <option key={planta.id} value={planta.id}>
                   {planta.nombre} - {planta.ubicacion}

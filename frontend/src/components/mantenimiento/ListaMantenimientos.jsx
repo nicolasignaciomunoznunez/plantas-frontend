@@ -244,7 +244,7 @@ export default function ListaMantenimientos({ plantaId, soloLectura = false }) {
         <div className="flex justify-between items-center">
           <div>
             <h3 className="text-xl font-semibold text-gray-900">Mantenimientos Programados</h3>
-            <p className="text-sm text-gray-500 mt-1">Gestiona los mantenimientos de esta planta</p>
+            <p className="text-sm text-gray-500 mt-1">Gestiona los mantenimientos de esta infraestructura</p>
           </div>
           <button
             onClick={() => setShowModal(true)}
@@ -294,7 +294,7 @@ export default function ListaMantenimientos({ plantaId, soloLectura = false }) {
           </div>
           <p className="text-gray-600 font-medium">No hay mantenimientos programados</p>
           {!soloLectura && (
-            <p className="text-sm text-gray-500 mt-1">Programa el primer mantenimiento para esta planta</p>
+            <p className="text-sm text-gray-500 mt-1">Programa el primer mantenimiento para esta infraestructura</p>
           )}
         </div>
       )}

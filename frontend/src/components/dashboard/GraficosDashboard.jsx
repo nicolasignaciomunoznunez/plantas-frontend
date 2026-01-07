@@ -308,7 +308,7 @@ export default function GraficosDashboard({ datosCompletos }) {
             ))
           ) : (
             <div className="text-center py-4 text-secondary-500">
-              No hay datos de plantas disponibles
+              No hay datos de infraestructuras disponibles
             </div>
           )}
         </div>
@@ -317,7 +317,7 @@ export default function GraficosDashboard({ datosCompletos }) {
       {/* Estado Operativo */}
       <div className="pt-6 border-t border-secondary-200">
         <h4 className="text-sm font-medium text-secondary-700 mb-4 font-sans">
-          Estado Operativo por Planta
+          Estado Operativo por infraestructuras
         </h4>
         {datosRendimientoReales.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
@@ -360,7 +360,7 @@ export default function GraficosDashboard({ datosCompletos }) {
         ) : (
           <div className="text-center py-8 text-secondary-500 bg-secondary-50 rounded-xl">
             <div className="text-3xl mb-2">🏭</div>
-            <p className="text-sm">No hay plantas registradas</p>
+            <p className="text-sm">No hay infraestructuras registradas</p>
           </div>
         )}
       </div>
@@ -503,7 +503,7 @@ export default function GraficosDashboard({ datosCompletos }) {
             Métricas del Sistema
           </h3>
           <p className="text-secondary-600 text-sm mt-1 truncate">
-            {tipoGrafico === 'rendimiento' ? 'Rendimiento y estado de plantas' : 'Seguimiento de incidencias'}
+            {tipoGrafico === 'rendimiento' ? 'Rendimiento y estado de infraestructuras' : 'Seguimiento de incidencias'}
           </p>
         </div>
         
@@ -543,7 +543,7 @@ export default function GraficosDashboard({ datosCompletos }) {
             })}
           </span>
           <span className="text-center sm:text-left">
-            {metricasResumen.totalPlantas} plantas • {incidencias?.length || 0} incidencias
+            {metricasResumen.totalPlantas} infraestructuras • {incidencias?.length || 0} incidencias
           </span>
         </div>
       </div>

@@ -23,7 +23,7 @@ export default function Administracion() {
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Panel de Administración</h1>
             <p className="text-gray-600 mt-2">
-              Gestiona usuarios y asigna plantas del sistema
+              Gestiona usuarios y asigna infraestructuras del sistema
             </p>
           </div>
           <div className="bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-medium">

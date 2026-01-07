@@ -39,7 +39,7 @@ export default function ModalReporte({ isOpen, onClose, plantas }) {
     e.preventDefault();
     
     if (!formData.plantId) {
-      alert('Selecciona una planta');
+      alert('Selecciona una infraestructura');
       return;
     }
 
@@ -136,7 +136,7 @@ export default function ModalReporte({ isOpen, onClose, plantas }) {
           {/* Campo Planta */}
           <div className="space-y-2">
             <label htmlFor="plantId" className="block text-sm font-medium text-gray-700">
-              Planta *
+              Infraestructura *
             </label>
             <select
               id="plantId"
@@ -146,7 +146,7 @@ export default function ModalReporte({ isOpen, onClose, plantas }) {
               onChange={handleChange}
               className="w-full px-3 py-2 sm:px-4 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg sm:rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 hover:border-gray-400"
             >
-              <option value="">Seleccionar planta...</option>
+              <option value="">Seleccionar infraestructura...</option>
               {plantas.map((planta) => (
                 <option key={planta.id} value={planta.id}>
                   {planta.nombre} - {planta.ubicacion}

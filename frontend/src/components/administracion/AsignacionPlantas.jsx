@@ -165,10 +165,10 @@ export default function AsignacionPlantas() {
       {/* Header */}
       <div className="text-center space-y-4">
         <h2 className="text-3xl lg:text-4xl font-heading font-bold text-gray-900">
-          Asignación de Plantas
+          Asignación de Infraestructura
         </h2>
         <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-          Gestiona las asignaciones de plantas entre técnicos y clientes del sistema
+          Gestiona las asignaciones de infraestructuras entre técnicos y clientes del sistema
         </p>
       </div>
 
@@ -191,14 +191,14 @@ export default function AsignacionPlantas() {
 
           <div className="space-y-2">
             <label className="block text-sm font-semibold text-gray-700">
-              Filtrar Planta
+              Filtrar Infraestructura
             </label>
             <select
               value={filtros.plantaId}
               onChange={(e) => setFiltros({...filtros, plantaId: e.target.value})}
               className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white text-sm md:text-base"
             >
-              <option value="">🌿 Todas las plantas</option>
+              <option value="">🌿 Todas las infraestructuras</option>
               {plantas.map(planta => (
                 <option key={planta.id} value={planta.id}>
                   {planta.nombre} - {planta.ubicacion}
@@ -217,7 +217,7 @@ export default function AsignacionPlantas() {
               className="w-full px-3 md:px-4 py-2 md:py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-300 bg-gray-50 hover:bg-white text-sm md:text-base"
             >
               <option value="por-usuario">👤 Por Usuario</option>
-              <option value="por-planta">🏭 Por Planta</option>
+              <option value="por-planta">🏭 Por infraestructura</option>
             </select>
           </div>
 
@@ -238,7 +238,7 @@ export default function AsignacionPlantas() {
         <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-4 md:p-6 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-xs md:text-sm font-medium">Total Plantas</p>
+              <p className="text-blue-100 text-xs md:text-sm font-medium">Total Infraestructuras</p>
               <p className="text-2xl md:text-3xl font-bold mt-1 md:mt-2">{plantas.length}</p>
             </div>
             <div className="text-2xl md:text-3xl">🏭</div>

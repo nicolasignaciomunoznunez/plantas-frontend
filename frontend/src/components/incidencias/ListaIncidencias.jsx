@@ -48,7 +48,7 @@ export default function ListaIncidencias({
         </div>
         <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 sm:mb-3">No hay incidencias reportadas</h3>
         <p className="text-gray-500 max-w-sm mx-auto mb-4 sm:mb-6 text-sm sm:text-base">
-          Todas las plantas están operando normalmente. ¡Buen trabajo!
+          Todas las infraestructuras están operando normalmente. ¡Buen trabajo!
         </p>
         <div className="w-10 sm:w-12 h-1 bg-gradient-to-r from-green-400 to-green-500 rounded-full mx-auto"></div>
       </div>

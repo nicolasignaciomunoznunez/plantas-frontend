@@ -89,8 +89,8 @@ export default function PlantaDetalle() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">Planta no encontrada</h2>
-          <p className="text-gray-600 mb-6">La planta que buscas no existe o no tienes acceso.</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Infraestructura no encontrada</h2>
+          <p className="text-gray-600 mb-6">La infraestructura que buscas no existe o no tienes acceso.</p>
           <Link 
             to="/plantas" 
             className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors duration-200"
@@ -98,7 +98,7 @@ export default function PlantaDetalle() {
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Volver a la lista de plantas
+            Volver a la lista de Infraestructuras
           </Link>
         </div>
       </div>
@@ -159,10 +159,10 @@ export default function PlantaDetalle() {
               to="/plantas" 
               className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200"
             >
-              ← Volver a plantas
+              ← Volver a infraestructura
             </Link>
             <span>/</span>
-            <span>Detalle de planta</span>
+            <span>Detalle de infraestructura</span>
           </div>
           <div className="flex items-center gap-4">
             <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
@@ -325,7 +325,7 @@ export default function PlantaDetalle() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
               </div>
-              <p className="text-gray-600">No hay datos registrados para esta planta</p>
+              <p className="text-gray-600">No hay datos registrados para esta infraestructura</p>
             </div>
           )}
         </div>

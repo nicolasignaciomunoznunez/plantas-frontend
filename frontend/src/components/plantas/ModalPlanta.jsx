@@ -68,7 +68,7 @@ export default function ModalPlanta({ isOpen, onClose, planta }) {
       }
       onClose();
     } catch (error) {
-      console.error('Error al guardar planta:', error);
+      console.error('Error al guardar infraestructura:', error);
     }
   };
 
@@ -111,10 +111,10 @@ export default function ModalPlanta({ isOpen, onClose, planta }) {
             </div>
             <div>
               <h2 className="text-xl font-bold text-gray-900">
-                {esEdicion ? 'Editar Planta' : 'Nueva Planta'}
+                {esEdicion ? 'Editar infraestructura' : 'Nueva Infraestructura'}
               </h2>
               <p className="text-sm text-gray-500">
-                {esEdicion ? 'Actualiza la información de la planta' : 'Agrega una nueva planta al sistema'}
+                {esEdicion ? 'Actualiza la información de la infraestructura' : 'Agrega una nueva infraestructura al sistema'}
               </p>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function ModalPlanta({ isOpen, onClose, planta }) {
           {/* Campo Nombre */}
           <div className="space-y-2">
             <label htmlFor="nombre" className="block text-sm font-medium text-gray-700">
-              Nombre de la Planta *
+              Nombre de la infraestructura *
             </label>
             <input
               type="text"
@@ -158,7 +158,7 @@ export default function ModalPlanta({ isOpen, onClose, planta }) {
               </p>
             )}
             <p className="text-xs text-gray-500">
-              Mínimo 3 caracteres. Usa un nombre descriptivo para la planta.
+              Mínimo 3 caracteres. Usa un nombre descriptivo para la infraestructura.
             </p>
           </div>
 
@@ -272,7 +272,7 @@ export default function ModalPlanta({ isOpen, onClose, planta }) {
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  {esEdicion ? 'Actualizar' : 'Crear'} Planta
+                  {esEdicion ? 'Actualizar' : 'Crear'} Infraestructura
                 </>
               )}
             </button>

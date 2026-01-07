@@ -429,7 +429,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
                 name="busqueda"
                 value={filtros.busqueda}
                 onChange={handleFiltroChange}
-                placeholder="Buscar por descripción, planta, tipo..."
+                placeholder="Buscar por descripción, infraestructura, tipo..."
                 className="block w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-gray-50/50 transition-colors hover:border-gray-400"
               />
             </div>
@@ -474,7 +474,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
           {/* Filtro Planta */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Planta
+              Infraestructura
             </label>
             <select
               name="planta"
@@ -482,7 +482,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
               onChange={handleFiltroChange}
               className="w-full px-3 py-2.5 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors hover:border-gray-400"
             >
-              <option value="todas">Todas las plantas</option>
+              <option value="todas">Todas las infraestructuras</option>
               {plantas.map((planta) => (
                 <option key={planta.id} value={planta.id}>
                   {planta.nombre}
@@ -534,7 +534,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
           </h3>
           <p className="text-gray-500 max-w-md mx-auto mb-6">
             {mantenimientos.length === 0 
-              ? 'Comienza programando el primer mantenimiento para tu sistema de plantas de agua.'
+              ? 'Comienza programando el primer mantenimiento para tu infraestructura.'
               : 'Intenta ajustar los filtros de búsqueda o limpiar los filtros activos.'
             }
           </p>
@@ -577,7 +577,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
           <h3 className="font-medium text-blue-800 text-sm mb-2">Debug Info:</h3>
           <div className="text-xs text-blue-700 space-y-1">
             <p>Mantenimientos: {mantenimientos.length} | Filtrados: {mantenimientosFiltrados.length}</p>
-            <p>Plantas: {plantas.length} | Usuario: {user?.nombre} ({user?.rol})</p>
+            <p>Infraestructuras: {plantas.length} | Usuario: {user?.nombre} ({user?.rol})</p>
             <p>Filtros activos: {JSON.stringify(filtros)}</p>
           </div>
         </div>
