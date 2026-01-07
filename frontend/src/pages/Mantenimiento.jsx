@@ -301,7 +301,7 @@ const handleGenerarPDF = useCallback(async (mantenimientoId) => {
           </div>
           <p className="text-gray-500 flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-            Programa y supervisa los mantenimientos del sistema de agua
+            Programa y supervisa los mantenimientos de tu sistema
           </p>
         </div>
         

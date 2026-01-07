@@ -87,7 +87,7 @@ export default function Plantas() {
       <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
         <div className="space-y-2">
           <h1 className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-            Gestión de Plantas
+            Gestión de Infraestructuras
           </h1>
           <p className="text-gray-500 flex items-center gap-2">
             <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
