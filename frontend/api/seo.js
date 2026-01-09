@@ -1,13 +1,14 @@
-// plantas-frontend/api/seo.js
-export default function handler(req, res) {
-  const userAgent = req.headers['user-agent'] || '';
+// frontend/api/seo.js - Edge Function
+export const config = {
+  runtime: 'edge'
+};
+
+export default async function handler(request) {
+  const userAgent = request.headers.get('user-agent') || '';
   const isBot = /googlebot|bingbot|slurp|duckduckbot|baiduspider|yandexbot/i.test(userAgent.toLowerCase());
   
-  console.log('SEO Function - User Agent:', userAgent.substring(0, 50));
-  console.log('Is bot?', isBot);
-  
   if (isBot) {
-    const seoHtml = `<!DOCTYPE html>
+    const html = `<!DOCTYPE html>
 <html lang="es-CL">
 <head>
     <meta charset="UTF-8">
@@ -46,15 +47,14 @@ export default function handler(req, res) {
 </body>
 </html>`;
     
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Cache-Control', 'public, max-age=3600');
-    res.status(200).send(seoHtml);
-  } else {
-    // Redirigir usuarios normales al frontend
-    res.writeHead(302, {
-      'Location': '/',
-      'Cache-Control': 'no-cache'
+    return new Response(html, {
+      headers: {
+        'Content-Type': 'text/html',
+        'Cache-Control': 'public, max-age=3600'
+      }
     });
-    res.end();
   }
+  
+  // Para usuarios normales, redirigir al frontend
+  return Response.redirect(new URL('/', request.url), 302);
 }
