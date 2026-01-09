@@ -5,7 +5,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:contacto@ryvspa.com';
+    window.location.href = 'mailto:contactoinfraexpert@gmail.com';
   };
 
   const handlePhoneClick = (phone) => {
@@ -88,7 +88,7 @@ const Footer = () => {
     {
       icon: "✉️",
       label: "Email", 
-      content: "contacto@ryvspa.com",
+      content: "contactoinfraexpert@gmail.com",
       action: handleEmailClick
     }
   ];

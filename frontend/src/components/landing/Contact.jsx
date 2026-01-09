@@ -37,7 +37,7 @@ const Contact = () => {
   };
 
   const handleEmailClick = () => {
-    window.location.href = 'mailto:contacto@ryvspa.com';
+    window.location.href = 'mailto:contactoinfraexpert@gmail.com';
   };
 
   const handlePhoneClick = (phone) => {
@@ -68,7 +68,7 @@ const Contact = () => {
     {
       icon: "✉️",
       title: "Email",
-      content: "contacto@ryvspa.com",
+      content: "contactoinfraexpert@gmail.com",
       description: "Respondemos en 24h",
       action: handleEmailClick,
       gradient: "from-primary-600 to-primary-700"
