@@ -1,0 +1,12 @@
+{
+  "name": "plantas-frontend-root",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "preview": "cd frontend && npm run preview"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
