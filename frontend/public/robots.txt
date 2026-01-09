@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /dashboard/
+
+Sitemap: https://infraexpert.cl/sitemap.xml
+
+# Para Google específicamente
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
