@@ -38,7 +38,7 @@ const FAQ = () => {
   ];
 
   return (
-    <section className="py-16 lg:py-24 bg-gradient-to-br from-secondary-50 to-white">
+    <section id ="faq" className="py-16 lg:py-24 bg-gradient-to-br from-secondary-50 to-white">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Unificado */}
         <div className="text-center max-w-3xl mx-auto mb-16 lg:mb-20">
