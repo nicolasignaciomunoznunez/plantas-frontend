@@ -1,92 +1,119 @@
-// api.js - VERSIÓN CORREGIDA
-import axios from 'axios';
+import { api } from './api';
 
-// ⚠️ TEMPORAL: URL absoluta para debug
-const API_URL = 'https://api.infraexpert.cl/api';
-
-console.log('🎯 [API] URL base configurada:', API_URL);
-
-export const api = axios.create({
-  baseURL: API_URL,
-  withCredentials: true,
-  timeout: 30000,
-});
-
-// Interceptor de request
-api.interceptors.request.use(
-  (config) => {
-    console.log('🚀 [API Request]', {
-      url: config.url,
-      method: config.method,
-      esFormData: config.data instanceof FormData
-    });
-    
-    // Obtener token
-    const token = obtenerToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-    
-    // CRÍTICO: Para FormData, dejar que el navegador establezca Content-Type
-    if (config.data instanceof FormData) {
-      delete config.headers['Content-Type'];
-    }
-    
-    return config;
+export const incidenciasService = {
+  // Obtener todas las incidencias
+  obtenerIncidencias: async (limite = 10, pagina = 1) => {
+    const response = await api.get(`/incidencias?limite=${limite}&pagina=${pagina}`);
+    return response.data;
   },
-  (error) => {
-    console.error('❌ [API Request Error]', error);
-    return Promise.reject(error);
-  }
-);
 
-// Interceptor de response
-api.interceptors.response.use(
-  (response) => {
-    console.log('✅ [API Response]', {
-      url: response.config.url,
-      status: response.status
-    });
-    return response;
+  // Obtener incidencia por ID
+  obtenerIncidencia: async (id) => {
+    const response = await api.get(`/incidencias/${id}`);
+    return response.data;
   },
-  (error) => {
-    console.error('❌ [API Response Error]', {
-      url: error.config?.url,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data
+
+  // ✅ NUEVO: Obtener incidencia COMPLETA con fotos y materiales
+  obtenerIncidenciaCompleta: async (id) => {
+    const response = await api.get(`/incidencias/${id}/completa`);
+    return response.data;
+  },
+
+  // Crear nueva incidencia
+  crearIncidencia: async (incidenciaData) => {
+    const response = await api.post('/incidencias', incidenciaData);
+    return response.data;
+  },
+
+  // Actualizar incidencia
+  actualizarIncidencia: async (id, incidenciaData) => {
+    const response = await api.put(`/incidencias/${id}`, incidenciaData);
+    return response.data;
+  },
+
+  // Cambiar estado de incidencia
+  cambiarEstadoIncidencia: async (id, estado) => {
+    const response = await api.patch(`/incidencias/${id}/estado`, { estado });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Completar incidencia con resumen, materiales y fotos
+  completarIncidencia: async (id, datosCompletar) => {
+    const response = await api.put(`/incidencias/${id}/completar`, datosCompletar);
+    return response.data;
+  },
+
+  // ✅ NUEVO: Subir fotos a incidencia
+  subirFotos: async (id, fotos, tipo) => {
+    const formData = new FormData();
+    formData.append('tipo', tipo);
+    
+    // Agregar cada archivo al FormData
+    fotos.forEach((foto) => {
+      formData.append('fotos', foto);
     });
-    
-    if (error.response?.status === 401) {
-      localStorage.removeItem('auth-storage');
-      window.location.href = '/login';
-    }
-    
-    return Promise.reject(error);
-  }
-);
 
-// Función para obtener token
-const obtenerToken = () => {
-  try {
-    const authStorage = localStorage.getItem('auth-storage');
-    if (!authStorage) return null;
-    
-    const authState = JSON.parse(authStorage);
-    return authState?.state?.token || null;
-  } catch (error) {
-    console.error('❌ [API Token Error]', error);
-    return null;
-  }
-};
+    const response = await api.post(`/incidencias/${id}/fotos`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    return response.data;
+  },
 
-export const uploadWithProgress = (url, formData, onProgress) => {
-  return api.post(url, formData, {
-    onUploadProgress: (progressEvent) => {
-      if (onProgress && progressEvent.total) {
-        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-        onProgress(percentCompleted);
-      }
-    },
-  });
+  // ✅ NUEVO: Agregar materiales a incidencia
+  agregarMateriales: async (id, materiales) => {
+    const response = await api.post(`/incidencias/${id}/materiales`, { materiales });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Generar reporte PDF
+  generarReportePDF: async (id) => {
+    const response = await api.get(`/incidencias/${id}/reporte-pdf`, {
+      responseType: 'blob', // Importante para archivos binarios
+    });
+    return response.data;
+  },
+
+  // ✅ NUEVO: Eliminar foto
+  eliminarFoto: async (id, fotoId) => {
+    const response = await api.delete(`/incidencias/${id}/fotos/${fotoId}`);
+    return response.data;
+  },
+
+  // ✅ NUEVO: Eliminar material
+  eliminarMaterial: async (id, materialId) => {
+    const response = await api.delete(`/incidencias/${id}/materiales/${materialId}`);
+    return response.data;
+  },
+
+  // Eliminar incidencia
+  eliminarIncidencia: async (id) => {
+    const response = await api.delete(`/incidencias/${id}`);
+    return response.data;
+  },
+
+  // Obtener incidencias por planta
+  obtenerIncidenciasPlanta: async (plantId) => {
+    const response = await api.get(`/incidencias/planta/${plantId}`);
+    return response.data;
+  },
+
+  // Obtener incidencias por estado
+  obtenerIncidenciasEstado: async (estado) => {
+    const response = await api.get(`/incidencias/estado/${estado}`);
+    return response.data;
+  },
+
+  // ✅ NUEVO: Obtener resumen para dashboard
+  obtenerResumenDashboard: async () => {
+    const response = await api.get('/incidencias/resumen/dashboard');
+    return response.data;
+  },
+
+  // ✅ NUEVO: Obtener incidencias recientes
+  obtenerIncidenciasRecientes: async (limite = 10) => {
+    const response = await api.get(`/incidencias/recientes?limite=${limite}`);
+    return response.data;
+  }
 };
