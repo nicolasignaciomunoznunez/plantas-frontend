@@ -11,6 +11,7 @@ const Contact = () => {
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // 'success' o 'error'
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,14 +24,75 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setSubmitMessage('');
+    setMessageType('');
     
-    // Simular envío del formulario
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSubmitMessage('¡Mensaje enviado con éxito! Te contactaremos pronto.');
-      setFormData({ name: '', email: '', phone: '', comment: '' });
+      // URL de tu backend - usando Vite
+      const API_URL = import.meta.env.VITE_API_URL || 'https://api.infraexpert.cl/api';
+      
+      // Asegurarnos de que la URL tenga el formato correcto
+      const contactEndpoint = API_URL.endsWith('/api') 
+        ? `${API_URL}/contact/send`
+        : `${API_URL}/api/contact/send`;
+      
+      console.log('📤 Enviando formulario a:', contactEndpoint);
+      
+      const response = await fetch(contactEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      
+      console.log('📥 Respuesta del servidor:', data);
+
+      if (data.success) {
+        setSubmitMessage('¡Mensaje enviado con éxito! Te contactaremos pronto.');
+        setMessageType('success');
+        setFormData({ name: '', email: '', phone: '', comment: '' });
+        
+        // Limpiar mensaje después de 5 segundos
+        setTimeout(() => {
+          setSubmitMessage('');
+          setMessageType('');
+        }, 5000);
+      } else {
+        // Mostrar mensaje de error específico si existe
+        let errorMessage = data.message || 'Error al enviar el mensaje. Por favor, intenta nuevamente.';
+        
+        // Mensajes más amigables para el usuario
+        if (errorMessage.includes('demasiadas solicitudes') || errorMessage.includes('Too many')) {
+          errorMessage = 'Has enviado demasiados mensajes en poco tiempo. Por favor, espera unos minutos antes de intentar nuevamente.';
+        } else if (errorMessage.includes('teléfono') || errorMessage.includes('phone')) {
+          errorMessage = 'Por favor, ingresa un número de teléfono chileno válido. Ejemplo: +56 9 1234 5678 o 9 1234 5678';
+        } else if (errorMessage.includes('email')) {
+          errorMessage = 'Por favor, ingresa un email válido.';
+        }
+        
+        setSubmitMessage(errorMessage);
+        setMessageType('error');
+        
+        // Si hay errores específicos por campo, mostrarlos en consola para debugging
+        if (data.errors) {
+          console.log('Errores de validación:', data.errors);
+        }
+      }
     } catch (error) {
-      setSubmitMessage('Error al enviar el mensaje. Por favor, intenta nuevamente.');
+      console.error('Error de conexión:', error);
+      
+      let errorMessage = 'Error de conexión. Por favor, verifica tu conexión e intenta nuevamente.';
+      
+      // Si es error de CORS
+      if (error.message.includes('CORS') || error.message.includes('Failed to fetch')) {
+        errorMessage = 'Error de conexión con el servidor. Si el problema persiste, contáctanos directamente por teléfono o email.';
+      }
+      
+      setSubmitMessage(errorMessage);
+      setMessageType('error');
     } finally {
       setIsSubmitting(false);
     }
@@ -202,6 +264,9 @@ const Contact = () => {
                     className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
                     placeholder="+56 9 1234 5678"
                   />
+                  <p className="text-xs text-secondary-500 mt-1">
+                    Formato: +56 9 1234 5678 o 9 1234 5678
+                  </p>
                 </div>
 
                 {/* Comentario */}
@@ -219,6 +284,9 @@ const Contact = () => {
                     className="w-full px-4 py-3 border border-secondary-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all duration-300 bg-white resize-none"
                     placeholder="Cuéntanos en qué podemos ayudarte..."
                   />
+                  <p className="text-xs text-secondary-500 mt-1">
+                    Mínimo 10 caracteres, máximo 2000 caracteres
+                  </p>
                 </div>
 
                 {/* Submit Button */}
@@ -240,14 +308,31 @@ const Contact = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-primary-700 to-primary-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </button>
 
-                {/* Mensaje de estado */}
+                {/* Mensaje de estado mejorado */}
                 {submitMessage && (
-                  <div className={`p-4 rounded-lg text-center border transition-all duration-300 ${
-                    submitMessage.includes('éxito') 
-                      ? 'bg-success-50 text-success-700 border-success-200' 
-                      : 'bg-error-50 text-error-700 border-error-200'
+                  <div className={`p-4 rounded-lg text-center border transition-all duration-300 animate-fade-in ${
+                    messageType === 'success' 
+                      ? 'bg-green-50 text-green-700 border-green-200' 
+                      : 'bg-red-50 text-red-700 border-red-200'
                   }`}>
-                    {submitMessage}
+                    <div className="flex items-center justify-center space-x-2">
+                      {messageType === 'success' ? (
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                      ) : (
+                        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      )}
+                      <span>{submitMessage}</span>
+                    </div>
+                    
+                    {messageType === 'success' && (
+                      <p className="text-sm text-green-600 mt-2">
+                        Te hemos enviado una confirmación a tu email.
+                      </p>
+                    )}
                   </div>
                 )}
               </form>
