@@ -4,6 +4,17 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig({
   plugins: [react()],
+  server: {
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: false,
+      },
+    },
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
   build: {
     outDir: 'dist',
     sourcemap: false,
@@ -15,5 +26,5 @@ export default defineConfig({
       }
     }
   },
-  base: '/',  // ✅ IMPORTANTE: Base path correcto
+  base: '/',
 });
